@@ -6,12 +6,12 @@ cursor-byok is a local implementation of Cursor's backend.
 <br>
 <a href="https://trendshift.io/repositories/39260?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-39260" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/39260" alt="leookun/cursor-byok | Trendshift" width="250" height="55" /></a>
 
-[User Guide](https://docs.leokun.cn) · [Download](https://github.com/leookun/cursor-byok/releases/latest) · [Report an Issue](https://github.com/leookun/cursor-byok/issues) · [中文版本说明](./README-CN.md)
+[User Guide](https://docs.leokun.cn) · [Download](https://github.com/renhao12356578/cursor-byok/releases/latest) · [Report an Issue](https://github.com/leookun/cursor-byok/issues) · [中文版本说明](./README-CN.md)
 
-[![Release](https://img.shields.io/github/v/release/leookun/cursor-byok?style=flat-square)](https://github.com/leookun/cursor-byok/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/leookun/cursor-byok/total?style=flat-square)](https://github.com/leookun/cursor-byok/releases)
+[![Release](https://img.shields.io/github/v/release/renhao12356578/cursor-byok?style=flat-square)](https://github.com/renhao12356578/cursor-byok/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/renhao12356578/cursor-byok/total?style=flat-square)](https://github.com/renhao12356578/cursor-byok/releases)
 [![License](https://img.shields.io/github/license/leookun/cursor-byok?style=flat-square)](./LICENSE)
-[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey?style=flat-square)](https://github.com/leookun/cursor-byok/releases/latest)
+[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey?style=flat-square)](https://github.com/renhao12356578/cursor-byok/releases/latest)
 
 
 
@@ -42,7 +42,7 @@ You can connect OpenAI- and Anthropic-compatible services, customize endpoints, 
 
 ## Quick Start
 
-1. Download the latest build for your platform from [GitHub Releases](https://github.com/leookun/cursor-byok/releases/latest).
+1. Download the latest build for your platform from [GitHub Releases](https://github.com/renhao12356578/cursor-byok/releases/latest).
 2. Launch cursor-byok, open **Model Settings**, and enter the endpoint, API key, and model ID.
 3. Test the model configuration. Once it passes, return to the dashboard and start the service.
 4. Test the model configuration. Once it passes, return to the dashboard and start the service.
