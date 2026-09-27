@@ -5,12 +5,12 @@ description: Prepare, authorize, publish, troubleshoot, and verify Cursor BYOK d
 
 # Desktop release
 
-Release through `.github/workflows/release.yml`. Preserve both updater formats: Tauri uses `latest.json`; legacy `v0.0.49` clients use `update.json`.
+Release through `.github/workflows/release.yml`. Preserve the updater manifests used by the current workflow: Tauri uses `latest.json`, Windows portable updates use `portable-latest.json`, and legacy `v0.0.49` clients use `update.json`.
 
 ## Publication authority
 
-- Only the repository author, GitHub user `leookun`, may authorize a live release.
-- Before any live mutation, require an explicit release instruction from the author in the current task and verify `gh api user --jq .login` returns `leookun`.
+- Release only to the user's explicitly selected repository. This fork uses `origin = renhao12356578/cursor-byok`; `upstream = leookun/cursor-byok` is a source of code, not a publication destination.
+- Before publication, require an explicit release instruction in the current task and verify the selected GitHub repository, push permission, and actor. The current workflow requires `gh api user --jq .login` to match that repository's owner (`renhao12356578` for this fork). Honor authorization already supplied for the current task; do not require the upstream author's identity to publish the user's fork.
 - Treat all of these as publication actions: pushing a `v*` tag, rerunning the release workflow, and publishing or editing a GitHub Release. Pushing a release commit to `main` only prepares the release and must never trigger publication by itself.
 - Without that authorization, restrict work to inspection, local edits, validation, and a release-ready commit or branch. Do not infer publication permission from requests such as “prepare”, “check”, or “ready to release”.
 - Never print, commit, or upload `.tauri/cursor-byok.key` anywhere except the repository's `TAURI_SIGNING_PRIVATE_KEY` Actions Secret when the author explicitly requests that secret configuration.
@@ -40,13 +40,13 @@ cursor-byok/
 │   └── src-tauri/
 │       ├── Cargo.toml
 │       └── tauri.conf.json
-├── scripts/cursor-proto/proto/
+├── protocols/cursor/
 │   ├── agent_v1.proto
 │   └── aiserver_v1.proto
 └── .github/workflows/release.yml
 ```
 
-The two listed Proto files are required build inputs and must be committed. Keep the other locally extracted Proto files ignored unless the build starts depending on them.
+The two listed Proto files are required build inputs and must be committed. Check `server/build.rs` and protobuf imports for additional inputs; preserve the repository's tracked protocol sources.
 
 ## Prepare and validate
 
@@ -73,5 +73,5 @@ After the author explicitly authorizes publication:
 2. Create the matching tag on that commit, for example `v0.1.0-beta.1`, and push only that tag. This tag push is the publication trigger.
 3. Follow the triggered `Release desktop app` run through completion. Report the run URL and stop on failure; diagnose locally before asking the author to authorize another live attempt.
 4. Verify `v<version>` exists, is published rather than draft, has `prerelease: false`, and is the repository's Latest release.
-5. Verify the Release contains signed Tauri updater artifacts plus `latest.json`, and the legacy platform archives plus `update.json`.
+5. Verify the Release contains signed Tauri updater artifacts plus `latest.json`, the signed Windows portable archive plus `portable-latest.json`, and the legacy platform archives plus `update.json`. Confirm manifest URLs target the selected repository and signatures match the app's existing updater public key.
 6. For a beta, report clearly that it is a test version even though GitHub represents it as a normal Latest Release.

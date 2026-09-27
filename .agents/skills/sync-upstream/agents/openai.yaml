@@ -1,0 +1,4 @@
+interface:
+  display_name: "同步个人仓库上游"
+  short_description: "合并 Cursor BYOK 上游更新，保留无广告定制、独立更新源与签名"
+  default_prompt: "使用 $sync-upstream 同步原仓库更新，保留无广告定制、我的更新地址和现有签名密钥，处理冲突并完成验证。"
