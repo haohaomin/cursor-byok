@@ -73,3 +73,14 @@ macOS 界面控制反复出现 ScreenCaptureKit `-3811`、`noWindowsAvailable` �
 已禁用并停止测试服务（53021/53022）及模拟服务（52821），移除临时真实模型配置，恢复正式服务（49588/49642）和 4 个原有模型。Cursor 设置文件与测试前备份逐字节一致。未合入、未发布。
 
 [本次尝试及恢复证据](2026-09-30-pr421-ui-attempt.json)。恢复可靠界面控制后，从选择测试模型继续。
+
+
+## 真实供应商连通性补测
+
+第二次尝试真实 Cursor UI 时，菜单输入仍被 `elementHasNoFrame`、`noWindowsAvailable` 和 ScreenCaptureKit `-3812` 阻塞。通过窗口菜单切换到独立 Cursor Agents、恢复窗口尺寸后仍无法提交对话。
+
+为推进独立验证，通过隔离服务的正式 Control API 模型测试入口，用既有 `gpt-5.6-sol` 供应商配置访问 `/v1/responses`（只在临时模型配置中切换协议）。实际返回数字 1～120，与预期字符串完全一致，无缺失或重复。耗时 16044 ms，首个有效响应 2557 ms，真实计费用量输入 30 / 输出 243 Token；SQLite 记录 1 次 `openai-responses` 调用、HTTP 200、completed / stop、无错误、140 个流事件。
+
+该补测是实际供应商连通性测试，未经过 Cursor UI，也没有多轮追问；不能代替四个界面场景。详见 [真实供应商证据](2026-09-30-pr421-live-connectivity.json)。
+
+补测结束已移除临时真实模型配置、停止测试服务并恢复正式服务（4 个模型）；Cursor 设置与本轮开始前逐字节一致，测试端口均关闭。
