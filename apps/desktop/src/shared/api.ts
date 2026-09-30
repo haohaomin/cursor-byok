@@ -112,6 +112,11 @@ export interface PortSettings {
   service_port: number;
 }
 
+export interface ExternalApiSettings {
+  enabled: boolean;
+  api_key: string;
+}
+
 export interface StatisticsStorage {
   call_count: number;
   trace_count: number;
@@ -530,6 +535,8 @@ export const api = {
   setObservability: (detailed: boolean) => request<{ detailed: boolean }>("/settings/observability", { method: "PUT", body: JSON.stringify({ detailed }) }),
   ports: () => request<PortSettings>("/settings/ports"),
   setPorts: (settings: PortSettings) => request<PortSettings>("/settings/ports", { method: "PUT", body: JSON.stringify(settings) }),
+  externalApiSettings: () => request<ExternalApiSettings>("/settings/external-api"),
+  setExternalApiSettings: (settings: ExternalApiSettings) => request<ExternalApiSettings>("/settings/external-api", { method: "PUT", body: JSON.stringify(settings) }),
   statisticsStorage: () => request<StatisticsStorage>("/settings/storage/statistics"),
   clearStatisticsStorage: (scope: StatisticsStorageScope) => request<StatisticsStorage>("/settings/storage/statistics", { method: "DELETE", body: JSON.stringify({ scope }) }),
   proxySettings: () => request<ProxySettings>("/settings/proxy"),

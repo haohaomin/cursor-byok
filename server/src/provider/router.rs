@@ -308,7 +308,7 @@ fn root_error_message(error: &(dyn std::error::Error + 'static)) -> String {
     current.to_string()
 }
 
-fn custom_headers(
+pub(crate) fn custom_headers(
     value: &serde_json::Value,
     conversation_id: &str,
 ) -> Result<reqwest::header::HeaderMap> {

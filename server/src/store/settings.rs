@@ -12,6 +12,7 @@ const DESKTOP_SETTINGS_KEY: &str = "desktop_lifecycle";
 const COMMIT_SETTINGS_KEY: &str = "commit_settings";
 const CURSOR_TAKEOVER_ENABLED_KEY: &str = "cursor_takeover_enabled";
 const PRICING_SETTINGS_KEY: &str = "token_pricing";
+const EXTERNAL_API_SETTINGS_KEY: &str = "external_api";
 
 /// Embedded default system prompts for commit message generation.
 pub const DEFAULT_COMMIT_PROMPT_ZH_CN: &str = include_str!("../../prompt/cursor/commit/zh-CN.md");
@@ -23,6 +24,12 @@ pub const PUBLIC_TAB_SERVICE_URL: &str = "https://tab.leokun.cn";
 pub struct PortSettings {
     pub proxy_port: u16,
     pub service_port: u16,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Eq, Serialize)]
+pub struct ExternalApiSettings {
+    pub enabled: bool,
+    pub api_key: String,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -211,6 +218,39 @@ fn read_proxy_settings(value: &str) -> ProxySettingsSecret {
 }
 
 impl Store {
+    pub async fn external_api_settings(&self) -> Result<ExternalApiSettings> {
+        let value = sqlx::query_scalar::<_, String>(
+            "SELECT value_json FROM service_settings WHERE setting_key = ?",
+        )
+        .bind(EXTERNAL_API_SETTINGS_KEY)
+        .fetch_optional(&self.pool)
+        .await?;
+        value
+            .map(|value| serde_json::from_str(&value).map_err(Into::into))
+            .unwrap_or_else(|| Ok(ExternalApiSettings::default()))
+    }
+
+    pub async fn set_external_api_settings(
+        &self,
+        mut settings: ExternalApiSettings,
+    ) -> Result<ExternalApiSettings> {
+        settings.api_key = settings.api_key.trim().to_owned();
+        if settings.enabled && settings.api_key.is_empty() {
+            return Err(crate::Error::Config(
+                "external API key is required when enabled".into(),
+            ));
+        }
+        let value_json = serde_json::to_string(&settings)?;
+        let _write = self.writes.lock().await;
+        sqlx::query("INSERT INTO service_settings(setting_key, value_json, updated_at_ms) VALUES (?, ?, ?) ON CONFLICT(setting_key) DO UPDATE SET value_json = excluded.value_json, updated_at_ms = excluded.updated_at_ms")
+            .bind(EXTERNAL_API_SETTINGS_KEY)
+            .bind(value_json)
+            .bind(now_ms())
+            .execute(&self.pool)
+            .await?;
+        Ok(settings)
+    }
+
     pub(crate) async fn cursor_takeover_enabled(&self) -> Result<bool> {
         let value = sqlx::query_scalar::<_, String>(
             "SELECT value_json FROM service_settings WHERE setting_key = ?",
@@ -470,9 +510,9 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::{
-        read_proxy_settings, CommitPromptLocale, CommitSettings, ProxyMode, ProxySettingsInput,
-        ProxySettingsSecret, Store, TokenPricingSettings, DEFAULT_COMMIT_PROMPT_EN_US,
-        DEFAULT_COMMIT_PROMPT_ZH_CN, PROXY_SETTINGS_KEY,
+        read_proxy_settings, CommitPromptLocale, CommitSettings, ExternalApiSettings, ProxyMode,
+        ProxySettingsInput, ProxySettingsSecret, Store, TokenPricingSettings,
+        DEFAULT_COMMIT_PROMPT_EN_US, DEFAULT_COMMIT_PROMPT_ZH_CN, PROXY_SETTINGS_KEY,
     };
 
     /// The `outbound_proxy` row exactly as builds before the `system` -> `default`
@@ -606,5 +646,44 @@ mod tests {
         assert_eq!(saved, custom);
 
         assert_eq!(store.pricing_settings().await.unwrap(), custom);
+    }
+
+    #[tokio::test]
+    async fn external_api_requires_a_key_and_persists_its_switch() {
+        let directory = tempfile::tempdir().unwrap();
+        let url = format!("sqlite://{}", directory.path().join("test.db").display());
+        let store = Store::connect(&url).await.unwrap();
+
+        assert_eq!(
+            store.external_api_settings().await.unwrap(),
+            ExternalApiSettings::default()
+        );
+        assert!(store
+            .set_external_api_settings(ExternalApiSettings {
+                enabled: true,
+                api_key: String::new(),
+            })
+            .await
+            .is_err());
+        let settings = ExternalApiSettings {
+            enabled: true,
+            api_key: "local-test-key".into(),
+        };
+        assert_eq!(
+            store
+                .set_external_api_settings(settings.clone())
+                .await
+                .unwrap(),
+            settings
+        );
+        assert_eq!(
+            Store::connect(&url)
+                .await
+                .unwrap()
+                .external_api_settings()
+                .await
+                .unwrap(),
+            settings
+        );
     }
 }
