@@ -1,4 +1,7 @@
 //! Projects Run events to live Cursor output and checkpoint steps.
+mod narration;
+
+use narration::{Narration, NarrationBuffer};
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine};
@@ -174,6 +177,7 @@ impl ConversationOutput {
         let mut context_tokens = None::<u64>;
         let mut ready = VecDeque::new();
         let mut presentation = StepBuffer::default();
+        let mut narration = NarrationBuffer::default();
 
         loop {
             if self.superseded.is_cancelled() {
@@ -267,6 +271,7 @@ impl ConversationOutput {
                         calls.clear();
                         streams.clear();
                         presentation.discard_model_output();
+                        narration.discard();
                     }
                     RunEvent::ModelAttemptFailed { attempt, message } => {
                         tracing::warn!(
@@ -275,7 +280,6 @@ impl ConversationOutput {
                             %message,
                             "retrying model call from current checkpoint"
                         );
-                        presentation.finish_model_attempt();
                         for call in calls.values_mut() {
                             if call.arguments.is_null() {
                                 call.arguments = serde_json::from_str(&call.arguments_text)
@@ -289,6 +293,8 @@ impl ConversationOutput {
                                 .emit(&codec::tool_completed(call, &completion))?;
                             presentation.tool_completed(&completion);
                         }
+                        narration.tools_finished(&self.handle, &mut presentation)?;
+                        presentation.finish_model_attempt();
                         response_text.clear();
                         response_thinking.clear();
                         calls.clear();
@@ -297,7 +303,7 @@ impl ConversationOutput {
                     RunEvent::TextStart => {}
                     RunEvent::TextEnd => {
                         if !self.context.compacting {
-                            presentation.finish_text();
+                            narration.push(Narration::TextEnd, &self.handle, &mut presentation)?;
                         }
                     }
                     RunEvent::TextDelta(delta) => {
@@ -305,10 +311,10 @@ impl ConversationOutput {
                         if self.context.compacting {
                             self.handle.emit(&events::summary_delta(delta))?;
                         } else {
-                            presentation.text_delta(&delta);
-                            self.emit_model_event(
-                                crate::provider::ModelEvent::TextDelta(delta),
-                                "",
+                            narration.push(
+                                Narration::Text(delta),
+                                &self.handle,
+                                &mut presentation,
                             )?;
                         }
                     }
@@ -316,17 +322,20 @@ impl ConversationOutput {
                     RunEvent::ThinkingDelta(delta) => {
                         response_thinking.push_str(&delta);
                         if !self.context.compacting {
-                            presentation.thinking_delta(&delta);
-                            self.emit_model_event(
-                                crate::provider::ModelEvent::ThinkingDelta(delta),
-                                "",
+                            narration.push(
+                                Narration::Thinking(delta),
+                                &self.handle,
+                                &mut presentation,
                             )?;
                         }
                     }
                     RunEvent::ThinkingEnd { duration } => {
                         if !self.context.compacting {
-                            presentation.finish_thinking(duration);
-                            self.handle.emit(&events::thinking_completed(duration))?;
+                            narration.push(
+                                Narration::ThinkingEnd(duration),
+                                &self.handle,
+                                &mut presentation,
+                            )?;
                         }
                     }
                     RunEvent::ToolCallStart {
@@ -335,6 +344,7 @@ impl ConversationOutput {
                         name,
                         model_call_id,
                     } => {
+                        narration.tools_started(&mut presentation);
                         let call = ToolCall {
                             index,
                             call_id: call_id.clone(),
@@ -580,7 +590,16 @@ impl ConversationOutput {
                                 presentation.tool_completed(&completion);
                             }
                             completed.insert(call_id.clone());
-                            tool_round_settled = snapshot.status == ToolRoundStatus::Settled;
+                            // The store may already include later results whose live
+                            // completion events are still queued. Wait for every card.
+                            tool_round_settled = snapshot.status == ToolRoundStatus::Settled
+                                && snapshot
+                                    .calls
+                                    .iter()
+                                    .all(|call| completed.contains(&call.call_id));
+                            if tool_round_settled {
+                                narration.tools_finished(&self.handle, &mut presentation)?;
+                            }
                         }
                         let final_turn = state.cause == CommitCause::FinalTurn;
                         if let CommitCause::Compaction { summary } = &state.cause {
