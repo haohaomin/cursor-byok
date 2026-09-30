@@ -55,4 +55,10 @@ ConversationOutput → 工具卡片/执行请求 → Cursor 执行
 
 ## 当前状态
 
-代码与协议回归验证完成；未替换已安装应用、修改用户配置、合入 main 或发布。真实 Cursor UI 尚未对修复版复测，历史已保存的 cancelled 卡片也未修改。
+2026 年 10 月 1 日真实 Cursor 界面复测通过，用户在隔离工作区发送测试。卡片显示 `Ran`，输出 `SKIPPED_FIX_EXECUTED`，随后出现 AFTER 和 COMPLETED。卡片描述中的“Skipped 修复验证”是测试名称，不是跳过状态。
+
+后台交叉核对：单次 Shell 完成且 result_is_error=0；标记文件恰好一行；2 次模型调用（发出工具 / 接收结果后结束）。Cursor 持久化卡片为 `status=completed`、`additionalData.status=success`，原来的 cancelled 标记未再出现。
+
+详见 [UI 证据](2026-10-01-tool-card-skipped-ui.json)和[用户截图](assets/2026-10-01-tool-card-skipped-retest.png)。这是本地模拟模型响应触发真实 Cursor Shell 执行的验证；未新增真实远端模型验证。
+
+复测后已关闭 53121/53122 测试服务与代理、52921 模拟服务，恢复正式代理 49642 和 4 个原有模型。Cursor 设置与本次测试前备份逐字节一致。未替换已安装应用、合入 main 或发布，历史旧 cancelled 卡片未修改。
