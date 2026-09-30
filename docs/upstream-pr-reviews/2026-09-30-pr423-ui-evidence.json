@@ -1,0 +1,44 @@
+{
+  "commit": "89d90c68e45fa2c04fa6812082139e8b47837e08",
+  "ui": "Cursor Agents",
+  "provider": "local simulated Anthropic SSE",
+  "refusal_tools": {
+    "requests": [
+      {
+        "time": 1790750472.260167,
+        "scenario": "refusal-tools",
+        "model": "pr423-ui",
+        "tool_result": false
+      }
+    ],
+    "observation_seconds": 203.6,
+    "marker_exists": false,
+    "calls": [
+      [
+        "pr423-ui",
+        "error",
+        "provider",
+        "provider refusal: Anthropic refused to execute tool calls",
+        4,
+        2
+      ]
+    ],
+    "ui_title": "Provider Refusal",
+    "ui_tool_status": "Skipped",
+    "screenshot": "assets/2026-09-30-pr423-refusal-tools.png"
+  },
+  "plain_refusal": "not run in UI: ScreenCaptureKit -3812",
+  "normal_tool": "not run in UI: ScreenCaptureKit -3812",
+  "restoration": {
+    "status": {
+      "platform": "macos",
+      "ca": "ready",
+      "configured_models": 4,
+      "enabled_models": 4,
+      "integration": "enabled",
+      "settings_applied": true,
+      "proxy_url": "http://127.0.0.1:49642"
+    },
+    "settings_identical": true
+  }
+}
