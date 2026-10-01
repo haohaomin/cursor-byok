@@ -119,4 +119,4 @@ macOS 界面控制反复出现 ScreenCaptureKit `-3811`、`noWindowsAvailable` �
 
 工具卡片 Skipped 已定位为 Cursor 展示事件顺序问题，由独立修复 `2616014` 解决；真实 Cursor 复测确认 Ran、客户端 success、命令仅执行一次，详见 [工具卡片修复记录](2026-10-01-tool-card-skipped-fix.md)。以上调查过程中的待确认结论保留为历史记录。
 
-#421 文本补全修复已通过合并提交 `e08cab5` 合入个人 fork 的 main，与工具卡片修复共同准备 v1.0.6。组合后的服务端 287 项测试、前端检查及 Tauri debug no-bundle 构建通过。此状态不表示上游 PR #421 已合并。最终发布结果见 [v1.0.6 发布记录](2026-10-01-v1.0.6-release.md)。
+#421 文本补全修复已通过合并提交 `e08cab5` 合入个人 fork 的 main，与工具卡片修复共同发布 v1.0.6。组合后的服务端 287 项测试、前端检查及 Tauri debug no-bundle 构建通过。GitHub CI、四平台发布及 7 个更新包签名验证均通过。此状态不表示上游 PR #421 已合并。最终发布结果见 [v1.0.6 发布记录](2026-10-01-v1.0.6-release.md)。
