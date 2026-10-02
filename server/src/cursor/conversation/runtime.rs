@@ -752,7 +752,7 @@ fn spawn_run_request(
         let mut checkpoint = CheckpointBuilder::new(
             dependencies.store.clone(),
             blob_sync.clone(),
-            handle.parent().map(|parent| parent.tool_call_id.clone()),
+            handle.parent().and_then(|parent| parent.tool_call_id),
             request.conversation_state.clone(),
         );
         let continuation = generation.prepared.lock().clone();

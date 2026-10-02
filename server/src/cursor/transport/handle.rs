@@ -1,6 +1,6 @@
 //! Provides the request-scoped input, subscription, and terminal interface.
 
-use std::sync::{Arc, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use bytes::Bytes;
 use tokio::sync::mpsc;
@@ -19,8 +19,8 @@ use super::{OutputHub, TransportAdmission, TransportLifecycle};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TransportParent {
-    pub request_id: String,
-    pub tool_call_id: String,
+    pub request_id: Option<String>,
+    pub tool_call_id: Option<String>,
 }
 
 #[derive(Clone)]
@@ -29,7 +29,7 @@ pub struct TransportHandle {
     commands: mpsc::Sender<TransportCommand>,
     output: Arc<OutputHub>,
     conversation_id: Arc<OnceLock<String>>,
-    parent: Arc<OnceLock<TransportParent>>,
+    parent: Arc<Mutex<Option<TransportParent>>>,
     trace: CursorTraceRecorder,
     lifecycle: TransportLifecycle,
     disconnect: CancellationToken,
@@ -47,7 +47,7 @@ impl TransportHandle {
             commands,
             output,
             conversation_id: Arc::new(OnceLock::new()),
-            parent: Arc::new(OnceLock::new()),
+            parent: Arc::new(Mutex::new(None)),
             trace,
             lifecycle: TransportLifecycle::new(),
             disconnect: CancellationToken::new(),
@@ -81,21 +81,44 @@ impl TransportHandle {
     }
 
     pub fn set_parent(&self, parent: TransportParent) -> Result<()> {
-        if parent.request_id.is_empty() || parent.tool_call_id.is_empty() {
-            return Err(Error::Protocol("Cursor parent ids are required".into()));
+        if (parent.request_id.is_none() && parent.tool_call_id.is_none())
+            || parent.request_id.as_ref().is_some_and(String::is_empty)
+            || parent.tool_call_id.as_ref().is_some_and(String::is_empty)
+        {
+            return Err(Error::Protocol(
+                "Cursor parent ids must not be empty".into(),
+            ));
         }
-        if self.parent.get().is_some_and(|current| current != &parent) {
-            return Err(Error::Protocol(format!(
-                "conflicting parent ids for request {}",
-                self.request_id
-            )));
+        let mut stored = self.parent.lock().expect("parent metadata lock");
+        if let Some(current) = stored.as_mut() {
+            // Headers can arrive independently; enrich missing fields without
+            // allowing an existing association to be changed or cleared.
+            if current
+                .request_id
+                .as_ref()
+                .zip(parent.request_id.as_ref())
+                .is_some_and(|(a, b)| a != b)
+                || current
+                    .tool_call_id
+                    .as_ref()
+                    .zip(parent.tool_call_id.as_ref())
+                    .is_some_and(|(a, b)| a != b)
+            {
+                return Err(Error::Protocol(format!(
+                    "conflicting parent ids for request {}",
+                    self.request_id
+                )));
+            }
+            current.request_id = current.request_id.take().or(parent.request_id);
+            current.tool_call_id = current.tool_call_id.take().or(parent.tool_call_id);
+        } else {
+            *stored = Some(parent);
         }
-        let _ = self.parent.set(parent);
         Ok(())
     }
 
-    pub fn parent(&self) -> Option<&TransportParent> {
-        self.parent.get()
+    pub fn parent(&self) -> Option<TransportParent> {
+        self.parent.lock().expect("parent metadata lock").clone()
     }
 
     pub async fn command(&self, command: TransportCommand) -> Result<()> {

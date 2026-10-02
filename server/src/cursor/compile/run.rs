@@ -400,6 +400,24 @@ pub(crate) fn execution_run_id(request_id: &str) -> RunId {
     RunId::new(format!("{request_id}:{}", &execution_id[..8]))
 }
 
+// Some Cursor subagent inputs omit the user ID. The incoming checkpoint
+// identifies the input position: retries share it, while a later turn (even
+// with identical text) has a different position. user_event_id adds semantic
+// content identity; volatile transport IDs and checkpoint maps stay excluded.
+fn subagent_input_id(request: &pb::AgentRunRequest) -> Result<String> {
+    let state = request.conversation_state.as_ref();
+    let empty = Vec::new();
+    let identity = serde_json::to_vec(&(
+        state.map_or(&empty, |state| &state.root_prompt_messages_json),
+        state.map_or(&empty, |state| &state.turns),
+        state.and_then(|state| state.summary.as_ref()),
+    ))?;
+    Ok(format!(
+        "subagent-input:{}",
+        BlobId::digest(&identity).to_base64()
+    ))
+}
+
 fn action(request: &pb::AgentRunRequest) -> Result<ActionProjection> {
     let conversation_mode = request
         .conversation_state
@@ -432,10 +450,18 @@ fn action(request: &pb::AgentRunRequest) -> Result<ActionProjection> {
             } else {
                 user.mode
             };
+            let mut user = user.clone();
             if user.message_id.is_empty() {
-                return Err(Error::Protocol(
-                    "Cursor user message action has no message_id".into(),
-                ));
+                if request
+                    .subagent_type_name
+                    .as_deref()
+                    .is_none_or(str::is_empty)
+                {
+                    return Err(Error::Protocol(
+                        "Cursor user message action has no message_id".into(),
+                    ));
+                }
+                user.message_id = subagent_input_id(request)?;
             }
             if user.text.trim() == "/summarize" {
                 return Ok(ActionProjection {
