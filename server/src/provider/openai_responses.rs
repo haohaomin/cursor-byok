@@ -135,7 +135,7 @@ impl Provider for OpenAiResponsesProvider {
                 let kind = value.get("type").and_then(Value::as_str).unwrap_or(&event.event);
                 match kind {
                     "response.output_text.delta" => {
-                        let text = enter_response_text_item(&value, &mut text_index, &mut texts);
+                        let text = enter_response_text_item(value.get("output_index").and_then(Value::as_u64), &mut text_index, &mut texts);
                         if thinking_open { thinking_open = false; yield ModelEvent::ThinkingEnd; }
                         if !text_open { text_open = true; yield ModelEvent::TextStart; }
                         if let Some(delta) = value.get("delta").and_then(Value::as_str) {
@@ -144,7 +144,7 @@ impl Provider for OpenAiResponsesProvider {
                         }
                     }
                     "response.output_text.done" => {
-                        let text = enter_response_text_item(&value, &mut text_index, &mut texts);
+                        let text = enter_response_text_item(value.get("output_index").and_then(Value::as_u64), &mut text_index, &mut texts);
                         if let Some(final_text) = value.get("text").and_then(Value::as_str) {
                             for event in reconcile_response_text(&mut text_open, text, final_text) { yield event; }
                         }
@@ -173,7 +173,7 @@ impl Provider for OpenAiResponsesProvider {
                             }
                             Some("message") => {
                                 saw_completed_item = true;
-                                let text = enter_response_text_item(&value, &mut text_index, &mut texts);
+                                let text = enter_response_text_item(value.get("output_index").and_then(Value::as_u64), &mut text_index, &mut texts);
                                 if let Some(final_text) = response_item_text(item) {
                                     for event in reconcile_response_text(&mut text_open, text, &final_text) { yield event; }
                                 }
@@ -223,6 +223,18 @@ impl Provider for OpenAiResponsesProvider {
                     "response.completed" => {
                         if let Some(usage) = value.pointer("/response/usage") { yield ModelEvent::Usage(responses_usage(usage)); }
                         if thinking_open { thinking_open = false; yield ModelEvent::ThinkingEnd; }
+                        if let Some(output) = value.pointer("/response/output").and_then(Value::as_array) {
+                            // Array positions are output_index values, including non-message items.
+                            // Reuse the streamed baselines so a full snapshot only adds missing text.
+                            for (index, item) in output.iter().enumerate() {
+                                if item.get("type").and_then(Value::as_str) != Some("message") { continue; }
+                                if let Some(final_text) = response_item_text(item) {
+                                    let text = enter_response_text_item(Some(index as u64), &mut text_index, &mut texts);
+                                    for event in reconcile_response_text(&mut text_open, text, &final_text) { yield event; }
+                                    if text_open { text_open = false; yield ModelEvent::TextEnd; }
+                                }
+                            }
+                        }
                         if text_open { text_open = false; yield ModelEvent::TextEnd; }
                         for (index, tool) in tools.iter_mut().filter(|(_, tool)| tool.started && !tool.ended) {
                             tool.ended = true;
@@ -291,11 +303,11 @@ fn response_item_text(item: &Value) -> Option<String> {
 /// Retains each output item's baseline until the response ends, including when
 /// another item's events arrive in between. Unindexed events use the current item.
 fn enter_response_text_item<'a>(
-    value: &Value,
+    index: Option<u64>,
     current: &mut Option<u64>,
     streamed: &'a mut std::collections::BTreeMap<Option<u64>, String>,
 ) -> &'a mut String {
-    if let Some(index) = value.get("output_index").and_then(Value::as_u64) {
+    if let Some(index) = index {
         // The first explicit index identifies any prefix that arrived unindexed.
         if current.is_none() {
             if let Some(prefix) = streamed.remove(&None) {

@@ -209,3 +209,128 @@ async fn first_explicit_index_adopts_the_unindexed_prefix() {
     .await;
     assert_eq!(result.text, "hello world");
 }
+
+fn completed_snapshot(text: &str) -> Value {
+    json!({
+        "type":"response.completed",
+        "response":{
+            "status":"completed",
+            "output":[{"type":"message","id":"msg_review","role":"assistant","status":"completed","content":[{"type":"output_text","text":text,"annotations":[]}]}],
+            "usage":{"input_tokens":3,"output_tokens":2}
+        }
+    })
+}
+
+#[tokio::test]
+async fn completed_snapshot_only_keeps_final_review_text() {
+    let result = cycle(vec![completed_snapshot("Review complete.")], false).await;
+    assert_eq!(result.finish_reason, FinishReason::Stop);
+    assert_eq!(result.text, "Review complete.");
+}
+
+#[tokio::test]
+async fn completed_snapshot_repairs_a_missing_review_suffix() {
+    let result = cycle(
+        vec![
+            delta(0, 0, "Review "),
+            completed_snapshot("Review complete."),
+        ],
+        false,
+    )
+    .await;
+    assert_eq!(result.text, "Review complete.");
+}
+
+#[tokio::test]
+async fn normal_item_events_plus_snapshot_do_not_repeat_review_text() {
+    let result = cycle(
+        vec![
+            delta(0, 0, "Review "),
+            text_done(0, 0, "Review complete."),
+            item_done(0, &["Review complete."]),
+            completed_snapshot("Review complete."),
+        ],
+        false,
+    )
+    .await;
+    assert_eq!(result.text, "Review complete.");
+}
+
+fn completed_items(items: Vec<Value>) -> Value {
+    json!({"type":"response.completed","response":{
+        "output":items,"usage":{"input_tokens":3,"output_tokens":2}
+    }})
+}
+
+#[tokio::test]
+async fn completed_snapshot_uses_output_positions_including_non_text_items() {
+    let tool = json!({"type":"function_call","call_id":"call_review","name":"Read","arguments":"{\"path\":\"review.md\"}"});
+    let result = cycle(
+        vec![
+            delta(0, 0, "开始"),
+            json!({"type":"response.output_item.done","output_index":1,"item":tool.clone()}),
+            delta(2, 0, "结论"),
+            completed_items(vec![
+                item_done(0, &["开始审阅。"])["item"].clone(),
+                tool,
+                item_done(2, &["结论正确。"])["item"].clone(),
+            ]),
+        ],
+        false,
+    )
+    .await;
+    assert_eq!(result.text, "开始结论审阅。正确。");
+    assert_eq!(result.finish_reason, FinishReason::ToolUse);
+    assert_eq!(result.calls.len(), 1);
+    assert_eq!(result.calls[0].call_id, "call_review");
+    assert_eq!(result.calls[0].arguments, json!({"path":"review.md"}));
+    assert_eq!(result.usage.unwrap().output_tokens, Some(2));
+}
+
+#[tokio::test]
+async fn completed_snapshot_adopts_unindexed_prefix_after_reasoning_item() {
+    let result = cycle(
+        vec![
+            json!({"type":"response.output_text.delta","delta":"Review "}),
+            completed_items(vec![
+                json!({"type":"reasoning","id":"rs_1","summary":[]}),
+                item_done(1, &["Review complete."])["item"].clone(),
+            ]),
+        ],
+        false,
+    )
+    .await;
+    assert_eq!(result.text, "Review complete.");
+    assert_eq!(result.finish_reason, FinishReason::Stop);
+}
+
+#[tokio::test]
+async fn completed_snapshot_repairs_multiple_parts_and_later_messages() {
+    let result = cycle(
+        vec![
+            delta(0, 0, "First "),
+            completed_items(vec![
+                item_done(0, &["First part;", "second part."])["item"].clone(),
+                item_done(1, &[""])["item"].clone(),
+                item_done(2, &["Final review."])["item"].clone(),
+            ]),
+        ],
+        false,
+    )
+    .await;
+    assert_eq!(result.text, "First part;second part.Final review.");
+    assert_eq!(result.finish_reason, FinishReason::Stop);
+}
+
+#[tokio::test]
+async fn completed_snapshot_does_not_replace_conflicting_streamed_text() {
+    let result = cycle(
+        vec![
+            delta(0, 0, "Already shown."),
+            completed_snapshot("Different final text."),
+        ],
+        false,
+    )
+    .await;
+    assert_eq!(result.text, "Already shown.");
+}
