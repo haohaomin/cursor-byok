@@ -76,7 +76,7 @@ async fn background_subagent_completion_starts_a_simulated_parent_turn() {
         .unwrap();
     assert!(messages.iter().any(|message| {
         message.runtime_event_id.as_deref()
-            == Some("background-completed:BACKGROUND_TASK_KIND_SUBAGENT:child-id:task-call")
+            == Some(r#"background-completed:["BACKGROUND_TASK_KIND_SUBAGENT","child-id","child-id","task-call"]"#)
             && matches!(&message.content, MessageContent::Parts { parts } if !parts.is_empty())
     }));
 
@@ -131,8 +131,8 @@ async fn background_subagent_completion_starts_a_simulated_parent_turn() {
     assert_eq!(
         runtime_ids,
         [
-            "runtime:background-completed:BACKGROUND_TASK_KIND_SUBAGENT:child-id:task-call",
-            "runtime:background-completed:BACKGROUND_TASK_KIND_SUBAGENT:child-id-2:task-call"
+            r#"runtime:background-completed:["BACKGROUND_TASK_KIND_SUBAGENT","child-id","child-id","task-call"]"#,
+            r#"runtime:background-completed:["BACKGROUND_TASK_KIND_SUBAGENT","child-id-2","child-id-2","task-call"]"#
         ]
     );
 }
@@ -252,7 +252,7 @@ async fn retrying_one_background_completion_reuses_its_runtime_message() {
             .filter(|message| {
                 message.runtime_event_id.as_deref()
                     == Some(
-                        "background-completed:BACKGROUND_TASK_KIND_SUBAGENT:retry-child:task-call",
+                        r#"background-completed:["BACKGROUND_TASK_KIND_SUBAGENT","retry-child","retry-child","task-call"]"#,
                     )
             })
             .count(),
@@ -368,6 +368,8 @@ async fn drive_completion(
             .unwrap();
         let (flags, payload) = connect::decode_frames(&frame).unwrap().pop().unwrap();
         if flags & connect::END_STREAM_FLAG != 0 {
+            let terminal: serde_json::Value = serde_json::from_slice(&payload).unwrap();
+            assert!(terminal.get("error").is_none(), "{terminal}");
             break;
         }
         let server = pb::AgentServerMessage::decode(payload).unwrap();
@@ -661,4 +663,147 @@ fn kv_ack(id: u32) -> pb::AgentClientMessage {
             },
         )),
     }
+}
+
+#[tokio::test]
+async fn background_completion_without_tool_id_wakes_finished_parent() {
+    assert_background_completion_wakes_finished_parent(false, None).await;
+}
+
+#[tokio::test]
+async fn fast_background_completion_without_tool_id_wakes_finished_parent() {
+    assert_background_completion_wakes_finished_parent(true, None).await;
+}
+
+#[tokio::test]
+async fn distinct_background_child_turns_with_same_tool_id_wake_finished_parent() {
+    assert_background_completion_wakes_finished_parent(false, Some("task-call")).await;
+}
+
+async fn assert_background_completion_wakes_finished_parent(
+    fast: bool,
+    tool_call_id: Option<&str>,
+) {
+    let (_directory, store) = fixtures::temp_store().await;
+    let provider = fake_provider::FakeProvider::default();
+    let assets =
+        PromptAssets::load(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("prompt/cursor"))
+            .unwrap();
+    let registry = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(assets),
+    );
+    let configure = |message: &mut pb::AgentClientMessage| {
+        let Some(pb::agent_client_message::Message::RunRequest(request)) = message.message.as_mut()
+        else {
+            unreachable!()
+        };
+        request.requested_model.as_mut().unwrap().parameters =
+            vec![pb::requested_model::ModelParameterValue {
+                id: "fast".into(),
+                value: fast.to_string(),
+            }];
+    };
+    // The parent has already ended its turn before Cursor sends the completion.
+    let mut start = completion_run(
+        "unused",
+        "parent-start",
+        pb::ConversationStateStructure {
+            mode: Some(pb::AgentMode::Multitask as i32),
+            ..Default::default()
+        },
+    );
+    let Some(pb::agent_client_message::Message::RunRequest(request)) = start.message.as_mut()
+    else {
+        unreachable!()
+    };
+    request.action = Some(pb::ConversationAction {
+        action: Some(pb::conversation_action::Action::UserMessageAction(
+            pb::UserMessageAction {
+                user_message: Some(pb::UserMessage {
+                    text: "Report the background child's result when it finishes.".into(),
+                    message_id: "parent-user".into(),
+                    mode: pb::AgentMode::Multitask as i32,
+                    ..Default::default()
+                }),
+                ..Default::default()
+            },
+        )),
+        ..Default::default()
+    });
+    configure(&mut start);
+    provider.push(stop_response(
+        "parent-start-call",
+        "Waiting for background child.",
+    ));
+    let handle = registry.get_or_create("parent-start").await.unwrap();
+    let (mut checkpoint, _) = drive_completion(&handle, start).await;
+
+    // A later completion from the same child is a new event, whether the
+    // originating tool call is omitted or shared across child turns.
+    for (index, task_id) in ["child-turn-1", "child-turn-2", "child-turn-2"]
+        .iter()
+        .enumerate()
+    {
+        let mut message = completion_run_with_detail(
+            "same-child",
+            &format!("wakeup-{index}"),
+            checkpoint.clone(),
+            &format!("result for {task_id}"),
+        );
+        let Some(pb::agent_client_message::Message::RunRequest(request)) = message.message.as_mut()
+        else {
+            unreachable!()
+        };
+        let Some(pb::conversation_action::Action::BackgroundTaskCompletionAction(action)) = request
+            .action
+            .as_mut()
+            .and_then(|action| action.action.as_mut())
+        else {
+            unreachable!()
+        };
+        action.completions[0].task_id = (*task_id).into();
+        action.completions[0].tool_call_id = tool_call_id.map(str::to_owned);
+        configure(&mut message);
+        provider.push(stop_response(
+            &format!("wakeup-call-{index}"),
+            &format!("Received {task_id}"),
+        ));
+        let handle = registry
+            .get_or_create(&format!("wakeup-{index}"))
+            .await
+            .unwrap();
+        (checkpoint, _) = drive_completion(&handle, message).await;
+    }
+    let requests = provider.requests();
+    assert_eq!(requests.len(), 4);
+    assert!(requests.iter().all(|request| (request.model.latency
+        == cursor_server::model::ModelLatency::Fast)
+        == fast));
+    for pair in requests.windows(2) {
+        assert!(pair[1].history.starts_with(&pair[0].history));
+    }
+    let second_history = &requests[2].history;
+    let history = serde_json::to_string(second_history).unwrap();
+    assert!(history.contains("Waiting for background child."));
+    assert!(history.contains("result for child-turn-1"));
+    assert!(history.contains("result for child-turn-2"));
+    let count: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM messages WHERE message_id LIKE 'runtime:background-completed:%'",
+    )
+    .fetch_one(store.pool())
+    .await
+    .unwrap();
+    assert_eq!(
+        count, 2,
+        "distinct child turns stay distinct, one retry is idempotent"
+    );
+    let statuses: Vec<String> =
+        sqlx::query_scalar("SELECT status FROM runs ORDER BY created_at_ms")
+            .fetch_all(store.pool())
+            .await
+            .unwrap();
+    assert_eq!(statuses, vec!["completed"; 4]);
+    registry.shutdown().await;
 }

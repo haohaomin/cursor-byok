@@ -90,12 +90,16 @@ pub(super) fn project(
         let tool_call_id = completion
             .tool_call_id
             .as_deref()
-            .filter(|id| !id.is_empty())
-            .ok_or_else(|| {
-                Error::Protocol("background task completion has no tool_call_id".into())
-            })?;
-        let task_identity = agent_id.unwrap_or(&completion.task_id);
-        let identity = format!("{}:{task_identity}:{tool_call_id}", kind.as_str_name());
+            .filter(|id| !id.is_empty());
+        // Cursor's background/interactive-child notifications may omit the
+        // originating tool call. Task IDs distinguish successive completions
+        // from the same child; encode field boundaries to avoid ID collisions.
+        let identity = serde_json::to_string(&(
+            kind.as_str_name(),
+            &completion.task_id,
+            agent_id,
+            tool_call_id,
+        ))?;
         let context = completion_context(completion, kind, agent_id)?;
         if completions
             .insert(identity.clone(), (completion, context))
