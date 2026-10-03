@@ -29,8 +29,8 @@ export interface ModelPreset {
   name: string;
   icon: string;
   keyHint: string;
-  /** 五家服务商均同时提供 Anthropic 与 OpenAI 兼容协议 */
-  endpoints: { anthropic: ModelPresetEndpoint; openai: ModelPresetEndpoint };
+  /** 服务商可以只提供其中一种协议；不支持的协议使用 null。 */
+  endpoints: { anthropic: ModelPresetEndpoint | null; openai: ModelPresetEndpoint | null };
   models: ModelPresetEntry[];
 }
 
@@ -85,6 +85,17 @@ export const modelPresets: ModelPreset[] = [
     ],
   },
   {
+    key: "moonshot",
+    name: "Moonshot Kimi API",
+    icon: kimiIcon,
+    keyHint: "platform.moonshot.cn → API Key；Kimi K3 使用 kimi-k3 模型标识",
+    endpoints: {
+      anthropic: null,
+      openai: openaiChat("https://api.moonshot.cn"),
+    },
+    models: [entry("kimi-k3", "Kimi K3", 1048576, 65536)],
+  },
+  {
     key: "deepseek",
     name: "DeepSeek",
     icon: deepseekIcon,
@@ -127,4 +138,4 @@ export const modelPresets: ModelPreset[] = [
 
 export const trimTrailingSlash = (url: string) => url.replace(/\/+$/, "");
 
-export const presetEndpoint = (preset: ModelPreset, type: ModelType): ModelPresetEndpoint => preset.endpoints[type];
+export const presetEndpoint = (preset: ModelPreset, type: ModelType): ModelPresetEndpoint | null => preset.endpoints[type];

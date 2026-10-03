@@ -8,7 +8,9 @@ export function CursorPresetChips({ type, baseUrl, onPick }: { type: ModelType; 
     <span className={styles.label}>{t("常用预设")}</span>
     <div className={styles.chips}>
       {modelPresets.map((preset) => {
-        const active = trimTrailingSlash(baseUrl) === trimTrailingSlash(presetEndpoint(preset, type).baseUrl);
+        const endpoint = presetEndpoint(preset, type);
+        if (!endpoint) return null;
+        const active = trimTrailingSlash(baseUrl) === trimTrailingSlash(endpoint.baseUrl);
         return <button
           type="button"
           key={preset.key}

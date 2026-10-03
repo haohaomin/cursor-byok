@@ -64,7 +64,10 @@ export function CursorModelEditor({ draft, modelOptions, discovering, onChange, 
     // 切换协议类型时，若当前地址命中某预设的另一协议端点，自动换到该预设对应协议的端点，
     // 避免出现「类型是 Anthropic、URL 却是 OpenAI chat/completions」的错配
     const other: ModelType = type === "anthropic" ? "openai" : "anthropic";
-    const preset = modelPresets.find((candidate) => trimTrailingSlash(presetEndpoint(candidate, other).baseUrl) === trimTrailingSlash(draft.model.base_url.trim()));
+    const preset = modelPresets.find((candidate) => {
+      const endpoint = presetEndpoint(candidate, other);
+      return endpoint && trimTrailingSlash(endpoint.baseUrl) === trimTrailingSlash(draft.model.base_url.trim());
+    });
     const endpoint = preset ? presetEndpoint(preset, type) : null;
     onChange({
       ...draft,
@@ -88,7 +91,10 @@ export function CursorModelEditor({ draft, modelOptions, discovering, onChange, 
   const canDiscover = Boolean(draft.model.base_url.trim() && draft.model.api_key.trim());
   // 选中预设后，把该服务商已知的模型 id 并入下拉，方便直接选（仍可用「获取模型」发现）
   const presetModelOptions = modelPresets
-    .filter((preset) => trimTrailingSlash(presetEndpoint(preset, draft.model.type).baseUrl) === trimTrailingSlash(draft.model.base_url.trim()))
+    .filter((preset) => {
+      const endpoint = presetEndpoint(preset, draft.model.type);
+      return endpoint && trimTrailingSlash(endpoint.baseUrl) === trimTrailingSlash(draft.model.base_url.trim());
+    })
     .flatMap((preset) => preset.models.map((item) => item.model_id));
   const combinedOptions = [...new Set([...modelOptions, ...presetModelOptions])];
   const discoverModels = async () => {
@@ -96,10 +102,12 @@ export function CursorModelEditor({ draft, modelOptions, discovering, onChange, 
   };
   const applyPreset = (preset: ModelPreset) => {
     const endpoint = presetEndpoint(preset, draft.model.type);
+    if (!endpoint) return;
     const first = preset.models[0];
     // 切到别家服务商时清空 API Key（不同家的 Key 不能串用）；同一家内切换协议则保留
     const currentBase = trimTrailingSlash(draft.model.base_url.trim());
     const sameProvider = [preset.endpoints.anthropic, preset.endpoints.openai]
+      .filter((candidate): candidate is NonNullable<typeof candidate> => candidate !== null)
       .some((candidate) => trimTrailingSlash(candidate.baseUrl) === currentBase);
     onChange({
       ...draft,
