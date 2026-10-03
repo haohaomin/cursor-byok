@@ -337,7 +337,7 @@
   "restoration": {
     "production_status": "enabled",
     "test_ports_closed": {
-      "53331": false,
+      "53331": true,
       "53332": true
     },
     "settings_byte_identical": true
