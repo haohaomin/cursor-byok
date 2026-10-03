@@ -515,11 +515,6 @@ fn normalize_mcp_parameters(tool_name: &str, mut parameters: Value) -> Result<Va
     let schema = parameters
         .as_object_mut()
         .ok_or_else(|| invalid_mcp_parameters(tool_name))?;
-    match schema.get("type") {
-        Some(Value::String(schema_type)) if schema_type == "object" => return Ok(parameters),
-        Some(_) => return Err(invalid_mcp_parameters(tool_name)),
-        None => {}
-    }
     let object_only_union = ["anyOf", "oneOf"].into_iter().any(|keyword| {
         schema
             .get(keyword)
@@ -535,15 +530,26 @@ fn normalize_mcp_parameters(tool_name: &str, mut parameters: Value) -> Result<Va
                     })
             })
     });
-    if !object_only_union {
-        return Err(invalid_mcp_parameters(tool_name));
+    match schema.get("type") {
+        Some(Value::String(schema_type)) if schema_type == "object" => {}
+        None if schema.is_empty() || object_only_union => {
+            // Tool arguments are objects. Make that explicit for empty schemas
+            // and Cursor's object-only unions without changing their branches.
+            schema.insert("type".into(), Value::String("object".into()));
+        }
+        _ => return Err(invalid_mcp_parameters(tool_name)),
     }
-    // OpenAI-compatible function schemas (and the corresponding schema
-    // validators used by other providers) require the root schema to declare
-    // an object type. Cursor's app-control MCP sometimes sends an object-only
-    // `anyOf`/`oneOf` schema without that root annotation. Preserve the union
-    // while adding the annotation to the model-facing copy.
-    schema.insert("type".into(), Value::String("object".into()));
+    // Some function-tool validators (including LM Studio) require an explicit
+    // properties record. An empty record adds no constraints to an object;
+    // preserve required, additionalProperties, references and unions as given.
+    let properties = schema
+        .entry("properties")
+        .or_insert_with(|| Value::Object(Default::default()));
+    if !properties.is_object() {
+        return Err(Error::Protocol(format!(
+            "MCP tool {tool_name} input schema properties must be an object"
+        )));
+    }
     Ok(parameters)
 }
 
@@ -582,6 +588,10 @@ fn xml(value: &str) -> String {
         .replace('<', "&lt;")
         .replace('>', "&gt;")
 }
+
+#[cfg(test)]
+#[path = "tool_schema_tests.rs"]
+mod tool_schema_tests;
 
 #[cfg(test)]
 mod tests {
