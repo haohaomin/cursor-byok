@@ -14,7 +14,7 @@
   "format": "passed",
   "desktop_check": "passed",
   "real_deepseek_request": false,
-  "status": "fix_ready_real_provider_retest_pending",
-  "merged": false,
+  "status": "merged_real_provider_retest_pending",
+  "merged": true,
   "released": false
 }
