@@ -616,4 +616,43 @@ mod tests {
             })]
         );
     }
+
+    #[test]
+    fn image_input_contains_required_detail_for_strict_responses_servers() {
+        let content = responses_content(
+            &[ContentPart::Image {
+                mime_type: "image/png".into(),
+                data: vec![0x89, 0x50, 0x4e, 0x47],
+            }],
+            "input_text",
+        )
+        .unwrap();
+        assert_eq!(
+            content,
+            vec![json!({
+                "type": "input_image",
+                "detail": "auto",
+                "image_url": "data:image/png;base64,iVBORw=="
+            })]
+        );
+    }
+
+    #[test]
+    fn image_detail_survives_history_projection() {
+        let messages = [ProjectedMessage {
+            message_id: "user-image".into(),
+            role: Role::User,
+            content: ProjectedContent::Parts(vec![ContentPart::Image {
+                mime_type: "image/jpeg".into(),
+                data: vec![0xff, 0xd8, 0xff],
+            }]),
+        }];
+        let input = responses_input(&messages).unwrap();
+        assert_eq!(input[0]["content"][0]["type"], "input_image");
+        assert_eq!(input[0]["content"][0]["detail"], "auto");
+        assert_eq!(
+            input[0]["content"][0]["image_url"],
+            "data:image/jpeg;base64,/9j/"
+        );
+    }
 }
