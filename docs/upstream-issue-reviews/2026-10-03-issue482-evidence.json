@@ -1,7 +1,7 @@
 {
   "issue": 482,
-  "base": "d950c39678e8fdf2c1f300c25dcc272cde378b5d",
-  "branch": "codex/fix-mcp-object-tool-schemas",
+  "base": "64f0ceb",
+  "branch": "main",
   "upstream_issue": "https://github.com/leookun/cursor-byok/issues/482",
   "related_report": "https://github.com/lmstudio-ai/lmstudio-bug-tracker/issues/2254",
   "validator_reference": "https://github.com/lmstudio-ai/lmstudio-js/blob/a883894645a2a1b70e48902eff87c3b3f141a215/packages/lms-shared-types/src/llm/LLMToolUseSetting.ts",
@@ -14,8 +14,8 @@
   },
   "green": {
     "focused_passed": 4,
-    "all_targets": 20,
-    "passed": 309,
+    "all_targets": 16,
+    "passed": 281,
     "failed": 0,
     "ignored": 0
   },
@@ -24,7 +24,7 @@
   "diff_check": "passed",
   "real_lmstudio_test": false,
   "original_tools_18_identified": false,
-  "merged": false,
+  "merged": true,
   "released": false,
   "scope": "Actual MCP compilation, full Ask static tools, Responses serialization and HTTP/SSE; focused LM Studio object-schema contract double, not the LM Studio server. Client dispatch descriptor preserved; retry request bodies equal."
 }
