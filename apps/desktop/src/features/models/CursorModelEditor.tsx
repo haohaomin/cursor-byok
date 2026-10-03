@@ -218,6 +218,7 @@ function ToggleJsonField({ label, enabled, text, onEnabledChange, onTextChange }
 function effortOptions(optional: boolean) {
   return [
     ...(optional ? [{ value: "", label: t("不设置") }] : []),
+    ...(optional ? [{ value: "none", label: t("不传入") }] : []),
     { value: "low", label: "Low" },
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" },

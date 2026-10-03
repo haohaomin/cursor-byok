@@ -466,4 +466,14 @@ mod tests {
         assert_eq!(map_finish("length", true), FinishReason::Length);
         assert_eq!(map_finish("length", false), FinishReason::Length);
     }
+
+    #[test]
+    fn disabled_reasoning_does_not_add_reasoning_effort() {
+        let mut body = json!({});
+        let model = crate::model::ModelSpec::new("deepseek-r1");
+
+        apply_model(&mut body, &model, None).expect("model fields apply");
+
+        assert!(body.get("reasoning_effort").is_none());
+    }
 }

@@ -196,13 +196,20 @@ impl ModelConfig {
         if model.context_window_tokens.is_none() {
             model.context_window_tokens = self.context_window_tokens;
         }
-        if model.reasoning.effort.is_none() {
-            model.reasoning.effort = match self.model_type {
-                ModelType::OpenAi => self.reasoning_effort.clone(),
-                ModelType::Anthropic => self.anthropic_thinking_effort.clone(),
-            };
+        let configured_effort = match self.model_type {
+            ModelType::OpenAi => self.reasoning_effort.clone(),
+            ModelType::Anthropic => self.anthropic_thinking_effort.clone(),
+        };
+        if configured_effort.as_deref() == Some("none") {
+            // An explicit "none" setting suppresses a reasoning value that Cursor
+            // selected for this model. This is needed by providers that reject
+            // the OpenAI reasoning_effort field entirely.
+            model.reasoning.effort = None;
+            model.reasoning.enabled = false;
+        } else if model.reasoning.effort.is_none() {
+            model.reasoning.effort = configured_effort;
+            model.reasoning.enabled |= model.reasoning.effort.is_some();
         }
-        model.reasoning.enabled |= model.reasoning.effort.is_some();
     }
 }
 
@@ -381,12 +388,60 @@ fn normalize_effort(value: Option<&str>, allow_empty: bool) -> Result<Option<Str
     if value.is_empty() && allow_empty {
         return Ok(None);
     }
+    if value == "none" && allow_empty {
+        return Ok(Some(value));
+    }
     if matches!(value.as_str(), "low" | "medium" | "high" | "xhigh" | "max") {
         Ok(Some(value))
     } else {
         Err(Error::Config(format!(
             "unsupported reasoning effort: {value}"
         )))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn explicit_none_reasoning_effort_clears_cursor_selection() {
+        let config = ModelConfig {
+            model_hash: "test".into(),
+            sort_order: 0,
+            display_name: "DeepSeek R1".into(),
+            group_name: None,
+            model_type: ModelType::OpenAi,
+            base_url: "https://api.deepseek.com".into(),
+            use_full_url: false,
+            api_key: "test".into(),
+            tooltip_data: "test".into(),
+            model_id: "deepseek-r1".into(),
+            reasoning_effort: Some("none".into()),
+            openai_endpoint: OPENAI_CHAT_ENDPOINT.into(),
+            openai_extra_params_enabled: false,
+            openai_extra_params: empty_object(),
+            custom_headers_enabled: false,
+            custom_headers: empty_object(),
+            anthropic_extra_params_enabled: false,
+            anthropic_extra_params: empty_object(),
+            context_window_tokens: None,
+            max_completion_tokens: None,
+            anthropic_max_tokens: None,
+            anthropic_thinking_effort: None,
+            thinking_budget_tokens: None,
+            created_at_ms: 0,
+            updated_at_ms: 0,
+        };
+        let mut model = ModelSpec::new("deepseek-r1");
+        model.reasoning = ReasoningSpec {
+            enabled: true,
+            effort: Some("medium".into()),
+        };
+
+        config.configure(&mut model);
+
+        assert_eq!(model.reasoning, ReasoningSpec::default());
     }
 }
 
