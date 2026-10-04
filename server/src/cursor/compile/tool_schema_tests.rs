@@ -1,10 +1,10 @@
-//! Checks MCP object schemas at the compiler and Responses HTTP boundary.
+//! Checks MCP object schemas at the compiler and OpenAI HTTP boundaries.
 use super::*;
 use crate::{
     config::{ProviderConfig, ProviderKind},
     cursor::prompting::{Mode, PromptAssets, PromptCompiler},
     model::{ModelInvocation, ModelRequest, ModelSpec},
-    provider::{ModelEvent, OpenAiResponsesProvider, Provider},
+    provider::{ModelEvent, OpenAiChatProvider, OpenAiResponsesProvider, Provider},
 };
 use axum::{http::StatusCode, response::IntoResponse, routing::post, Json, Router};
 use futures_util::StreamExt;
@@ -22,7 +22,31 @@ async fn responses_accepts_empty_mcp_schema() {
     assert_responses_accepts(json!({})).await;
 }
 
+#[tokio::test]
+async fn chat_accepts_mcp_null_required() {
+    assert_openai_accepts(
+        json!({"type":"object","properties":{},"required":null}),
+        json!({"type":"object","properties":{},"required":[]}),
+        true,
+    )
+    .await;
+}
+
+#[tokio::test]
+async fn responses_accepts_mcp_null_required() {
+    assert_openai_accepts(
+        json!({"type":"object","properties":{},"required":null}),
+        json!({"type":"object","properties":{},"required":[]}),
+        false,
+    )
+    .await;
+}
+
 async fn assert_responses_accepts(schema: Value) {
+    assert_openai_accepts(schema, json!({"type":"object","properties":{}}), false).await;
+}
+
+async fn assert_openai_accepts(schema: Value, expected: Value, chat: bool) {
     let wire = pb::McpToolDefinition {
         name: "mcp__local__status".into(),
         description: "Get local status".into(),
@@ -50,16 +74,29 @@ async fn assert_responses_accepts(schema: Value) {
     let requests = captured.clone();
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let address = listener.local_addr().unwrap();
-    let app = Router::new().route("/v1/responses", post(move |Json(body): Json<Value>| {
+    let endpoint = if chat {
+        "/v1/chat/completions"
+    } else {
+        "/v1/responses"
+    };
+    let app = Router::new().route(endpoint, post(move |Json(body): Json<Value>| {
         let requests = requests.clone();
         async move {
             requests.lock().unwrap().push(body.clone());
             // LM Studio's public llmToolParametersSchema requires an object
             // type and properties record; required is optional. This is a
             // focused contract double, not an actual LM Studio instance.
+            // The required-array check reproduces the validation in #199;
+            // it does not emulate the author's Grok gateway.
             for (index, tool) in body["tools"].as_array().unwrap().iter().enumerate() {
-                if tool["parameters"]["type"] != "object"
-                    || !tool["parameters"]["properties"].is_object()
+                let parameters = if chat { &tool["function"]["parameters"] } else { &tool["parameters"] };
+                if parameters.get("required").is_some_and(|required| !required.is_array()) {
+                    return (StatusCode::BAD_REQUEST, Json(json!({"error": {
+                        "message": "Schema validation failed: [standard_violation] /required: null is not of type array"
+                    }}))).into_response();
+                }
+                if parameters["type"] != "object"
+                    || !parameters["properties"].is_object()
                 {
                     return (StatusCode::BAD_REQUEST, Json(json!({"error":{
                         "message":"Invalid input", "type":"invalid_request_error",
@@ -67,9 +104,12 @@ async fn assert_responses_accepts(schema: Value) {
                     }}))).into_response();
                 }
             }
-            ([("content-type", "text/event-stream")],
-             "event: response.completed\ndata: {\"type\":\"response.completed\",\"response\":{\"output\":[]}}\n\n")
-                .into_response()
+            let sse = if chat {
+                "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"ok\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n"
+            } else {
+                "event: response.completed\ndata: {\"type\":\"response.completed\",\"response\":{\"output\":[]}}\n\n"
+            };
+            ([("content-type", "text/event-stream")], sse).into_response()
         }
     }));
     let shutdown = CancellationToken::new();
@@ -80,18 +120,25 @@ async fn assert_responses_accepts(schema: Value) {
             .await
             .unwrap();
     });
-    let provider = OpenAiResponsesProvider::new(
-        reqwest::Client::builder().no_proxy().build().unwrap(),
-        ProviderConfig {
-            kind: ProviderKind::OpenAiResponses,
-            request_url: format!("http://{address}/v1/responses"),
-            api_key: "test-only".into(),
-            custom_headers: Default::default(),
-            max_output_tokens: None,
-            request_timeout: Duration::from_secs(5),
-            allowed_body_fields: None,
+    let config = ProviderConfig {
+        kind: if chat {
+            ProviderKind::OpenAiChat
+        } else {
+            ProviderKind::OpenAiResponses
         },
-    );
+        request_url: format!("http://{address}{endpoint}"),
+        api_key: "test-only".into(),
+        custom_headers: Default::default(),
+        max_output_tokens: None,
+        request_timeout: Duration::from_secs(5),
+        allowed_body_fields: None,
+    };
+    let client = reqwest::Client::builder().no_proxy().build().unwrap();
+    let provider: Box<dyn Provider> = if chat {
+        Box::new(OpenAiChatProvider::new(client, config))
+    } else {
+        Box::new(OpenAiResponsesProvider::new(client, config))
+    };
     let invocation = ModelInvocation {
         call_id: "schema-call".into(),
         run_id: "schema-run".into(),
@@ -133,8 +180,13 @@ async fn assert_responses_accepts(schema: Value) {
         requests[0], requests[1],
         "retry must preserve tool definitions"
     );
-    let parameters = &requests[0]["tools"].as_array().unwrap().last().unwrap()["parameters"];
-    assert_eq!(parameters, &json!({"type":"object","properties":{}}));
+    let tool = requests[0]["tools"].as_array().unwrap().last().unwrap();
+    let parameters = if chat {
+        &tool["function"]["parameters"]
+    } else {
+        &tool["parameters"]
+    };
+    assert_eq!(parameters, &expected);
 }
 
 #[test]
@@ -172,4 +224,60 @@ fn mcp_explicit_object_constraints_are_not_rewritten() {
             "{invalid}"
         );
     }
+}
+
+#[test]
+fn mcp_null_required_preserves_property_values_and_is_idempotent() {
+    let original = json!({"type":"object","required":null,
+        "properties":{"required":{"type":["string","null"],"default":null}},
+        "default":{"required":null},"examples":[{"required":null}],
+        "additionalProperties":false});
+    let mut expected = original.clone();
+    expected["required"] = json!([]);
+    let normalized = normalize_mcp_parameters("nullable", original).unwrap();
+    assert_eq!(normalized, expected);
+    assert_eq!(
+        normalize_mcp_parameters("nullable", normalized).unwrap(),
+        expected
+    );
+}
+
+#[test]
+fn mcp_protobuf_schema_normalizes_null_required() {
+    use prost_types::{value::Kind, Struct};
+    let wire = pb::McpToolDefinition {
+        name: "protobuf_tool".into(),
+        input_schema: Some(prost_types::Value {
+            kind: Some(Kind::StructValue(Struct {
+                fields: [
+                    (
+                        "type".into(),
+                        prost_types::Value {
+                            kind: Some(Kind::StringValue("object".into())),
+                        },
+                    ),
+                    (
+                        "required".into(),
+                        prost_types::Value {
+                            kind: Some(Kind::NullValue(0)),
+                        },
+                    ),
+                ]
+                .into_iter()
+                .collect(),
+            })),
+        }),
+        ..Default::default()
+    };
+    let context = pb::RequestContext {
+        tools: vec![wire.clone()],
+        ..Default::default()
+    };
+    let compiled = dynamic_mcp(&pb::AgentRunRequest::default(), &context).unwrap();
+    let (original, tool) = compiled.values().next().unwrap();
+    assert_eq!(original, &wire);
+    assert_eq!(
+        tool.parameters,
+        json!({"type":"object","properties":{},"required":[]})
+    );
 }

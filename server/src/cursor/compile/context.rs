@@ -541,7 +541,7 @@ fn normalize_mcp_parameters(tool_name: &str, mut parameters: Value) -> Result<Va
     }
     // Some function-tool validators (including LM Studio) require an explicit
     // properties record. An empty record adds no constraints to an object;
-    // preserve required, additionalProperties, references and unions as given.
+    // preserve additionalProperties, references and unions as given.
     let properties = schema
         .entry("properties")
         .or_insert_with(|| Value::Object(Default::default()));
@@ -549,6 +549,11 @@ fn normalize_mcp_parameters(tool_name: &str, mut parameters: Value) -> Result<Va
         return Err(Error::Protocol(format!(
             "MCP tool {tool_name} input schema properties must be an object"
         )));
+    }
+    // Some MCP producers serialize an empty required list as null. Tool schema
+    // validators require an array; keep absent and explicit lists unchanged.
+    if schema.get("required").is_some_and(Value::is_null) {
+        schema.insert("required".into(), Value::Array(Vec::new()));
     }
     Ok(parameters)
 }
