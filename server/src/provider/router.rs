@@ -7,7 +7,7 @@ use tokio_util::sync::CancellationToken;
 
 use crate::{
     config::{ProviderConfig, ProviderKind},
-    model::{ModelInvocation, ModelLatency, NewLlmCall, ProviderType},
+    model::{strip_images, ModelInvocation, ModelLatency, NewLlmCall, ProviderType},
     plugin::{PluginRegistry, ADAPTER_ID_PREFIX},
     store::Store,
     Error, Result,
@@ -82,6 +82,9 @@ impl Provider for ProviderRouter {
                     let provider_type = model.provider_type();
                     let request_url = model.request_url()?;
                     model.configure(&mut routed.request.model);
+                    if routed.request.model.strip_images {
+                        strip_images(&mut routed.request.history);
+                    }
                     routed.request.model.extra_params =
                         super::request_template::render_json_strings(
                             model.extra_params(),

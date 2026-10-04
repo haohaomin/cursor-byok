@@ -177,6 +177,7 @@ fn model_input(model: LegacyModel) -> Result<ModelConfigInput> {
             &model.openai_extra_params_json,
         )?,
         custom_headers_enabled: model.custom_headers_enabled,
+        strip_images: false,
         custom_headers: enabled_json_object(
             model.custom_headers_enabled,
             &model.custom_headers_json,

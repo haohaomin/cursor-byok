@@ -14,6 +14,7 @@ const MODEL_COLUMNS: &str = r#"
     model_hash, sort_order, display_name, group_name, model_type, base_url, use_full_url, api_key, tooltip_data,
     model_id, reasoning_effort, openai_endpoint, openai_extra_params_enabled,
     openai_extra_params_json, custom_headers_enabled, custom_headers_json,
+    strip_images,
     anthropic_extra_params_enabled, anthropic_extra_params_json, context_window_tokens,
     max_completion_tokens, anthropic_max_tokens, anthropic_thinking_effort,
     thinking_budget_tokens, created_at_ms, updated_at_ms
@@ -127,6 +128,7 @@ impl Store {
                 use_full_url = ?, api_key = ?, tooltip_data = ?, model_id = ?, reasoning_effort = ?,
                 openai_endpoint = ?, openai_extra_params_enabled = ?, openai_extra_params_json = ?,
                 custom_headers_enabled = ?, custom_headers_json = ?,
+                strip_images = ?,
                 anthropic_extra_params_enabled = ?, anthropic_extra_params_json = ?,
                 context_window_tokens = ?, max_completion_tokens = ?, anthropic_max_tokens = ?,
                 anthropic_thinking_effort = ?, thinking_budget_tokens = ?, updated_at_ms = ?
@@ -148,6 +150,7 @@ impl Store {
         .bind(serde_json::to_string(&input.openai_extra_params)?)
         .bind(input.custom_headers_enabled)
         .bind(serde_json::to_string(&input.custom_headers)?)
+        .bind(input.strip_images)
         .bind(input.anthropic_extra_params_enabled)
         .bind(serde_json::to_string(&input.anthropic_extra_params)?)
         .bind(input.context_window_tokens.map(to_i64).transpose()?)
@@ -246,10 +249,11 @@ async fn insert_model_with_conflict(
             model_hash, sort_order, display_name, group_name, model_type, base_url, use_full_url, api_key, tooltip_data,
             model_id, reasoning_effort, openai_endpoint, openai_extra_params_enabled,
             openai_extra_params_json, custom_headers_enabled, custom_headers_json,
+            strip_images,
             anthropic_extra_params_enabled, anthropic_extra_params_json, context_window_tokens,
             max_completion_tokens, anthropic_max_tokens, anthropic_thinking_effort,
             thinking_budget_tokens, created_at_ms, updated_at_ms
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
     );
     if ignore_existing {
         statement.push_str(" ON CONFLICT(model_hash) DO NOTHING");
@@ -271,6 +275,7 @@ async fn insert_model_with_conflict(
         .bind(serde_json::to_string(&input.openai_extra_params)?)
         .bind(input.custom_headers_enabled)
         .bind(serde_json::to_string(&input.custom_headers)?)
+        .bind(input.strip_images)
         .bind(input.anthropic_extra_params_enabled)
         .bind(serde_json::to_string(&input.anthropic_extra_params)?)
         .bind(input.context_window_tokens.map(to_i64).transpose()?)
@@ -305,6 +310,7 @@ fn model_from_row(row: sqlx::sqlite::SqliteRow) -> Result<ModelConfig> {
                 .as_str(),
         )?,
         custom_headers_enabled: row.try_get("custom_headers_enabled")?,
+        strip_images: row.try_get("strip_images")?,
         custom_headers: serde_json::from_str(
             row.try_get::<String, _>("custom_headers_json")?.as_str(),
         )?,
@@ -355,6 +361,7 @@ mod tests {
             openai_extra_params_enabled: false,
             openai_extra_params: serde_json::json!({}),
             custom_headers_enabled: false,
+            strip_images: false,
             custom_headers: serde_json::json!({}),
             anthropic_extra_params_enabled: false,
             anthropic_extra_params: serde_json::json!({}),
@@ -378,24 +385,30 @@ mod tests {
         .await
         .unwrap();
 
-        let created = store
-            .create_model(&model_input(Some("  My Group  ")))
-            .await
-            .unwrap();
+        let mut initial = model_input(Some("  My Group  "));
+        initial.strip_images = true;
+        let created = store.create_model(&initial).await.unwrap();
         assert_eq!(created.group_name.as_deref(), Some("My Group"));
+        assert!(created.strip_images);
 
+        let mut renamed_input = model_input(Some("Renamed"));
+        renamed_input.strip_images = true;
         let renamed = store
-            .update_model(&created.model_hash, &model_input(Some("Renamed")))
+            .update_model(&created.model_hash, &renamed_input)
             .await
             .unwrap();
         assert_eq!(renamed.model_hash, created.model_hash);
         assert_eq!(renamed.group_name.as_deref(), Some("Renamed"));
+        assert!(renamed.strip_images);
 
+        let mut cleared_input = model_input(Some("   "));
+        cleared_input.strip_images = true;
         let cleared = store
-            .update_model(&created.model_hash, &model_input(Some("   ")))
+            .update_model(&created.model_hash, &cleared_input)
             .await
             .unwrap();
         assert_eq!(cleared.model_hash, created.model_hash);
         assert_eq!(cleared.group_name, None);
+        assert!(cleared.strip_images);
     }
 }

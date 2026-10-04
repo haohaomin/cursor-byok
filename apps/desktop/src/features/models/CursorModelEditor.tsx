@@ -37,6 +37,7 @@ export const emptyCursorModelDraft = (): CursorModelDraft => ({
     openai_extra_params_enabled: false,
     openai_extra_params: {},
     custom_headers_enabled: false,
+    strip_images: false,
     custom_headers: {},
     anthropic_extra_params_enabled: false,
     anthropic_extra_params: {},
@@ -167,6 +168,8 @@ export function CursorModelEditor({ draft, modelOptions, discovering, onChange, 
       <FormField label={t("模型名称")} hint={t("可以直接输入模型标识，也可以读取接口返回的模型列表。")}><Combobox ref={modelCombobox} value={draft.model.model_id} options={combinedOptions} placeholder="gpt-5" append={<Button className={styles.discoverButton} disabled={discovering || !canDiscover} onClick={() => void discoverModels()}>{discovering ? t("获取中…") : t("获取模型")}</Button>} onChange={(model_id) => setModel({ model_id, display_name: draft.model.display_name || model_id })} /></FormField>
       <FormField label={t("显示名称")} hint={t("仅用于界面展示，不会改变发送给模型服务的模型名称。")}> <TextInput placeholder={t("例如：主力模型")} value={draft.model.display_name} onChange={(event) => setModel({ display_name: event.target.value })} /></FormField>
       <FormField className={styles.fullWidth} label={t("备注")} hint={t("显示在 Cursor 模型说明中。")}> <TextInput placeholder={t("请输入模型备注")} value={draft.model.tooltip_data} onChange={(event) => setModel({ tooltip_data: event.target.value })} /></FormField>
+
+      <FormField className={styles.fullWidth} label={t("移除图片输入")} hint={t("为不支持图片的文本模型移除当前对话历史中的图片；原始会话数据仍会保留。")}> <Checkbox checked={draft.model.strip_images} label={t("仅向此模型发送文本内容")} onChange={(strip_images) => setModel({ strip_images })} /></FormField>
 
       <FormField label={t("上下文窗口 Token")} hint={t("留空时使用默认值。")}> <TextInput type="number" min={1} step={1} placeholder={t("留空使用默认值")} value={draft.model.context_window_tokens ?? ""} onChange={(event) => setModel({ context_window_tokens: numberValue(event.target.value) })} /></FormField>
       {draft.model.type === "openai" ? <>

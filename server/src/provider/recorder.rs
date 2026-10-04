@@ -407,6 +407,7 @@ mod tests {
                 openai_extra_params_enabled: false,
                 openai_extra_params: serde_json::json!({}),
                 custom_headers_enabled: false,
+                strip_images: false,
                 custom_headers: serde_json::json!({}),
                 anthropic_extra_params_enabled: false,
                 anthropic_extra_params: serde_json::json!({}),

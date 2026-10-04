@@ -18,6 +18,7 @@ export interface Model {
   openai_extra_params_enabled: boolean;
   openai_extra_params: Record<string, unknown>;
   custom_headers_enabled: boolean;
+  strip_images: boolean;
   custom_headers: Record<string, string>;
   anthropic_extra_params_enabled: boolean;
   anthropic_extra_params: Record<string, unknown>;
@@ -45,6 +46,7 @@ export interface ModelInput {
   openai_extra_params_enabled: boolean;
   openai_extra_params: Record<string, unknown>;
   custom_headers_enabled: boolean;
+  strip_images: boolean;
   custom_headers: Record<string, string>;
   anthropic_extra_params_enabled: boolean;
   anthropic_extra_params: Record<string, unknown>;

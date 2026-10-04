@@ -108,6 +108,8 @@ pub struct ModelConfigInput {
     pub openai_extra_params: serde_json::Value,
     #[serde(default)]
     pub custom_headers_enabled: bool,
+    #[serde(default)]
+    pub strip_images: bool,
     #[serde(default = "empty_object")]
     pub custom_headers: serde_json::Value,
     #[serde(default)]
@@ -140,6 +142,7 @@ pub struct ModelConfig {
     pub openai_extra_params_enabled: bool,
     pub openai_extra_params: serde_json::Value,
     pub custom_headers_enabled: bool,
+    pub strip_images: bool,
     pub custom_headers: serde_json::Value,
     pub anthropic_extra_params_enabled: bool,
     pub anthropic_extra_params: serde_json::Value,
@@ -191,6 +194,7 @@ impl ModelConfig {
 
     pub fn configure(&self, model: &mut super::ModelSpec) {
         model.display_name = Some(self.display_name.clone());
+        model.strip_images = self.strip_images;
         // A request-selected context is authoritative.  Use the saved model
         // value only when Cursor did not send a context parameter.
         if model.context_window_tokens.is_none() {
@@ -266,6 +270,7 @@ pub fn normalize_model_input(input: &ModelConfigInput) -> Result<ModelConfigInpu
             empty_object()
         },
         custom_headers_enabled: input.custom_headers_enabled,
+        strip_images: input.strip_images,
         custom_headers: input.custom_headers.clone(),
         anthropic_extra_params_enabled: input.model_type == ModelType::Anthropic
             && input.anthropic_extra_params_enabled,
@@ -422,6 +427,7 @@ mod tests {
             openai_extra_params_enabled: false,
             openai_extra_params: empty_object(),
             custom_headers_enabled: false,
+            strip_images: false,
             custom_headers: empty_object(),
             anthropic_extra_params_enabled: false,
             anthropic_extra_params: empty_object(),
@@ -515,6 +521,8 @@ pub struct ModelSpec {
     #[serde(default)]
     pub supports_image_generation: bool,
     #[serde(default)]
+    pub strip_images: bool,
+    #[serde(default)]
     pub extra_params: serde_json::Value,
 }
 
@@ -528,6 +536,7 @@ impl ModelSpec {
             max_output_tokens: None,
             context_window_tokens: None,
             supports_image_generation: false,
+            strip_images: false,
             extra_params: serde_json::json!({}),
         }
     }

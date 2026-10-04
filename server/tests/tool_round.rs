@@ -843,6 +843,7 @@ async fn one_run_can_auto_compact_again_after_more_tool_output() {
             openai_extra_params_enabled: false,
             openai_extra_params: json!({}),
             custom_headers_enabled: false,
+            strip_images: false,
             custom_headers: json!({}),
             anthropic_extra_params_enabled: false,
             anthropic_extra_params: json!({}),

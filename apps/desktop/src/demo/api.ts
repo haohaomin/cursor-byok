@@ -212,6 +212,7 @@ function createModel({ hash, order, name, type, url, modelId, endpoint = "/v1/re
     openai_extra_params_enabled: false,
     openai_extra_params: {},
     custom_headers_enabled: false,
+    strip_images: false,
     custom_headers: {},
     anthropic_extra_params_enabled: false,
     anthropic_extra_params: {},

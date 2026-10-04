@@ -44,6 +44,17 @@ pub fn project_messages(messages: &[CanonicalMessage]) -> Result<Vec<ProjectedMe
     Ok(projected)
 }
 
+/// Removes provider-visible image parts for models configured as text-only.
+/// Canonical messages remain unchanged so the setting can be changed without
+/// losing the original conversation input.
+pub fn strip_images(messages: &mut [ProjectedMessage]) {
+    for message in messages {
+        if let ProjectedContent::Parts(parts) = &mut message.content {
+            parts.retain(|part| !matches!(part, ContentPart::Image { .. }));
+        }
+    }
+}
+
 fn project_tool_round(
     messages: &[CanonicalMessage],
     start: usize,
@@ -215,5 +226,31 @@ mod tests {
             panic!("expected assistant projection");
         };
         assert_eq!(calls[0].name, "multi_tool_use_parallel");
+    }
+
+    #[test]
+    fn strip_images_only_changes_provider_projection() {
+        let mut projected = vec![ProjectedMessage {
+            message_id: "user-1".into(),
+            role: Role::User,
+            content: ProjectedContent::Parts(vec![
+                ContentPart::Text {
+                    text: "look".into(),
+                },
+                ContentPart::Image {
+                    mime_type: "image/png".into(),
+                    data: vec![1, 2],
+                },
+            ]),
+        }];
+
+        strip_images(&mut projected);
+
+        assert_eq!(
+            projected[0].content,
+            ProjectedContent::Parts(vec![ContentPart::Text {
+                text: "look".into()
+            },])
+        );
     }
 }
