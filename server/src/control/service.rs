@@ -375,7 +375,7 @@ impl ControlService {
             provider_call_index: 0,
             request: ModelRequest {
                 prompt: PromptSpec {
-                    instructions: String::new(),
+                    instructions: "Follow the user's output format exactly.".into(),
                     tools: Vec::new(),
                 },
                 model,
