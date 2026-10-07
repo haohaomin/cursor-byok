@@ -227,6 +227,7 @@ async fn compile_with_timestamp(
 
 pub(super) fn compile_request_context(
     event_id: &str,
+    request: &pb::AgentRunRequest,
     request_context: &pb::RequestContext,
     history: &[CanonicalMessage],
 ) -> Result<Option<CanonicalMessage>> {
@@ -236,7 +237,14 @@ pub(super) fn compile_request_context(
             .as_ref()
             .map(|env| env.time_zone.as_str()),
     )?;
-    let text = context::compile_context(request_context, &time.today);
+    let text = [
+        context::compile_context(request_context, &time.today),
+        super::model::subagent_model_context(request),
+    ]
+    .into_iter()
+    .filter(|section| !section.is_empty())
+    .collect::<Vec<_>>()
+    .join("\n\n");
     if text.is_empty() {
         return Ok(None);
     }

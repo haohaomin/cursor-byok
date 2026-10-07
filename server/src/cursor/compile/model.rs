@@ -138,6 +138,60 @@ fn parse_bool(parameter: &pb::requested_model::ModelParameterValue) -> Result<bo
     }
 }
 
+/// Projects only model identity into the append-only context, never credentials.
+/// Keep the Task schema stable when the client's selected models change.
+pub(super) fn subagent_model_context(request: &pb::AgentRunRequest) -> String {
+    let mut models = std::collections::BTreeMap::<&str, &str>::new();
+    for model in &request.selected_subagent_models {
+        if !model.model_id.is_empty() {
+            models.entry(&model.model_id).or_default();
+        }
+    }
+    for details in &request.selected_subagent_model_details {
+        if !details.model_id.is_empty() {
+            models
+                .entry(&details.model_id)
+                .and_modify(|name| {
+                    if !details.display_name.is_empty()
+                        && (name.is_empty() || details.display_name.as_str() < *name)
+                    {
+                        *name = &details.display_name;
+                    }
+                })
+                .or_insert(&details.display_name);
+        }
+    }
+    // Match exec_context: the first override currently controls Task execution.
+    // Do not advertise per-type routing that the runtime does not implement.
+    let configured = match request
+        .subagent_model_overrides
+        .first()
+        .and_then(|value| value.selection.as_ref())
+    {
+        Some(pb::subagent_model_override::Selection::Model(model))
+            if model.model_id != "default" =>
+        {
+            serde_json::json!({"mode":"configured", "model_id":model.model_id})
+        }
+        Some(pb::subagent_model_override::Selection::Model(_))
+        | Some(pb::subagent_model_override::Selection::Inherit(true)) => {
+            serde_json::json!({"mode":"inherit_parent"})
+        }
+        Some(pb::subagent_model_override::Selection::Disabled(true)) => {
+            serde_json::json!({"mode":"disabled"})
+        }
+        _ => serde_json::json!({"mode":"no_override"}),
+    };
+    let data = serde_json::json!({"client_selected_models":models, "cursor_setting":configured});
+    // Escape markup delimiters in client labels without serializing credential fields.
+    let data = data
+        .to_string()
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;");
+    format!("<subagent_models>\nCursor-supplied model IDs mapped to display names, and the effective Cursor subagent setting. An empty map means no model list was supplied, not that subagents are unavailable. Use inherit by default. A configured setting takes precedence over the Task model argument.\n{data}\n</subagent_models>")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

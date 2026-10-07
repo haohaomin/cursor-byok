@@ -13,3 +13,6 @@ pub(crate) use break_messages::{compile_injection, compile_user_message_action, 
 pub use run::*;
 
 pub(crate) use insert_messages::task_completion;
+
+#[cfg(test)]
+mod subagent_models_tests;

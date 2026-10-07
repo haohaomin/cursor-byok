@@ -190,6 +190,7 @@ pub(crate) async fn prepare(
     {
         break_messages::compile_request_context(
             "identity",
+            request,
             &request_context,
             base_messages.as_deref().unwrap_or_default(),
         )?
@@ -234,6 +235,7 @@ pub(crate) async fn prepare(
                 }),
                 None => break_messages::compile_request_context(
                     event_id,
+                    request,
                     &request_context,
                     base_messages.as_deref().unwrap_or_default(),
                 )?,

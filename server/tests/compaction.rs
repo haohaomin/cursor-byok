@@ -175,12 +175,24 @@ async fn summarize_replaces_model_history_and_preserves_cursor_history() {
         .prompt
         .instructions
         .contains("compacting conversation history"));
-    assert_eq!(requests[1].history.len(), 3);
+    assert_eq!(requests[1].history.len(), 4);
+    assert!(requests[1].history[0]
+        .message_id
+        .starts_with("request-context:"));
     assert_eq!(
-        requests[1].history[2].message_id, "compaction:instruction",
+        requests[1].history[3].message_id, "compaction:instruction",
         "an assistant-terminated history gets the summarize instruction as its user tail"
     );
-    assert_eq!(requests[2].history.len(), 2);
+    assert_eq!(requests[2].history.len(), 3);
+    assert!(requests[2].history[1]
+        .message_id
+        .starts_with("request-context:"));
+    let ProjectedContent::Parts(context_parts) = &requests[2].history[1].content else {
+        panic!("expected request context")
+    };
+    assert!(
+        matches!(context_parts.as_slice(), [ContentPart::Text { text }] if text.contains("<subagent_models>"))
+    );
     let ProjectedContent::Parts(summary_parts) = &requests[2].history[0].content else {
         panic!("first post-compaction message must be the summary")
     };
@@ -188,8 +200,8 @@ async fn summarize_replaces_model_history_and_preserves_cursor_history() {
         matches!(summary_parts.as_slice(), [ContentPart::Text { text }]
         if text.contains("Durable summary"))
     );
-    let ProjectedContent::Parts(new_user_parts) = &requests[2].history[1].content else {
-        panic!("second post-compaction message must be the new runtime user")
+    let ProjectedContent::Parts(new_user_parts) = &requests[2].history[2].content else {
+        panic!("third post-compaction message must be the new runtime user")
     };
     assert!(
         matches!(new_user_parts.as_slice(), [ContentPart::Text { text }]
