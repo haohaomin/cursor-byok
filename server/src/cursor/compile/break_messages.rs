@@ -227,7 +227,7 @@ async fn compile_with_timestamp(
 
 pub(super) fn compile_request_context(
     event_id: &str,
-    request: &pb::AgentRunRequest,
+    subagent_models: &str,
     request_context: &pb::RequestContext,
     history: &[CanonicalMessage],
 ) -> Result<Option<CanonicalMessage>> {
@@ -239,7 +239,7 @@ pub(super) fn compile_request_context(
     )?;
     let text = [
         context::compile_context(request_context, &time.today),
-        super::model::subagent_model_context(request),
+        subagent_models.to_string(),
     ]
     .into_iter()
     .filter(|section| !section.is_empty())

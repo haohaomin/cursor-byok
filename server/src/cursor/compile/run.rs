@@ -186,11 +186,18 @@ pub(crate) async fn prepare(
         }
         None => proposed_base_checkpoint_id,
     };
+    let local_model_names = store
+        .models()
+        .await?
+        .into_iter()
+        .map(|model| (model.model_hash, model.display_name))
+        .collect();
+    let subagent_models = model::subagent_model_context(request, &local_model_names);
     let mut projected_user_context = if input_id.is_some() && !compacting && !background_completion
     {
         break_messages::compile_request_context(
             "identity",
-            request,
+            &subagent_models,
             &request_context,
             base_messages.as_deref().unwrap_or_default(),
         )?
@@ -235,7 +242,7 @@ pub(crate) async fn prepare(
                 }),
                 None => break_messages::compile_request_context(
                     event_id,
-                    request,
+                    &subagent_models,
                     &request_context,
                     base_messages.as_deref().unwrap_or_default(),
                 )?,

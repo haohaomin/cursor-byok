@@ -194,7 +194,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleSearch",
             "SembleFindRelated",
         ],
-        "1721de78776f47160321ccbd0e6c513e198d525c61dc01a0b0a69c90a0e521f3",
+        "1a7f017ee0f01b1caed4a822c1f070b7a9372131410c2c6d1d03bc6ad30e260a",
     );
     assert_mode(
         &assets,
@@ -216,7 +216,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleSearch",
             "SembleFindRelated",
         ],
-        "97764e1a3bf9c5fd46a27f93a0b87d986bb886425d91a0508b3c896cd4abe249",
+        "c828e7667aa695b5f8162e61bd51cd4105ca6af6ff3c857957578726d7151a8e",
     );
     assert_mode(
         &assets,
@@ -240,7 +240,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleSearch",
             "SembleFindRelated",
         ],
-        "1721de78776f47160321ccbd0e6c513e198d525c61dc01a0b0a69c90a0e521f3",
+        "1a7f017ee0f01b1caed4a822c1f070b7a9372131410c2c6d1d03bc6ad30e260a",
     );
     assert_mode(
         &assets,
@@ -266,7 +266,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleSearch",
             "SembleFindRelated",
         ],
-        "9c9404db2cb741bb49aec2fdc02d5ce7495703916312fca5c6631b989a565b96",
+        "c43adaacc93a5ef0a8e8413a5d141436c04866b84e4e2c0c25a225b5c0195a80",
     );
     assert_mode(
         &assets,
@@ -303,7 +303,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
     );
     assert_eq!(
         schema_digest(&assets.mode(Mode::Agent).tools),
-        "55910f7d25b2ef98d39a27a3f2793cf9493b83df2beb80d43321136bee9fb549"
+        "acdaf1b067ee6d0c1387f91d0c01d23d9ccfe025385c632ba6ea5addc2defa5a"
     );
     let task = assets
         .mode(Mode::Agent)

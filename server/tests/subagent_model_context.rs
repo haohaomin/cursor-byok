@@ -13,14 +13,56 @@ use cursor_server::{
         protocol::proto::agent::v1 as pb,
         TransportCommand, TransportRegistry,
     },
-    model::{ContentPart, ProjectedContent},
+    model::{ContentPart, ModelConfigInput, ProjectedContent},
     provider::{FinishReason, ModelEvent},
 };
 use prost::Message;
 
 #[tokio::test]
 async fn client_subagent_models_reach_provider_context() {
+    check_client_model_context(false).await;
+}
+
+#[tokio::test]
+async fn hash_only_client_models_get_local_names_without_exposing_other_config() {
+    check_client_model_context(true).await;
+}
+
+async fn check_client_model_context(hash_only: bool) {
     let (_store_dir, store) = fixtures::temp_store().await;
+    let mut run = user_run();
+    let mut expected_id = "my-custom-model".to_string();
+    if hash_only {
+        let input: ModelConfigInput = serde_json::from_value(serde_json::json!({
+            "display_name": "My Custom Model",
+            "type": "openai", "base_url": "https://private-provider.invalid/v1",
+            "api_key": "secret-not-for-context", "tooltip_data": "private-tooltip",
+            "model_id": "private-provider-slug", "openai_endpoint": cursor_server::model::OPENAI_CHAT_ENDPOINT
+        })).unwrap();
+        let model = store.create_model(&input).await.unwrap();
+        let mut unselected = input;
+        unselected.display_name = "Unselected Local Model".into();
+        unselected.model_id = "unselected-slug".into();
+        store.create_model(&unselected).await.unwrap();
+        expected_id = model.model_hash;
+        let Some(pb::agent_client_message::Message::RunRequest(request)) = run.message.as_mut()
+        else {
+            unreachable!()
+        };
+        request.selected_subagent_models[0].model_id = expected_id.clone();
+        request.selected_subagent_model_details.clear();
+        request
+            .subagent_model_overrides
+            .push(pb::SubagentModelOverride {
+                subagent_type: "generalPurpose".into(),
+                selection: Some(pb::subagent_model_override::Selection::Model(
+                    pb::RequestedModel {
+                        model_id: expected_id.clone(),
+                        ..Default::default()
+                    },
+                )),
+            });
+    }
     let provider = fake_provider::FakeProvider::default();
     provider.push(vec![
         ModelEvent::Start {
@@ -48,7 +90,7 @@ async fn client_subagent_models_reach_provider_context() {
     handle
         .command(TransportCommand::Append {
             seqno: 0,
-            message: Box::new(user_run()),
+            message: Box::new(run),
         })
         .await
         .unwrap();
@@ -101,11 +143,25 @@ async fn client_subagent_models_reach_provider_context() {
         "exactly one request-context message is projected"
     );
     assert!(
-        context_texts[0].contains("my-custom-model"),
+        context_texts[0].contains(&expected_id),
         "client model is missing: {}",
         context_texts[0]
     );
-    assert!(context_texts[0].contains("My Custom Model"));
+    assert!(
+        context_texts[0].contains("My Custom Model"),
+        "missing name: {}",
+        context_texts[0]
+    );
+    for private in [
+        "secret-not-for-context",
+        "private-provider.invalid",
+        "private-tooltip",
+        "private-provider-slug",
+        "Unselected Local Model",
+        "unselected-slug",
+    ] {
+        assert!(!context_texts[0].contains(private), "leaked {private}");
+    }
     let task = requests[0]
         .prompt
         .tools

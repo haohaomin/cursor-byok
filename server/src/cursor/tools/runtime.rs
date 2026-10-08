@@ -88,16 +88,16 @@ impl ExecContext {
         if self.task_disabled(call) {
             return Ok(call.clone());
         }
-        let model = match &self.subagent_model {
-            Some(SubagentModel::Model(model)) => model.clone(),
-            Some(SubagentModel::Disabled) => unreachable!("disabled Task returned above"),
-            None => arguments
-                .get("model")
-                .and_then(serde_json::Value::as_str)
-                .filter(|model| *model != "inherit")
-                .unwrap_or(&self.default_subagent_model)
-                .to_string(),
-        };
+        let model = arguments
+            .get("model")
+            .and_then(serde_json::Value::as_str)
+            .filter(|model| *model != "inherit")
+            .unwrap_or_else(|| match &self.subagent_model {
+                Some(SubagentModel::Model(model)) => model,
+                Some(SubagentModel::Disabled) => unreachable!("disabled Task returned above"),
+                None => &self.default_subagent_model,
+            })
+            .to_string();
         if model.is_empty() {
             return Err(Error::Protocol(format!(
                 "Task subagent type {subagent_type} has no model"

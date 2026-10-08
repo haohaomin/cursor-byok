@@ -1442,3 +1442,104 @@ fn kv_ack(id: u32) -> pb::AgentClientMessage {
         )),
     }
 }
+
+#[tokio::test]
+async fn task_model_priority_is_preserved_in_cursor_execution_messages() {
+    use cursor_server::cursor::tools::runtime::SubagentModel;
+    for (explicit, configured, expected) in [
+        (
+            Some("requested-hash"),
+            Some("configured-hash"),
+            "requested-hash",
+        ),
+        (Some("requested-hash"), Some("parent"), "requested-hash"),
+        (Some("inherit"), Some("configured-hash"), "configured-hash"),
+        (None, Some("configured-hash"), "configured-hash"),
+        (Some("requested-hash"), None, "requested-hash"),
+        (
+            Some("unknown-hash"),
+            Some("configured-hash"),
+            "unknown-hash",
+        ),
+        (Some("inherit"), None, "parent"),
+        (None, None, "parent"),
+    ] {
+        let dispatcher = ToolDispatcher::new(CursorToolRuntime::default());
+        let mut context = exec_context();
+        context.default_subagent_model = "parent".into();
+        context.subagent_model = configured.map(|id| SubagentModel::Model(id.into()));
+        let mut task = call("priority-test", "Task");
+        task.arguments = json!({"description":"Read README", "prompt":"Read README", "subagent_type":"generalPurpose"});
+        if let Some(model) = explicit {
+            task.arguments["model"] = json!(model);
+        }
+        let dispatched = dispatcher
+            .start_batch(
+                &[task],
+                ToolBatchState {
+                    completed: &HashSet::new(),
+                    started: &HashSet::new(),
+                    response_text: "",
+                    response_thinking: "",
+                },
+                &[],
+                &BTreeMap::new(),
+                &context,
+            )
+            .await
+            .unwrap();
+        let args = dispatched[0]
+            .messages
+            .iter()
+            .find_map(|message| match message.message.as_ref()? {
+                pb::agent_server_message::Message::ExecServerMessage(exec) => {
+                    match exec.message.as_ref()? {
+                        pb::exec_server_message::Message::SubagentArgs(args) => Some(args),
+                        _ => None,
+                    }
+                }
+                _ => None,
+            })
+            .expect("Task must dispatch to Cursor");
+        assert_eq!(
+            args.model_id, expected,
+            "explicit={explicit:?}, configured={configured:?}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn explicit_task_model_cannot_bypass_disabled_subagents() {
+    use cursor_server::cursor::tools::runtime::SubagentModel;
+    for disabled_via_flag in [false, true] {
+        let dispatcher = ToolDispatcher::new(CursorToolRuntime::default());
+        let mut context = exec_context();
+        context.subagents_disabled = disabled_via_flag;
+        if !disabled_via_flag {
+            context.subagent_model = Some(SubagentModel::Disabled);
+        }
+        let mut task = call("disabled-task", "Task");
+        task.arguments =
+            json!({"description":"Read README", "prompt":"Read README", "model":"requested-hash"});
+        let dispatched = dispatcher
+            .start_batch(
+                &[task],
+                ToolBatchState {
+                    completed: &HashSet::new(),
+                    started: &HashSet::new(),
+                    response_text: "",
+                    response_thinking: "",
+                },
+                &[],
+                &BTreeMap::new(),
+                &context,
+            )
+            .await
+            .unwrap();
+        assert!(!dispatched[0].messages.iter().any(|message| matches!(
+            message.message,
+            Some(pb::agent_server_message::Message::ExecServerMessage(_))
+        )));
+        assert!(dispatched[0].completion.as_ref().unwrap().result().is_error);
+    }
+}
