@@ -1,5 +1,6 @@
 //! Owns conversation-scoped runtime coordination.
 
+mod background;
 mod command;
 mod delivery;
 mod output;

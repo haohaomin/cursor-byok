@@ -65,7 +65,16 @@ impl RunEngine {
             )
             .await;
         let usage = outcome.1;
-        let outcome = outcome.0;
+        // A replacement transport may close the receiver while a cancelled run
+        // publishes its final recovery checkpoint. That remains a cancellation.
+        let outcome = match outcome.0 {
+            RunOutcome::Failed(RunFailure::Client(_))
+                if cancellation.is_cancelled() && client.events.is_closed() =>
+            {
+                RunOutcome::Cancelled
+            }
+            outcome => outcome,
+        };
         let (status, failure) = match &outcome {
             RunOutcome::Completed => (RunStatus::Completed, None),
             RunOutcome::Cancelled => (RunStatus::Cancelled, None),
@@ -238,7 +247,7 @@ impl RunEngine {
             }
             // The usage anchor counts persisted messages only; a transient
             // tail is provider-visible but never committed.
-            let anchored_messages = history.len();
+            let mut anchored_messages = history.len();
             let history = if prepared.action == RunAction::Compact {
                 super::history::user_terminated(
                     history,
@@ -248,7 +257,7 @@ impl RunEngine {
             } else {
                 super::history::user_terminated(history, CONTINUE_MESSAGE_ID, CONTINUE_INSTRUCTION)
             };
-            let request = crate::model::ModelRequest {
+            let mut request = crate::model::ModelRequest {
                 prompt: prepared.prompt.clone(),
                 model: prepared.model.clone(),
                 history,
@@ -288,7 +297,16 @@ impl RunEngine {
                                 Some(RunCommand::BreakMessages(messages)) => messages,
                                 Some(RunCommand::Cancel) => {
                                     cycle_cancellation.cancel();
-                                    let _ = cycle.await;
+                                    let text = match cycle.await {
+                                        Ok(cycle) => cycle.text,
+                                        Err(failure) => failure.partial_text,
+                                    };
+                                    if let Err(outcome) = super::interruption::preserve_text(
+                                        &self.store, prepared, client, checkpoint,
+                                        &format!("{provider_call_index}:{retries}"), &text,
+                                    ).await {
+                                        return (outcome, usage);
+                                    }
                                     let _ = emit(client, RunEvent::CycleInterrupted).await;
                                     return (RunOutcome::Cancelled, usage);
                                 }
@@ -378,6 +396,41 @@ impl RunEngine {
                                 anchored_messages,
                             );
                             accumulate_usage(&mut usage, cycle_usage);
+                        }
+                        let previous_checkpoint = checkpoint;
+                        checkpoint = match super::interruption::preserve_text(
+                            &self.store,
+                            prepared,
+                            client,
+                            checkpoint,
+                            &format!("{provider_call_index}:{retries}"),
+                            &cycle_failure.partial_text,
+                        )
+                        .await
+                        {
+                            Ok(checkpoint) => checkpoint,
+                            Err(outcome) => return (outcome, usage),
+                        };
+                        if checkpoint != previous_checkpoint {
+                            let messages =
+                                match self.store.load_checkpoint_messages(checkpoint).await {
+                                    Ok(messages) => messages,
+                                    Err(error) => return (RunOutcome::Failed(error.into()), usage),
+                                };
+                            let mut history = match crate::model::project_messages(&messages) {
+                                Ok(history) => history,
+                                Err(error) => return (RunOutcome::Failed(error.into()), usage),
+                            };
+                            if let Err(error) = hydrate_tool_images(&self.store, &mut history).await
+                            {
+                                return (RunOutcome::Failed(error.into()), usage);
+                            }
+                            anchored_messages = history.len();
+                            request.history = super::history::user_terminated(
+                                history,
+                                CONTINUE_MESSAGE_ID,
+                                CONTINUE_INSTRUCTION,
+                            );
                         }
                         if cancellation.is_cancelled() {
                             let _ = emit(client, RunEvent::CycleInterrupted).await;

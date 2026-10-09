@@ -31,6 +31,7 @@ pub(crate) struct ConversationDependencies {
 }
 
 struct RegistryInner {
+    background: super::background::BackgroundCompletions,
     current: Mutex<HashMap<ConversationId, ActiveRun>>,
     pending: Mutex<HashMap<ConversationId, PendingMessages>>,
     changed: Notify,
@@ -53,6 +54,7 @@ impl ConversationRegistry {
     ) -> Self {
         Self {
             inner: Arc::new(RegistryInner {
+                background: super::background::BackgroundCompletions::default(),
                 current: Mutex::new(HashMap::new()),
                 pending: Mutex::new(HashMap::new()),
                 changed: Notify::new(),
@@ -69,6 +71,17 @@ impl ConversationRegistry {
 
     pub(crate) fn dependencies(&self) -> &ConversationDependencies {
         &self.inner.dependencies
+    }
+
+    pub(super) async fn admit_background(
+        &self,
+        request_id: &str,
+        request: &crate::cursor::protocol::proto::agent::v1::AgentRunRequest,
+    ) -> crate::Result<super::background::Admission> {
+        self.inner
+            .background
+            .admit(&self.inner.dependencies.store, request_id, request)
+            .await
     }
 
     pub(crate) fn bind_transport(

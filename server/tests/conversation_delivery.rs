@@ -203,7 +203,7 @@ async fn background_completion_joins_the_active_run_instead_of_replacing_it() {
 }
 
 #[tokio::test]
-async fn retrying_one_background_completion_reuses_its_runtime_message() {
+async fn retrying_one_background_completion_does_not_call_the_model_again() {
     let (_directory, store) = fixtures::temp_store().await;
     let provider = fake_provider::FakeProvider::default();
     provider.push(stop_response("model-call", "followed up"));
@@ -234,11 +234,59 @@ async fn retrying_one_background_completion_reuses_its_runtime_message() {
 
     provider.push(stop_response("model-call-2", "followed up again"));
     let second = registry.get_or_create("completion-retry-2").await.unwrap();
-    drive_completion(
+    drive_forwarded_completion(
         &second,
-        completion_run("retry-child", "completion-retry-run-2", checkpoint),
+        completion_run("retry-child", "completion-retry-run-2", checkpoint.clone()),
     )
     .await;
+    assert_eq!(
+        provider.requests().len(),
+        1,
+        "duplicate completion must not wake the model"
+    );
+
+    // Recreate all in-memory coordination while retaining the same durable store.
+    registry.shutdown().await;
+    let restarted = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(PromptAssets::embedded().unwrap()),
+    );
+    let third = restarted.get_or_create("completion-retry-3").await.unwrap();
+    drive_forwarded_completion(
+        &third,
+        completion_run(
+            "retry-child",
+            "completion-retry-run-3",
+            pb::ConversationStateStructure::default(),
+        ),
+    )
+    .await;
+    assert_eq!(
+        provider.requests().len(),
+        1,
+        "restart must not forget consumed completions"
+    );
+
+    // Explicit Resume is not a completion redelivery and still invokes the model.
+    let mut resume = completion_run("retry-child", "explicit-resume", checkpoint);
+    let Some(pb::agent_client_message::Message::RunRequest(request)) = resume.message.as_mut()
+    else {
+        unreachable!()
+    };
+    request.action = Some(pb::ConversationAction {
+        action: Some(pb::conversation_action::Action::ResumeAction(
+            pb::ResumeAction::default(),
+        )),
+        ..Default::default()
+    });
+    let handle = restarted.get_or_create("explicit-resume").await.unwrap();
+    drive_completion(&handle, resume).await;
+    assert_eq!(
+        provider.requests().len(),
+        2,
+        "explicit Resume must remain available"
+    );
 
     let messages = store
         .load_current_messages(&cursor_server::model::ConversationId::new(
@@ -460,6 +508,14 @@ async fn drive_completion(
 }
 
 async fn drive_forwarded_completion(handle: &TransportHandle, message: pb::AgentClientMessage) {
+    drive_completion_end(handle, message, false).await;
+}
+
+async fn drive_completion_end(
+    handle: &TransportHandle,
+    message: pb::AgentClientMessage,
+    cancelled: bool,
+) {
     let mut output = handle.subscribe();
     handle
         .command(TransportCommand::Append {
@@ -476,7 +532,12 @@ async fn drive_forwarded_completion(handle: &TransportHandle, message: pb::Agent
             .unwrap();
         let (flags, payload) = connect::decode_frames(&frame).unwrap().pop().unwrap();
         if flags & connect::END_STREAM_FLAG != 0 {
-            assert_eq!(payload.as_ref(), b"{}");
+            if cancelled {
+                let error: serde_json::Value = serde_json::from_slice(&payload).unwrap();
+                assert_eq!(error["error"]["code"], "canceled");
+            } else {
+                assert_eq!(payload.as_ref(), b"{}");
+            }
             return;
         }
         let server = pb::AgentServerMessage::decode(payload).unwrap();
@@ -774,10 +835,14 @@ async fn assert_background_completion_wakes_finished_parent(
             .get_or_create(&format!("wakeup-{index}"))
             .await
             .unwrap();
-        (checkpoint, _) = drive_completion(&handle, message).await;
+        if index == 2 {
+            drive_forwarded_completion(&handle, message).await;
+        } else {
+            (checkpoint, _) = drive_completion(&handle, message).await;
+        }
     }
     let requests = provider.requests();
-    assert_eq!(requests.len(), 4);
+    assert_eq!(requests.len(), 3);
     assert!(requests.iter().all(|request| (request.model.latency
         == cursor_server::model::ModelLatency::Fast)
         == fast));
@@ -804,6 +869,88 @@ async fn assert_background_completion_wakes_finished_parent(
             .fetch_all(store.pool())
             .await
             .unwrap();
-    assert_eq!(statuses, vec!["completed"; 4]);
+    assert_eq!(statuses, vec!["completed"; 3]);
     registry.shutdown().await;
+}
+
+#[tokio::test]
+async fn simultaneous_shell_completion_requests_start_only_one_run() {
+    let (_directory, store) = fixtures::temp_store().await;
+    let provider = fake_provider::FakeProvider::default();
+    provider.push(stop_response("first", "shell completed"));
+    provider.push(stop_response("unexpected", "duplicate"));
+    let registry = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(PromptAssets::embedded().unwrap()),
+    );
+    let first = registry.get_or_create("shell-duplicate-1").await.unwrap();
+    let second = registry.get_or_create("shell-duplicate-2").await.unwrap();
+    tokio::join!(
+        drive_forwarded_completion(&first, shell_completion_run(Default::default())),
+        drive_forwarded_completion(&second, shell_completion_run(Default::default())),
+    );
+    assert_eq!(provider.requests().len(), 1);
+    let before = store
+        .load_current_messages(&cursor_server::model::ConversationId::new(
+            "parent-conversation",
+        ))
+        .await
+        .unwrap();
+    let third = registry.get_or_create("shell-duplicate-3").await.unwrap();
+    drive_forwarded_completion(&third, shell_completion_run(Default::default())).await;
+    assert_eq!(provider.requests().len(), 1);
+    let after = store
+        .load_current_messages(&cursor_server::model::ConversationId::new(
+            "parent-conversation",
+        ))
+        .await
+        .unwrap();
+    assert_eq!(
+        before, after,
+        "stale duplicate checkpoint must not replace current history"
+    );
+}
+
+#[tokio::test]
+async fn cancelled_completion_is_not_restarted_by_automatic_redelivery() {
+    let (_directory, store) = fixtures::temp_store().await;
+    let provider = fake_provider::FakeProvider::default();
+    provider.push_pending();
+    provider.push(stop_response("unwanted-restart", "unexpected"));
+    let registry = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(PromptAssets::embedded().unwrap()),
+    );
+    let first = registry.get_or_create("cancel-completion-1").await.unwrap();
+    let client = first.clone();
+    let pending = tokio::spawn(async move {
+        drive_completion_end(&client, shell_completion_run(Default::default()), true).await;
+    });
+    tokio::time::timeout(std::time::Duration::from_secs(5), async {
+        while provider.requests().is_empty() {
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    first.command(TransportCommand::Disconnect).await.unwrap();
+    pending.await.unwrap();
+    registry.shutdown().await;
+    let restarted = TransportRegistry::new(
+        store,
+        Arc::new(provider.clone()),
+        PromptCompiler::new(PromptAssets::embedded().unwrap()),
+    );
+    let retry = restarted
+        .get_or_create("cancel-completion-2")
+        .await
+        .unwrap();
+    drive_forwarded_completion(&retry, shell_completion_run(Default::default())).await;
+    assert_eq!(
+        provider.requests().len(),
+        1,
+        "automatic notification must not undo cancellation"
+    );
 }

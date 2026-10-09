@@ -394,7 +394,9 @@ async fn runtime_cancel_action_aborts_active_exec_before_canceled_end_stream() {
         })
         .await
         .unwrap();
+    append_seqno += 1;
     let mut saw_abort = false;
+    let mut saw_cancelled_checkpoint = false;
     loop {
         let frame = tokio::time::timeout(std::time::Duration::from_secs(5), output.recv())
             .await
@@ -405,19 +407,29 @@ async fn runtime_cancel_action_aborts_active_exec_before_canceled_end_stream() {
             let json: serde_json::Value = serde_json::from_slice(&payload).unwrap();
             assert_eq!(json["error"]["code"], "canceled");
             assert!(saw_abort, "ExecServerAbort must precede canceled EndStream");
+            assert!(
+                saw_cancelled_checkpoint,
+                "cancelled tools must be checkpointed before EndStream"
+            );
             break;
         }
         let server = pb::AgentServerMessage::decode(payload).unwrap();
-        if let Some(pb::agent_server_message::Message::ExecServerControlMessage(control)) =
-            server.message
-        {
-            let Some(pb::exec_server_control_message::Message::Abort(abort)) = control.message
-            else {
-                panic!("expected ExecServerAbort")
-            };
-            assert_eq!(abort.id, exec_id);
-            saw_abort = true;
+        match server.message {
+            Some(pb::agent_server_message::Message::ExecServerControlMessage(control)) => {
+                let Some(pb::exec_server_control_message::Message::Abort(abort)) = control.message
+                else {
+                    panic!("expected ExecServerAbort")
+                };
+                assert_eq!(abort.id, exec_id);
+                saw_abort = true;
+            }
+            Some(pb::agent_server_message::Message::ConversationCheckpointUpdate(state)) => {
+                saw_cancelled_checkpoint |= saw_abort && state.pending_tool_calls.is_empty();
+            }
+            _ => {}
         }
+        // Cancellation now publishes recovery blobs before closing the stream.
+        acknowledge_kv(&handle, &mut append_seqno, &frame).await;
     }
     assert_eq!(output.recv().await, None);
 }

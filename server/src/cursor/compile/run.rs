@@ -55,6 +55,24 @@ pub(crate) struct PrepareDependencies<'a> {
     pub local_rules_dir: Option<&'a std::path::Path>,
 }
 
+pub(crate) fn background_completion_event_id(
+    request: &pb::AgentRunRequest,
+) -> Result<Option<String>> {
+    let Some(pb::conversation_action::Action::BackgroundTaskCompletionAction(completion)) = request
+        .action
+        .as_ref()
+        .and_then(|action| action.action.as_ref())
+    else {
+        return Ok(None);
+    };
+    // Use the same validated, sorted identity as the persisted runtime message.
+    Ok(Some(
+        insert_messages::project(completion, pb::AgentMode::Agent as i32)?
+            .turn_user
+            .message_id,
+    ))
+}
+
 pub(crate) async fn prepare(
     request_id: &str,
     request: &pb::AgentRunRequest,

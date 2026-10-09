@@ -6,6 +6,7 @@ mod engine;
 mod event;
 mod handle;
 mod history;
+pub(crate) mod interruption;
 mod messages;
 mod model_cycle;
 mod model_retry;

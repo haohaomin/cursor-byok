@@ -21,6 +21,7 @@ enum FakeResponse {
         events: Vec<Result<ModelEvent, Error>>,
     },
     Pending,
+    EventsThenPending(Vec<ModelEvent>),
 }
 
 #[derive(Clone, Default)]
@@ -44,6 +45,12 @@ impl FakeProvider {
             .lock()
             .unwrap()
             .push_back(FakeResponse::Events(vec![Err(error)]));
+    }
+    pub fn push_events_then_pending(&self, events: Vec<ModelEvent>) {
+        self.responses
+            .lock()
+            .unwrap()
+            .push_back(FakeResponse::EventsThenPending(events));
     }
     pub fn push_pending(&self) {
         self.responses
@@ -90,6 +97,9 @@ impl Provider for FakeProvider {
                 .flat_map(stream::iter),
             ),
             FakeResponse::Pending => Box::pin(stream::pending()),
+            FakeResponse::EventsThenPending(events) => {
+                Box::pin(stream::iter(events.into_iter().map(Ok)).chain(stream::pending()))
+            }
         }
     }
 }

@@ -76,8 +76,9 @@ pub(super) async fn execute(
     let mut pending_insertions = insertions;
     while remaining > 0 {
         let command = tokio::select! {
-            _ = cancellation.cancelled() => return Err(RunOutcome::Cancelled),
+            biased;
             command = client.commands.recv() => command,
+            _ = cancellation.cancelled() => Some(RunCommand::Cancel),
         };
         match command {
             Some(RunCommand::ToolResult(result)) => {
@@ -126,7 +127,7 @@ pub(super) async fn execute(
                 )
                 .await?;
                 if let Some(ready) = ready {
-                    super::engine::wait_for_state_ready(ready, cancellation).await?;
+                    super::engine::wait_for_state_ready(ready, &CancellationToken::new()).await?;
                 }
             }
             Some(RunCommand::BreakMessages(messages)) => {
@@ -205,7 +206,10 @@ pub(super) async fn execute(
                 return Ok(checkpoint);
             }
             Some(RunCommand::InsertMessages(insertion)) => pending_insertions.push(insertion),
-            Some(RunCommand::Cancel) => return Err(RunOutcome::Cancelled),
+            Some(RunCommand::Cancel) => {
+                super::interruption::cancel_tools(store, prepared, client, &round_id).await?;
+                return Err(RunOutcome::Cancelled);
+            }
             None => return Err(client_failure()),
         }
     }

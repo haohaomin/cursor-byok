@@ -39,7 +39,7 @@ async fn all_tools_complete_before_interleaved_text_is_released() {
 }
 
 #[tokio::test]
-async fn cancel_drops_deferred_narration_and_does_not_start_another_model_call() {
+async fn cancel_settles_tools_then_preserves_narration_without_another_model_call() {
     exercise("cancel", 1).await;
 }
 
@@ -145,9 +145,8 @@ async fn exercise(outcome: &str, count: usize) {
             if outcome == "cancel" {
                 let error: serde_json::Value = serde_json::from_slice(&payload).unwrap();
                 assert_eq!(error["error"]["code"], "canceled");
-                assert_eq!(transcript, ["text:before"]);
                 assert_eq!(provider.requests().len(), 1);
-                return;
+                break;
             }
             assert_eq!(payload.as_ref(), b"{}");
             break;
@@ -215,7 +214,7 @@ async fn exercise(outcome: &str, count: usize) {
                         assert!(unfinished.remove(&call.call_id));
                         completed += 1;
                         let tool = call.tool_call.unwrap().tool.unwrap();
-                        if outcome == "retry" {
+                        if matches!(outcome, "retry" | "cancel") {
                             let pb::tool_call::Tool::McpToolCall(mcp) = tool else {
                                 panic!("expected failed partial call");
                             };
@@ -296,7 +295,9 @@ async fn exercise(outcome: &str, count: usize) {
     for i in 0..count {
         expected.extend([format!("text:after-{i}"), format!("thinking:thinking-{i}")]);
     }
-    expected.push("text:final".into());
+    if outcome != "cancel" {
+        expected.push("text:final".into());
+    }
     assert_eq!(transcript, expected);
     // Replay uses the exact same presentation order as the live stream.
     let mut replay = Vec::new();
@@ -333,8 +334,10 @@ async fn exercise(outcome: &str, count: usize) {
     }
     assert_eq!(replay, expected);
     let requests = provider.requests();
-    assert_eq!(requests.len(), 2);
-    assert!(requests[1].history.starts_with(&requests[0].history));
+    assert_eq!(requests.len(), if outcome == "cancel" { 1 } else { 2 });
+    if outcome != "cancel" {
+        assert!(requests[1].history.starts_with(&requests[0].history));
+    }
     let messages = store
         .load_current_messages(&ConversationId::new("presentation-conversation"))
         .await
@@ -346,18 +349,10 @@ async fn exercise(outcome: &str, count: usize) {
     let has_attempt_text = messages.iter().any(
         |m| matches!(&m.content, MessageContent::Assistant { text, .. } if text == &expected_text),
     );
-    if outcome == "retry" {
-        assert_eq!(
-            requests[0], requests[1],
-            "retry must use the same canonical history"
-        );
-        assert!(
-            !has_attempt_text,
-            "failed attempt text is presentation-only"
-        );
-    } else {
-        assert!(has_attempt_text);
-    }
+    assert!(
+        has_attempt_text,
+        "interrupted text must remain in canonical history"
+    );
 }
 
 fn shell_result(id: u32, outcome: &str) -> pb::AgentClientMessage {

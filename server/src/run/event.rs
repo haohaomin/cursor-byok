@@ -63,6 +63,8 @@ pub enum RunOutcome {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CommitCause {
     InitialMessages,
+    Interrupted,
+    ToolRoundCancelled(ToolRoundId),
     ToolRoundStarted(ToolRoundId),
     ToolResult { call_id: String, synthetic: bool },
     FinalTurn,

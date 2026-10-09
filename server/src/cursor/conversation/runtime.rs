@@ -749,13 +749,40 @@ fn spawn_run_request(
             return;
         }
 
+        // Reject repeated completion actions before importing their potentially
+        // stale checkpoint or preparing a fresh model invocation.
+        let continuation = generation.prepared.lock().clone();
+        let _completion_guard = if continuation.is_none() {
+            match registry
+                .admit_background(handle.request_id(), &request)
+                .await
+            {
+                Ok(super::background::Admission::New(guard)) => Some(guard),
+                Ok(super::background::Admission::Ordinary) => None,
+                result => {
+                    let finish = match result {
+                        Ok(super::background::Admission::Duplicate) => TransportFinish::Success,
+                        Err(error) => TransportFinish::Failed(error),
+                        _ => unreachable!(),
+                    };
+                    let _ = handle
+                        .command(TransportCommand::RunFinished {
+                            generation: generation.id,
+                            finish: RunFinish::Transport(finish),
+                        })
+                        .await;
+                    return;
+                }
+            }
+        } else {
+            None
+        };
         let mut checkpoint = CheckpointBuilder::new(
             dependencies.store.clone(),
             blob_sync.clone(),
             handle.parent().and_then(|parent| parent.tool_call_id),
             request.conversation_state.clone(),
         );
-        let continuation = generation.prepared.lock().clone();
         let prepared = if let Some((mut prepared, mut context)) = continuation {
             prepared.run_id = compile::execution_run_id(handle.request_id());
             prepared.initial_messages = generation.tasks.take_ready();

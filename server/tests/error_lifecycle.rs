@@ -154,7 +154,13 @@ async fn provider_failure_retries_from_the_current_checkpoint_without_hiding_par
     );
     let requests = provider.requests();
     assert_eq!(requests.len(), 2);
-    assert_eq!(requests[0], requests[1]);
+    assert_eq!(requests[0].prompt, requests[1].prompt);
+    assert_eq!(requests[0].model, requests[1].model);
+    assert!(requests[1].history.starts_with(&requests[0].history));
+    assert!(requests[1].history.iter().any(|message| {
+        matches!(&message.content, cursor_server::model::ProjectedContent::Assistant { text, calls, .. }
+            if text == "partial " && calls.is_empty())
+    }));
     let messages = store
         .load_current_messages(&cursor_server::model::ConversationId::new(
             "protocol-failed-conversation",
@@ -164,7 +170,7 @@ async fn provider_failure_retries_from_the_current_checkpoint_without_hiding_par
     assert!(messages.iter().any(|message| {
         matches!(&message.content, MessageContent::Assistant { text, .. } if text == "completed")
     }));
-    assert!(!messages.iter().any(|message| {
+    assert!(messages.iter().any(|message| {
         matches!(&message.content, MessageContent::Assistant { text, .. } if text.contains("partial"))
     }));
 }

@@ -280,19 +280,11 @@ impl ConversationOutput {
                             %message,
                             "retrying model call from current checkpoint"
                         );
-                        for call in calls.values_mut() {
-                            if call.arguments.is_null() {
-                                call.arguments = serde_json::from_str(&call.arguments_text)
-                                    .unwrap_or_else(|_| serde_json::json!({}));
-                            }
-                            let completion = compat::failure_with_message(
-                                call,
-                                format!("Model attempt failed before tool completion: {message}"),
-                            );
-                            self.handle
-                                .emit(&codec::tool_completed(call, &completion))?;
-                            presentation.tool_completed(&completion);
-                        }
+                        self.close_partial_tools(
+                            &mut calls,
+                            &mut presentation,
+                            &format!("Model attempt failed before tool completion: {message}"),
+                        )?;
                         narration.tools_finished(&self.handle, &mut presentation)?;
                         presentation.finish_model_attempt();
                         response_text.clear();
@@ -601,6 +593,37 @@ impl ConversationOutput {
                                 narration.tools_finished(&self.handle, &mut presentation)?;
                             }
                         }
+                        if let CommitCause::ToolRoundCancelled(round_id) = &state.cause {
+                            self.abort_execs().await;
+                            let snapshot =
+                                self.store.tool_round(round_id).await?.ok_or_else(|| {
+                                    Error::Store("cancelled tool round disappeared".into())
+                                })?;
+                            for call in &snapshot.calls {
+                                if completed.contains(&call.call_id) {
+                                    continue;
+                                }
+                                let completion = compat::failure_with_message(
+                                    call,
+                                    crate::run::interruption::CANCELLED_TOOL_MESSAGE.into(),
+                                );
+                                self.handle
+                                    .emit(&codec::tool_completed(call, &completion))?;
+                                presentation.tool_completed(&completion);
+                                completed.insert(call.call_id.clone());
+                            }
+                            narration.tools_finished(&self.handle, &mut presentation)?;
+                            tool_round_settled = true;
+                        }
+                        if state.cause == CommitCause::Interrupted {
+                            self.close_partial_tools(
+                                &mut calls,
+                                &mut presentation,
+                                "Model response was interrupted before tool execution.",
+                            )?;
+                            narration.tools_finished(&self.handle, &mut presentation)?;
+                            presentation.finish_model_attempt();
+                        }
                         let final_turn = state.cause == CommitCause::FinalTurn;
                         if let CommitCause::Compaction { summary } = &state.cause {
                             if !state.barrier.is_required() {
@@ -827,6 +850,25 @@ impl ConversationOutput {
                 },
             }
         }
+    }
+
+    fn close_partial_tools(
+        &self,
+        calls: &mut BTreeMap<usize, ToolCall>,
+        presentation: &mut StepBuffer,
+        message: &str,
+    ) -> Result<()> {
+        for mut call in std::mem::take(calls).into_values() {
+            if call.arguments.is_null() {
+                call.arguments = serde_json::from_str(&call.arguments_text)
+                    .unwrap_or_else(|_| serde_json::json!({}));
+            }
+            let completion = compat::failure_with_message(&call, message.into());
+            self.handle
+                .emit(&codec::tool_completed(&call, &completion))?;
+            presentation.tool_completed(&completion);
+        }
+        Ok(())
     }
 
     async fn abort_execs(&self) {
