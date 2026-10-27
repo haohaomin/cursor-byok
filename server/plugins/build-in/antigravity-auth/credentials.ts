@@ -32,6 +32,21 @@ export async function prepareAccount(
   const rejected = rejectedResource !== null &&
     accountData(rejectedResource).accessToken === data.accessToken;
   if (!rejected && resource.state.status !== "invalid" && !isTokenExpired(data)) return null;
+  if (data.refreshError) {
+    return {
+      privateData: data as unknown as JsonValue,
+      state: { status: "invalid", message: data.refreshError },
+    };
+  }
+  if (data.refreshRetryAtMs && data.refreshRetryAtMs > Date.now()) {
+    return {
+      state: {
+        status: "cooling",
+        retryAtMs: data.refreshRetryAtMs,
+        message: "Google token refresh temporarily unavailable; retry shortly",
+      },
+    };
+  }
   if (!data.refreshToken) {
     return {
       state: { status: "invalid", message: "Google refresh token is missing; sign in again" },
@@ -72,7 +87,9 @@ export async function prepareAccount(
   if (response.status >= 200 && response.status < 300) {
     const accessToken = text(body.access_token);
     if (!accessToken) {
+      const refreshToken = text(body.refresh_token) ?? data.refreshToken;
       return {
+        privateData: { ...data, refreshToken, refreshRetryAtMs: Date.now() + 15_000 } as unknown as JsonValue,
         state: {
           status: "cooling",
           retryAtMs: Date.now() + 15_000,
@@ -82,7 +99,12 @@ export async function prepareAccount(
     }
     const refreshToken = text(body.refresh_token) ?? data.refreshToken;
     const expiresIn = number(body.expires_in);
-    const { expiresAtMs: _oldExpiry, ...previous } = data;
+    const {
+      expiresAtMs: _oldExpiry,
+      refreshError: _oldError,
+      refreshRetryAtMs: _oldRetry,
+      ...previous
+    } = data;
     return {
       privateData: {
         ...previous,
@@ -98,17 +120,18 @@ export async function prepareAccount(
 
   const errorCode = text(body.error);
   if (errorCode === "invalid_grant" || errorCode === "unauthorized_client") {
+    const message = "Google authorization expired or revoked; sign in again";
     return {
-      state: {
-        status: "invalid",
-        message: "Google authorization expired or revoked; sign in again",
-      },
+      privateData: { ...data, refreshError: message } as unknown as JsonValue,
+      state: { status: "invalid", message },
     };
   }
+  const retryAtMs = Date.now() + 15_000;
   return {
+    privateData: { ...data, refreshRetryAtMs: retryAtMs } as unknown as JsonValue,
     state: {
       status: "cooling",
-      retryAtMs: Date.now() + 15_000,
+      retryAtMs,
       message: `Google token refresh temporarily failed (HTTP ${response.status}); retry shortly`,
     },
   };

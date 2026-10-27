@@ -68,16 +68,19 @@ Deno.test("Google refresh persists a rotated token and explicit expiry", async (
   );
 });
 
-Deno.test("Google invalid_grant requires a new login", async () => {
+Deno.test("Google invalid_grant requires a new login and is not retried", async () => {
+  let calls = 0;
   const context = {
     signal: new AbortController().signal,
     network: {
-      fetch: () =>
-        Promise.resolve({
+      fetch: () => {
+        calls += 1;
+        return Promise.resolve({
           status: 400,
           headers: {},
           body: JSON.stringify({ error: "invalid_grant" }),
-        }),
+        });
+      },
       stream: () => Promise.reject(new Error("stream is not expected")),
     },
   } satisfies PluginContext;
@@ -93,4 +96,41 @@ Deno.test("Google invalid_grant requires a new login", async () => {
     context,
   );
   assert(patch?.state?.status === "invalid", "revoked Google token should require login");
+  const rejectedAgain = await prepareAccount(
+    snapshot(patch.privateData as JsonValue, patch.state),
+    null,
+    context,
+  );
+  assert(rejectedAgain?.state?.status === "invalid", "revoked token state should remain invalid");
+  assert(calls === 1, "revoked refresh token must not be sent repeatedly");
+});
+
+Deno.test("Google malformed refresh response cools down and preserves rotation", async () => {
+  const context = {
+    signal: new AbortController().signal,
+    network: {
+      fetch: () =>
+        Promise.resolve({
+          status: 200,
+          headers: {},
+          body: JSON.stringify({ refresh_token: "refresh-after" }),
+        }),
+      stream: () => Promise.reject(new Error("stream is not expected")),
+    },
+  } satisfies PluginContext;
+  const patch = await prepareAccount(
+    snapshot({
+      accessToken: "google-access-before",
+      refreshToken: "refresh-before",
+      displayName: "test",
+      quota: null,
+      expiresAtMs: Date.now() - 1,
+    }),
+    null,
+    context,
+  );
+  const privateData = patch?.privateData as Record<string, JsonValue>;
+  assert(patch?.state?.status === "cooling", "malformed response should defer retry");
+  assert(privateData.refreshToken === "refresh-after", "returned rotation must be persisted");
+  assert(typeof privateData.refreshRetryAtMs === "number", "retry deadline must be persisted");
 });

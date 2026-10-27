@@ -54,6 +54,8 @@ export type AccountData = {
   displayName: string;
   projectId?: string | null;
   expiresAtMs?: number | null;
+  refreshError?: string;
+  refreshRetryAtMs?: number;
   quota: AccountQuota | null;
 };
 
@@ -287,6 +289,8 @@ export function accountData(resource: ResourceSnapshot): AccountData {
     displayName: text(data?.displayName) ?? "Antigravity account",
     projectId: text(data?.projectId) ?? "bamboo-precept-lgxtn",
     expiresAtMs: typeof data?.expiresAtMs === "number" ? data.expiresAtMs : null,
+    ...(text(data?.refreshError) ? { refreshError: text(data?.refreshError)! } : {}),
+    ...(typeof data?.refreshRetryAtMs === "number" ? { refreshRetryAtMs: data.refreshRetryAtMs } : {}),
     quota: (data?.quota ?? null) as AccountQuota | null,
   };
 }
