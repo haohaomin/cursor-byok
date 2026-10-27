@@ -1,6 +1,6 @@
 # Issue #469：按 Cursor 的内联输出上限分页
 
-**候选已实现，本机自动化通过；仍在 `codex/remote-semble`，没有合入 main 或发布。** 上一轮真实 SSH 的大元数据失败已找到对应客户端限制，新分页方案仍需真实 Cursor SSH 复测及审批验证。
+**分页补丁已实现，本机自动化和后续真实 SSH 复测通过；仍在 `codex/remote-semble`，没有合入 main 或发布。** 上一轮大元数据失败已找到对应客户端限制，完整复测见[真实 SSH 验收](2026-10-27-issue469-paging-live.md)；真实审批仍待验证。
 
 ## 证据
 
@@ -41,4 +41,4 @@ server/src/search/snapshot/
 - 全工作区 Clippy `-D warnings` 通过。Windows/macOS CI 的采集过滤范围扩展到整个 `search::snapshot::`，包含新增分页校验测试。
 - 执行策略修正 `b89304881ebfa05ee0b64c0d5777109cb6568d76` 的 [CI 40443198339](https://github.com/haohaomin/cursor-byok/actions/runs/40443198339) 四组已通过；它发生在本分页修改之前，不能作为分页实现的 CI 结果。
 
-下一次真实 Cursor SSH 验收必须覆盖原 18,144 文件元数据失败、接近正文批次上限的响应、过滤与取消；真实审批仍未验证。上一轮 UI 的成功不能转用为这次分页补丁的 UI 验收。
+后续已按这些要求完成新的[真实 Cursor SSH 复测](2026-10-27-issue469-paging-live.md)：18,144 文件、大元数据及正文、过滤、相关查询和采集中止通过。真实审批仍未验证；不是沿用分页修改前的 UI 结果。
