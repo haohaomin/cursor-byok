@@ -24,6 +24,9 @@ pub(super) fn build(root: &str, request: &Value) -> Result<String, String> {
     let script = STANDARD.encode(encoder.finish().map_err(|e| e.to_string())?);
     let request = STANDARD.encode(serde_json::to_vec(request).map_err(|e| e.to_string())?);
     let program = "import base64,sys,zlib;source=zlib.decompress(base64.b64decode(sys.argv.pop(1)));exec(compile(source,'semble-collect','exec'))";
+    // Collection runs inside the source tree, whose Python modules must never
+    // become collector dependencies. Both interpreter startup and collection
+    // use only the standard library, without PYTHON* paths or site hooks.
     let command = if windows {
         // EncodedCommand avoids the configured outer shell's quote rules.
         // Payload and JSON output are ASCII, including non-ASCII path names.
@@ -32,8 +35,8 @@ pub(super) fn build(root: &str, request: &Value) -> Result<String, String> {
              foreach ($name in @('python3','python')) {{ \
              $exe=Get-Command $name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; \
              if ($null -ne $exe -and $exe.Source -notlike '*\\WindowsApps\\*') {{ \
-             & $exe.Source -c 'import sys;sys.exit(sys.version_info < (3,9))'; \
-             if ($LASTEXITCODE -eq 0) {{ & $exe.Source -c \"{program}\" '{script}' '{request}'; exit $LASTEXITCODE }} }} }}; \
+             & $exe.Source -I -S -c 'import sys;sys.exit(sys.version_info < (3,9))'; \
+             if ($LASTEXITCODE -eq 0) {{ & $exe.Source -I -S -c \"{program}\" '{script}' '{request}'; exit $LASTEXITCODE }} }} }}; \
              [Console]::Error.WriteLine('Semble requires Python 3.9+ on the Cursor workspace host'); exit 127"
         );
         let encoded = STANDARD.encode(
@@ -47,8 +50,8 @@ pub(super) fn build(root: &str, request: &Value) -> Result<String, String> {
         format!(
             "for semble_python in python3 python3.13 python3.12 python3.11 python3.10 python3.9; do \
              if command -v \"$semble_python\" >/dev/null 2>&1 && \
-             \"$semble_python\" -c 'import sys;sys.exit(sys.version_info < (3,9))' >/dev/null 2>&1; then \
-             exec \"$semble_python\" -c \"{program}\" '{script}' '{request}'; fi; done; \
+             \"$semble_python\" -I -S -c 'import sys;sys.exit(sys.version_info < (3,9))' >/dev/null 2>&1; then \
+             exec \"$semble_python\" -I -S -c \"{program}\" '{script}' '{request}'; fi; done; \
              printf '%s\\n' 'Semble requires Python 3.9+ on the Cursor workspace host' >&2; exit 127"
         )
     };

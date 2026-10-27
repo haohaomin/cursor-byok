@@ -66,7 +66,7 @@ mod host {
         (parent, root)
     }
 
-    fn run(collector: &Collector) -> std::process::Output {
+    fn process(collector: &Collector) -> Command {
         let command = collector.command().unwrap();
         #[cfg(unix)]
         let mut process = {
@@ -83,7 +83,91 @@ mod host {
             p.env("GIT_CONFIG_GLOBAL", "NUL");
             p
         };
-        process.env("GIT_CONFIG_NOSYSTEM", "1").output().unwrap()
+        process
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .current_dir(&collector.root);
+        process
+    }
+
+    fn run(collector: &Collector) -> std::process::Output {
+        process(collector).output().unwrap()
+    }
+
+    #[test]
+    fn real_host_does_not_import_workspace_python_modules() {
+        let (_parent, root) = fixture();
+        let body = "fn public() {}\n";
+        write(&root, "public.rs", body);
+        // These are excluded source files, never collector dependencies.
+        for name in ["base64.py", "json.py", "sitecustomize.py"] {
+            write(
+                &root,
+                name,
+                "raise RuntimeError('WORKSPACE_CODE_EXECUTED')\n",
+            );
+        }
+        write(&root, ".cursorignore", "*.py\n");
+        let before = fs::read_dir(&root).unwrap().count();
+        let mut collector =
+            Collector::new(root.to_string_lossy().into_owned(), vec![ContentType::Code]);
+        for stage in 0..2 {
+            let output = run(&collector);
+            assert!(
+                output.status.success(),
+                "stage={stage} stdout={} stderr={}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            let result = collector
+                .accept(std::str::from_utf8(&output.stdout).unwrap())
+                .unwrap();
+            if stage == 0 {
+                assert!(result.is_none());
+            } else {
+                let files = result.unwrap();
+                assert_eq!(files.len(), 1);
+                assert_eq!(files[0].relative_path, "public.rs");
+                assert_eq!(files[0].bytes, body.as_bytes());
+            }
+        }
+        assert_eq!(fs::read_dir(&root).unwrap().count(), before);
+        assert!(!root.join("__pycache__").exists());
+    }
+
+    #[test]
+    fn real_host_does_not_import_modules_from_python_environment() {
+        let (_parent, root) = fixture();
+        write(&root, "public.rs", "fn public() {}\n");
+        let imports = root.parent().unwrap().join("python-env");
+        fs::create_dir(&imports).unwrap();
+        write(
+            &imports,
+            "base64.py",
+            "raise RuntimeError('ENVIRONMENT_CODE_EXECUTED')\n",
+        );
+        let mut collector =
+            Collector::new(root.to_string_lossy().into_owned(), vec![ContentType::Code]);
+        for stage in 0..2 {
+            let output = process(&collector)
+                .env("PYTHONPATH", &imports)
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "stage={stage} stdout={} stderr={}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            let result = collector
+                .accept(std::str::from_utf8(&output.stdout).unwrap())
+                .unwrap();
+            assert_eq!(result.is_some(), stage == 1);
+            if let Some(files) = result {
+                assert_eq!(files.len(), 1);
+                assert_eq!(files[0].relative_path, "public.rs");
+            }
+        }
+        assert!(!imports.join("__pycache__").exists());
     }
 
     #[test]
