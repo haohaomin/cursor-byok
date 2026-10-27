@@ -44,6 +44,18 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-targets
 
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.6
+
+      - name: Test Grok OAuth credential lifecycle
+        run: deno test --config server/plugins/build-in/grok-auth/deno.json server/plugins/build-in/grok-auth/
+
+      - name: Test plugin credential lifecycle
+        env:
+          DENO_TEST_EXECUTABLE: deno
+        run: cargo test --package cursor-server --lib plugin:: -- --include-ignored
+
   frontend:
     name: Frontend
     runs-on: ubuntu-22.04
@@ -89,3 +101,11 @@ jobs:
 
       - name: Test SQLite storage reclamation on the native host
         run: "cargo test --package cursor-server --lib store::storage::"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.6
+
+      - name: Test plugin credential lifecycle
+        env:
+          DENO_TEST_EXECUTABLE: deno
+        run: cargo test --package cursor-server --lib plugin:: -- --include-ignored
