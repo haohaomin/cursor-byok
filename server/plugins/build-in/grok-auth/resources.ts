@@ -6,6 +6,7 @@ import type {
   ResourceImportSupport,
   ResourceMetric,
   ResourcePatch,
+  ResourceRefreshResult,
   ResourceSnapshot,
   ResourceState,
   ResourceView,
@@ -361,7 +362,7 @@ export function presentAccount(resource: ResourceSnapshot): ResourceView {
 export async function refreshAccount(
   resource: ResourceSnapshot,
   context: PluginContext,
-): Promise<ResourcePatch> {
+): Promise<ResourceRefreshResult> {
   const data = accountData(resource);
   const response = await context.network.fetch(CREDITS_URL, {
     method: "GET",
@@ -370,14 +371,14 @@ export async function refreshAccount(
   if (response.status < 200 || response.status >= 300) {
     if (response.status === 401) {
       return {
-        state: { status: "invalid", message: "Grok authorization expired; sign in again" },
+        status: "auth-error", message: "Grok usage authorization rejected (HTTP 401)",
       };
     }
     if (
       (response.status === 403 || response.status === 429) &&
       /spending-limit|quota|credits exhausted|run out of credits/i.test(response.body)
     ) {
-      return quotaExhaustedPatch(data);
+      return { status: "completed", patch: quotaExhaustedPatch(data) };
     }
     throw new Error(`Grok usage lookup failed (HTTP ${response.status}): ${response.body}`);
   }
@@ -389,8 +390,11 @@ export async function refreshAccount(
   }
   const quota = parseGrokUsage(body);
   return {
-    privateData: { ...data, quota } as unknown as JsonValue,
-    state: quotaState(quota),
+    status: "completed",
+    patch: {
+      privateData: { ...data, quota } as unknown as JsonValue,
+      state: quotaState(quota),
+    },
   };
 }
 

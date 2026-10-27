@@ -13,7 +13,7 @@ fn authentication_retries_once_and_never_after_output() {
     assert!(!should_retry_auth("request-error", 0, false));
 }
 
-async fn fixture() -> (
+pub(super) async fn fixture() -> (
     tempfile::TempDir,
     PluginRegistry,
     PluginEntry,
@@ -29,7 +29,7 @@ async fn fixture() -> (
     let path = root.path().canonicalize().unwrap().join("plugins");
     let directory = path.join("installed/test");
     std::fs::create_dir_all(&directory).unwrap();
-    std::fs::write(directory.join("plugin.json"), r#"{"apiVersion":1,"id":"dev.refresh","name":"Refresh test","version":"0.1.0","minAppVersion":"0.1.0","entry":"main.ts","icon":"icon.svg","permissions":{"network":[]}}"#).unwrap();
+    std::fs::write(directory.join("plugin.json"), r#"{"apiVersion":2,"id":"dev.refresh","name":"Refresh test","version":"0.1.0","minAppVersion":"0.1.0","entry":"main.ts","icon":"icon.svg","permissions":{"network":[]}}"#).unwrap();
     std::fs::write(
         directory.join("icon.svg"),
         "<svg xmlns=\"http://www.w3.org/2000/svg\"/>",
@@ -37,7 +37,15 @@ async fn fixture() -> (
     .unwrap();
     std::fs::write(
         directory.join("main.ts"),
-        include_str!("refresh_fixture.ts"),
+        include_str!("refresh_fixture.ts").replace(
+            "../../../plugins/build-in/grok-auth/resources.ts",
+            "./grok_resources.ts",
+        ),
+    )
+    .unwrap();
+    std::fs::write(
+        directory.join("grok_resources.ts"),
+        include_str!("../../../plugins/build-in/grok-auth/resources.ts"),
     )
     .unwrap();
     let deno = std::process::Command::new(&executable)
@@ -104,7 +112,7 @@ async fn fixture() -> (
     (root, registry, entry, executable, record)
 }
 
-async fn stop_workers(registry: &PluginRegistry) {
+pub(super) async fn stop_workers(registry: &PluginRegistry) {
     for worker in registry.inner.workers.lock().await.values() {
         worker.stop().await;
     }
@@ -172,7 +180,7 @@ async fn model_stream(
     )
 }
 
-async fn worker_observations(
+pub(super) async fn worker_observations(
     registry: &PluginRegistry,
     entry: &PluginEntry,
     executable: &Path,

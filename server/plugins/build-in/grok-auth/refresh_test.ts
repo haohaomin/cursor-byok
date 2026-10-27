@@ -190,11 +190,22 @@ Deno.test("malformed successful refresh still preserves a returned rotated refre
 });
 
 Deno.test("quota denial remains a quota error, not an expired login", async () => {
-  const patch = await refreshAccount(
+  const result = await refreshAccount(
     account(3600),
     context(async () => response(403, { error: "spending-limit" })),
   );
+  assert(result.status === "completed");
+  const patch = result.patch;
   assert(patch.state?.status === "cooling" && data(patch).refreshToken === "refresh-old");
+});
+
+Deno.test("usage 401 requests host recovery without destroying opaque credentials", async () => {
+  const resource = account(3600);
+  data(resource).accessToken = "opaque-test-access";
+  const before = JSON.stringify(resource);
+  const result = await refreshAccount(resource, context(async () => response(401, {})));
+  assert(result.status === "auth-error");
+  assert(JSON.stringify(resource) === before);
 });
 
 Deno.test("HTTP 401 asks the host for a pre-output refresh instead of invalidating the account", async () => {

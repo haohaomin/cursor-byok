@@ -1,10 +1,33 @@
 import { defineProviderPlugin } from "cursor-byok:plugin";
+import type { PluginContext } from "cursor-byok:plugin";
+import { prepareAccount, refreshAccount } from "../../../plugins/build-in/grok-auth/resources.ts";
 
 type TestData = { token: string; delayMs?: number; rejectedDelayMs?: number };
 
 // Synthetic worker state is only observed by the host integration tests.
 let exchanges = 0;
 const invocations: unknown[] = [];
+const grokCalls: string[] = [];
+const grokContext: PluginContext = {
+  signal: new AbortController().signal,
+  network: {
+    fetch: async (url, init) => {
+      const token = init?.headers?.authorization ?? "";
+      grokCalls.push(url.includes("oauth2/token") ? "token" : token);
+      if (url.includes("oauth2/token")) {
+        const mode = new URLSearchParams(init?.body).get("refresh_token")!.replace("refresh-", "");
+        return { status: 200, headers: {}, body: JSON.stringify({
+          access_token: `opaque-${mode}-rotated`, refresh_token: `rotated-${mode}`, expires_in: 3600,
+        }) };
+      }
+      const status = token.includes("-rotated")
+        ? (token.includes("reject") ? 401 : token.includes("unavailable") ? 503 : 200)
+        : 401;
+      return { status, headers: {}, body: JSON.stringify({ creditUsagePercent: 25 }) };
+    },
+    stream: () => { throw new Error("unexpected inference network call"); },
+  },
+};
 
 export default defineProviderPlugin({
   providers: [{
@@ -26,7 +49,7 @@ export default defineProviderPlugin({
   }],
   resources: [{
     type: "account", displayName: "account",
-    present: () => ({ displayName: JSON.stringify({ exchanges, invocations }) }),
+    present: () => ({ displayName: JSON.stringify({ exchanges, invocations, grokCalls }) }),
     prepare: async (resource, rejected) => {
       const data = resource.privateData as TestData;
       if (data.token.startsWith("fresh-") && !rejected) return null;
@@ -38,5 +61,10 @@ export default defineProviderPlugin({
         state: { status: "ready" },
       };
     },
+  }, {
+    type: "grok-account", displayName: "Synthetic Grok account",
+    present: () => ({ displayName: "test" }),
+    prepare: (resource, rejected) => prepareAccount(resource, rejected, grokContext),
+    refresh: (resource) => refreshAccount(resource, grokContext),
   }],
 });

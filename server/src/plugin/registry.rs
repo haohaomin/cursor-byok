@@ -893,28 +893,46 @@ impl PluginRegistry {
         let lock = self
             .preparation_lock(plugin_id, resource_type, resource_id)
             .await;
-        let _guard = lock.lock().await;
-        let record = self
-            .find_record(plugin_id, resource_type, resource_id)
-            .await?;
-        let value = self
-            .worker(&entry, &executable)
-            .await
-            .invoke(
+        for attempt in 0..2 {
+            let guard = lock.lock().await;
+            let record = self
+                .find_record(plugin_id, resource_type, resource_id)
+                .await?;
+            let value = self.worker(&entry, &executable).await.invoke(
                 "resource.refresh",
-                serde_json::json!({
-                    "resourceType": resource_type,
-                    "resource": record.snapshot(resource_type),
-                }),
+                serde_json::json!({"resourceType": resource_type, "resource": record.snapshot(resource_type)}),
                 self.cancellation(),
-            )
-            .await?;
-        let patch: ResourcePatch = serde_json::from_value(value)?;
-        self.inner
-            .state
-            .apply_patch_if_current(plugin_id, resource_type, &record, patch)
-            .await
-            .map(|_| ())
+            ).await?;
+            match serde_json::from_value::<ResourceRefreshResult>(value)? {
+                ResourceRefreshResult::Completed { patch } => {
+                    return self
+                        .inner
+                        .state
+                        .apply_patch_if_current(plugin_id, resource_type, &record, patch)
+                        .await
+                        .map(|_| ());
+                }
+                ResourceRefreshResult::AuthError { message } => {
+                    if attempt != 0 || !resource.can_prepare {
+                        return Err(Error::Provider(message));
+                    }
+                    // Preparation owns the same account lock. Release it, then persist
+                    // any rotation before querying quota again with the latest snapshot.
+                    drop(guard);
+                    self.prepare_resource(
+                        &entry,
+                        &executable,
+                        resource_type,
+                        record.clone(),
+                        Some(record),
+                    )
+                    .await?;
+                }
+            }
+        }
+        Err(Error::Provider(
+            "plugin account authentication retry exhausted".into(),
+        ))
     }
 
     pub async fn resource_action(
@@ -1522,6 +1540,13 @@ impl PluginRegistry {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(tag = "status", rename_all = "kebab-case", deny_unknown_fields)]
+enum ResourceRefreshResult {
+    Completed { patch: ResourcePatch },
+    AuthError { message: String },
+}
+
+#[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct OAuth2Begin {
     session: serde_json::Value,
@@ -1621,3 +1646,5 @@ fn should_retry_auth(status: &str, attempt: usize, emitted: bool) -> bool {
 
 #[cfg(test)]
 mod auth_retry_tests;
+#[cfg(test)]
+mod manual_refresh_tests;
