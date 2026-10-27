@@ -31,14 +31,17 @@ export async function prepareAccount(
   const data = accountData(resource);
   const rejected = rejectedResource !== null &&
     accountData(rejectedResource).accessToken === data.accessToken;
-  if (!rejected && resource.state.status !== "invalid" && !isTokenExpired(data)) return null;
-  if (data.refreshError) {
+  const now = Date.now();
+  if (!rejected && data.refreshError) {
     return {
       privateData: data as unknown as JsonValue,
       state: { status: "invalid", message: data.refreshError },
     };
   }
-  if (data.refreshRetryAtMs && data.refreshRetryAtMs > Date.now()) {
+  if (!rejected && resource.state.status === "invalid") {
+    return { privateData: data as unknown as JsonValue, state: resource.state };
+  }
+  if (!rejected && data.refreshRetryAtMs && data.refreshRetryAtMs > now) {
     return {
       state: {
         status: "cooling",
@@ -47,6 +50,7 @@ export async function prepareAccount(
       },
     };
   }
+  if (!rejected && !isTokenExpired(data)) return null;
   if (!data.refreshToken) {
     return {
       state: { status: "invalid", message: "Google refresh token is missing; sign in again" },
@@ -88,11 +92,12 @@ export async function prepareAccount(
     const accessToken = text(body.access_token);
     if (!accessToken) {
       const refreshToken = text(body.refresh_token) ?? data.refreshToken;
+      const retryAtMs = Date.now() + 15_000;
       return {
-        privateData: { ...data, refreshToken, refreshRetryAtMs: Date.now() + 15_000 } as unknown as JsonValue,
+        privateData: { ...data, refreshToken, refreshRetryAtMs: retryAtMs } as unknown as JsonValue,
         state: {
           status: "cooling",
-          retryAtMs: Date.now() + 15_000,
+          retryAtMs,
           message: "Google token refresh returned no access token; retry shortly",
         },
       };
@@ -105,14 +110,15 @@ export async function prepareAccount(
       refreshRetryAtMs: _oldRetry,
       ...previous
     } = data;
+    const expiresAtMs = expiresIn !== null && expiresIn > 0
+      ? Date.now() + expiresIn * 1000
+      : Date.now() + 3500 * 1000;
     return {
       privateData: {
         ...previous,
         accessToken,
         refreshToken,
-        ...(expiresIn !== null && expiresIn > 0
-          ? { expiresAtMs: Date.now() + expiresIn * 1000 }
-          : {}),
+        expiresAtMs,
       } as unknown as JsonValue,
       state: { status: "ready" },
     };

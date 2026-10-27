@@ -349,6 +349,8 @@ impl PluginRegistry {
                             let patch = value.get("patch").filter(|patch| !patch.is_null())
                                 .map(|patch| serde_json::from_value::<ResourcePatch>(patch.clone())).transpose()?;
                             if let (Some(patch), Some((kind, record))) = (patch, resource.as_ref()) {
+                                let lock = registry.preparation_lock(&plugin_id, kind, &record.id).await;
+                                let _guard = lock.lock().await;
                                 registry.inner.state.apply_patch_if_current(&plugin_id, kind, record, patch).await?;
                             }
                             match status {
@@ -961,6 +963,10 @@ impl PluginRegistry {
                 "plugin '{plugin_id}' resource action '{action_id}' has an invalid target"
             )));
         }
+        let lock = self
+            .preparation_lock(plugin_id, resource_type, resource_id)
+            .await;
+        let _guard = lock.lock().await;
         let record = self
             .find_record(plugin_id, resource_type, resource_id)
             .await?;
@@ -1459,22 +1465,35 @@ impl PluginRegistry {
                 .get(&key)
                 .cloned();
             if let Some((snapshot, value)) = pending {
-                registry
+                let applied = registry
                     .inner
                     .state
                     .apply_patch_if_current(
                         plugin,
                         &kind,
                         &snapshot,
-                        serde_json::from_value(value)?,
+                        serde_json::from_value(value.clone())?,
                     )
                     .await?;
-                registry
-                    .inner
-                    .pending_preparations
-                    .lock()
-                    .await
-                    .remove(&key);
+                if applied {
+                    registry
+                        .inner
+                        .pending_preparations
+                        .lock()
+                        .await
+                        .remove(&key);
+                } else {
+                    // Another serialized mutation superseded this snapshot. Keep the
+                    // pending rotation for the next preparation instead of dropping it.
+                    let current = registry.find_record(plugin, &kind, &record.id).await?;
+                    registry
+                        .inner
+                        .pending_preparations
+                        .lock()
+                        .await
+                        .insert(key, (current.clone(), value));
+                    return Ok(current);
+                }
             }
             let current = registry.find_record(plugin, &kind, &record.id).await?;
             let value = registry
@@ -1495,17 +1514,19 @@ impl PluginRegistry {
                     .lock()
                     .await
                     .insert(key.clone(), (current.clone(), value.clone()));
-                registry
+                let applied = registry
                     .inner
                     .state
                     .apply_patch_if_current(plugin, &kind, &current, serde_json::from_value(value)?)
                     .await?;
-                registry
-                    .inner
-                    .pending_preparations
-                    .lock()
-                    .await
-                    .remove(&key);
+                if applied {
+                    registry
+                        .inner
+                        .pending_preparations
+                        .lock()
+                        .await
+                        .remove(&key);
+                }
             }
             let prepared = registry.find_record(plugin, &kind, &record.id).await?;
             if had_patch && !prepared.state.is_ready(now_ms()) {

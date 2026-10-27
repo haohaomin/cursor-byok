@@ -134,3 +134,36 @@ Deno.test("Google malformed refresh response cools down and preserves rotation",
   assert(privateData.refreshToken === "refresh-after", "returned rotation must be persisted");
   assert(typeof privateData.refreshRetryAtMs === "number", "retry deadline must be persisted");
 });
+
+Deno.test("Google opaque access tokens receive a fallback expiry", async () => {
+  const context = {
+    signal: new AbortController().signal,
+    network: {
+      fetch: () =>
+        Promise.resolve({
+          status: 200,
+          headers: {},
+          body: JSON.stringify({ access_token: "opaque-access-after" }),
+        }),
+      stream: () => Promise.reject(new Error("stream is not expected")),
+    },
+  } satisfies PluginContext;
+  const patch = await prepareAccount(
+    snapshot({
+      accessToken: "opaque-access-before",
+      refreshToken: "refresh-before",
+      displayName: "test",
+      quota: null,
+      expiresAtMs: Date.now() - 1,
+    }),
+    null,
+    context,
+  );
+  const privateData = patch?.privateData as Record<string, JsonValue>;
+  assert(patch?.state?.status === "ready", "successful refresh should be ready");
+  assert(privateData.accessToken === "opaque-access-after", "new access token missing");
+  assert(
+    typeof privateData.expiresAtMs === "number" && privateData.expiresAtMs > Date.now(),
+    "opaque access token needs a fallback expiry",
+  );
+});

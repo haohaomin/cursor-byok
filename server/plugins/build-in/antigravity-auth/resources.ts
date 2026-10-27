@@ -290,7 +290,9 @@ export function accountData(resource: ResourceSnapshot): AccountData {
     projectId: text(data?.projectId) ?? "bamboo-precept-lgxtn",
     expiresAtMs: typeof data?.expiresAtMs === "number" ? data.expiresAtMs : null,
     ...(text(data?.refreshError) ? { refreshError: text(data?.refreshError)! } : {}),
-    ...(typeof data?.refreshRetryAtMs === "number" ? { refreshRetryAtMs: data.refreshRetryAtMs } : {}),
+    ...(typeof data?.refreshRetryAtMs === "number"
+      ? { refreshRetryAtMs: data.refreshRetryAtMs }
+      : {}),
     quota: (data?.quota ?? null) as AccountQuota | null,
   };
 }
@@ -380,60 +382,13 @@ export async function refreshAccount(
   context: PluginContext,
 ): Promise<ResourcePatch> {
   const data = accountData(resource);
-  let accessToken = data.accessToken;
-  let refreshToken = data.refreshToken;
-  let projectId = data.projectId ?? "bamboo-precept-lgxtn";
-  let expiresAtMs = data.expiresAtMs ?? null;
-
-  if (refreshToken) {
-    const response = await context.network.fetch(REFRESH_TOKEN_URL, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-      }).toString(),
-    });
-
-    if (response.status < 200 || response.status >= 300) {
-      const bodyText = response.body.toLowerCase();
-      // Only mark invalid if token is revoked or client is invalid
-      if (bodyText.includes("invalid_grant") || bodyText.includes("unauthorized_client")) {
-        return {
-          state: {
-            status: "invalid",
-            message: "Google authorization expired or revoked; please sign in again",
-          },
-        };
-      }
-      // On network glitches or temporary Google server errors, keep ready
-      return {
-        state: { status: "ready" },
-      };
-    }
-
-    const body = object(JSON.parse(response.body));
-    accessToken = text(body?.access_token) ?? accessToken;
-    refreshToken = text(body?.refresh_token) ?? refreshToken;
-    const expiresIn = typeof body?.expires_in === "number" ? body.expires_in : 3600;
-    expiresAtMs = Date.now() + expiresIn * 1000;
-  }
-
   // Fetch real-time quota and project ID
-  const result = await queryAccountQuota(accessToken, context.network);
-  projectId = result.projectId || projectId;
+  const projectId = data.projectId ?? "bamboo-precept-lgxtn";
+  const result = await queryAccountQuota(data.accessToken, context.network);
 
   const updatedData: AccountData = {
     ...data,
-    accessToken,
-    refreshToken,
-    projectId,
-    expiresAtMs,
+    projectId: result.projectId || projectId,
     quota: result.quota ?? data.quota,
   };
   return {

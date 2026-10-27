@@ -68,68 +68,61 @@ export async function prepareAccount(
       : null;
   }
   if (!data.refreshToken) return failure("ChatGPT refresh token is missing; sign in again", true);
-  for (let attempt = 0; attempt < 3; attempt++) {
-    let response;
-    try {
-      response = await context.network.fetch(TOKEN_URL, {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          grant_type: "refresh_token",
-          client_id: CLIENT_ID,
-          refresh_token: data.refreshToken,
-        }).toString(),
-      });
-    } catch {
-      // A lost response may have rotated the token. Do not repeatedly replay it in this call.
-      return failure("ChatGPT token refresh network error; retry shortly", false);
-    }
-    let body: Record<string, unknown> = {};
-    try {
-      body = object(JSON.parse(response.body)) ?? {};
-    } catch { /* classified below */ }
-    if (response.status >= 200 && response.status < 300) {
-      const accessToken = text(body.access_token);
-      const refreshToken = text(body.refresh_token) ?? data.refreshToken;
-      // Even a malformed successful response must not discard a rotated refresh token.
-      if (!accessToken) {
-        data.refreshToken = refreshToken;
-        return failure("ChatGPT token refresh returned no access token; retry shortly", false);
-      }
-      const seconds = number(body.expires_in);
-      const jwtExpiry = tokenExpiresAt({ ...data, accessToken, expiresAtMs: undefined });
-      const expiresAtMs = seconds !== null && seconds > 0
-        ? Date.now() + seconds * 1000
-        : jwtExpiry !== null
-        ? jwtExpiry
-        : undefined;
-      const { refreshError: _error, refreshRetryAtMs: _retry, expiresAtMs: _expiry, ...previous } =
-        data;
-      return {
-        privateData: {
-          ...previous,
-          accessToken,
-          refreshToken,
-          ...(expiresAtMs ? { expiresAtMs } : {}),
-        } as unknown as JsonValue,
-        state: { status: "ready" },
-      };
-    }
-    const code = text(body.error);
-    if (code === "invalid_grant" || code === "invalid_client") {
-      return failure(`ChatGPT refresh authorization rejected (${code}); sign in again`, true);
-    }
-    if ((response.status === 429 || response.status >= 500) && attempt < 2) {
-      await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt));
-      continue;
-    }
-    return failure(
-      `ChatGPT token refresh temporarily failed (HTTP ${response.status}); retry shortly`,
-      false,
-    );
+  let response;
+  try {
+    response = await context.network.fetch(TOKEN_URL, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        client_id: CLIENT_ID,
+        refresh_token: data.refreshToken,
+      }).toString(),
+    });
+  } catch {
+    // A lost response may have rotated the token. Do not replay it in this call.
+    return failure("ChatGPT token refresh network error; retry shortly", false);
   }
-  return failure("ChatGPT token refresh temporarily unavailable; retry shortly", false);
+  let body: Record<string, unknown> = {};
+  try {
+    body = object(JSON.parse(response.body)) ?? {};
+  } catch { /* classified below */ }
+  if (response.status >= 200 && response.status < 300) {
+    const accessToken = text(body.access_token);
+    const refreshToken = text(body.refresh_token) ?? data.refreshToken;
+    // Even a malformed successful response must not discard a rotated refresh token.
+    if (!accessToken) {
+      data.refreshToken = refreshToken;
+      return failure("ChatGPT token refresh returned no access token; retry shortly", false);
+    }
+    const seconds = number(body.expires_in);
+    const jwtExpiry = tokenExpiresAt({ ...data, accessToken, expiresAtMs: undefined });
+    const expiresAtMs = seconds !== null && seconds > 0
+      ? Date.now() + seconds * 1000
+      : jwtExpiry !== null
+      ? jwtExpiry
+      : undefined;
+    const { refreshError: _error, refreshRetryAtMs: _retry, expiresAtMs: _expiry, ...previous } =
+      data;
+    return {
+      privateData: {
+        ...previous,
+        accessToken,
+        refreshToken,
+        ...(expiresAtMs ? { expiresAtMs } : {}),
+      } as unknown as JsonValue,
+      state: { status: "ready" },
+    };
+  }
+  const code = text(body.error);
+  if (code === "invalid_grant" || code === "invalid_client") {
+    return failure(`ChatGPT refresh authorization rejected (${code}); sign in again`, true);
+  }
+  return failure(
+    `ChatGPT token refresh temporarily failed (HTTP ${response.status}); retry shortly`,
+    false,
+  );
 }
