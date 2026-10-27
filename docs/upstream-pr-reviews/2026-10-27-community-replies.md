@@ -24,6 +24,12 @@
 
 ## 其他候选草稿（未发送）
 
+### Issue #504：仅确认相关的重复交付缺口（未发送）
+
+我维护的 fork 中独立复现了一个相关问题：同一 UserMessage.message_id 使用新传输序号再次送入活动 Run 时，服务端会重新排队并中断已经执行中的工具。补丁把消息 ID 去重放到排队之前；相同文字、不同 ID 的新消息仍正常执行。
+
+六项协议测试覆盖初始与追加消息重传、真正的新输入、checkpoint 恢复、分片 Write 内容及缺失内容报错。后两类原报告症状在受控路径未复现，尚不能认定三种现象具有同一个根因。[修复与验证边界](https://github.com/haohaomin/cursor-byok/blob/main/docs/upstream-issue-reviews/2026-10-27-issue504-input-redelivery-fix.md)。源码补丁尚未发布安装包；需要原环境的脱敏请求与工具记录才能进一步确认。原仓库归档只读，本段没有发送。
+
 ### Issue #340
 
 我维护的 [fork](https://github.com/haohaomin/cursor-byok) 中已补齐后台子代理完成后的结果交付，v1.0.9 起包含，当前可下载 v1.0.17。此前使用真实 Cursor 连续两轮测试普通与 Fast：父初始 Run 结束后，子代理完成通知创建父会话的新 Run，并回复子代理结果。两次真实通知均携带工具 ID，缺省 ID 仍仅有自动化覆盖；不把此结论扩展到所有后台 Shell 审批和压缩边界。[验证记录](https://github.com/haohaomin/cursor-byok/blob/main/docs/upstream-issue-reviews/2026-10-03-issue340-fix.md)。
@@ -59,3 +65,11 @@
 [配置步骤与证据](https://github.com/haohaomin/cursor-byok/blob/main/docs/remote-ssh.md)。这项配置可用于现有 v1.0.17；新增应用内指南尚未发布。另已选择性移植并补齐该 PR 的 WebFetch 分页：同一真实 SSH 环境中，模型自动读取 3 页、完整还原 34,103 字节，同会话续读和跨会话拒绝也通过；9 次供应商调用全部 completed，源码全工作区 464 项测试通过。[分页修复证据](https://github.com/haohaomin/cursor-byok/blob/main/docs/upstream-issue-reviews/2026-10-27-issue469-webfetch-fix.md)。此修复尚未发布，v1.0.17 不包含。远端 Semble 独有路径失败已复现；候选快照存在启动参数、忽略规则及索引来源缺陷，尚未采用，详见[审查记录](https://github.com/haohaomin/cursor-byok/blob/main/docs/upstream-issue-reviews/2026-10-27-issue469-semble-check.md)。因此没有把 PR 整体标成已解决。证书错误与其他模型协议仍需独立复测。上游已归档，本段保存为草稿，没有发送。
 
 后续源码进展：远程快照审查中发现的本机 Semble `.cursorignore` 与热缓存问题已独立修复，真实嵌入模型三组对照及 469 项全工作区回归通过。[独立修复记录](https://github.com/haohaomin/cursor-byok/blob/main/docs/upstream-issue-reviews/2026-10-27-semble-cursorignore-fix.md)。尚未发布安装包，远程 Semble 采集仍未实现；这不是 #469 的整体完成声明，也未发送评论。
+
+### Issue #511：已确认的清理缺口，原始增长来源待查（未发送）
+
+我维护的 fork 中复现了两种统计清理删除记录却不收缩 SQLite 文件的独立问题。现补丁在删除事务提交后回收主库与 WAL 空间，保留既有清理范围；调用者断开后继续完成，其他读连接阻止截断时明确报告部分完成。
+
+真实临时数据库从约 12.23 MiB 缩至 228 KiB，WAL 归零；历史、模型配置、共享 blob、并发读写、断开和失败重试均有覆盖。本机全工作区 475 项、Linux 473 项通过，Windows/macOS 各 6 项原生回归通过。[PR #1 与源码](https://github.com/haohaomin/cursor-byok/pull/1)、[详细边界](https://github.com/haohaomin/cursor-byok/blob/main/docs/upstream-issue-reviews/2026-10-27-issue511-storage-fix.md)。安装包尚未包含此补丁。
+
+原截图的 19.09 GB 主库中有效会话、日志及空闲页各占多少尚未知，不能据此宣称所有增长原因已解决；没有清理正式数据。上游已归档只读，本段只保存为草稿，没有发送，也没有关闭原 Issue。

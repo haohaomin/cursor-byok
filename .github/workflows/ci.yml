@@ -97,3 +97,6 @@ jobs:
 
       - name: Test host-independent source selection and snapshots
         run: cargo test --package semble-core --test inventory_policy --test request_snapshot
+
+      - name: Test SQLite storage reclamation on the native host
+        run: "cargo test --package cursor-server --lib store::storage::"
