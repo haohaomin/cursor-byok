@@ -15,10 +15,7 @@ export default defineProviderPlugin({
     add: [antigravityAuthorizationCodeOAuth],
     import: credentialImport,
     present: presentAccount,
-    refresh: async (resource, context) => ({
-      status: "completed",
-      patch: await refreshAccount(resource, context),
-    }),
+    refresh: refreshAccount,
     prepare: prepareAccount,
   }],
 });

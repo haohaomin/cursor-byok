@@ -6,6 +6,7 @@ import type {
   ResourceImportSupport,
   ResourceMetric,
   ResourcePatch,
+  ResourceRefreshResult,
   ResourceSnapshot,
   ResourceState,
   ResourceView,
@@ -20,6 +21,8 @@ import { CLIENT_ID, CLIENT_SECRET } from "./google_oauth.ts";
 export const RESOURCE_TYPE = "antigravity-account";
 
 const REFRESH_TOKEN_URL = "https://oauth2.googleapis.com/token";
+
+class AccountAuthenticationError extends Error {}
 
 async function fetchText(
   network: PluginContext["network"] | undefined,
@@ -84,8 +87,12 @@ export async function fetchAccountProjectAndTier(
         },
         body: JSON.stringify({ metadata: { ideType: "ANTIGRAVITY" } }),
       });
+      if (assistRes.status === 401) {
+        throw new AccountAuthenticationError("Google project lookup rejected the access token");
+      }
       if (assistRes.status >= 200 && assistRes.status < 300) {
         const body = object(JSON.parse(assistRes.body));
+        if (!body) throw new Error("Google project lookup returned an invalid response");
         const project = text(body?.cloudaicompanionProject);
         const paid = object(body?.paidTier);
         const current = object(body?.currentTier);
@@ -101,11 +108,12 @@ export async function fetchAccountProjectAndTier(
         }
         return { projectId: project ?? "bamboo-precept-lgxtn", planLabel };
       }
-    } catch {
+    } catch (error) {
+      if (error instanceof AccountAuthenticationError) throw error;
       // Continue next endpoint
     }
   }
-  return { projectId: "bamboo-precept-lgxtn", planLabel: "FREE" };
+  throw new Error("Google project lookup failed on all endpoints; retry shortly");
 }
 
 export async function queryAccountQuota(
@@ -127,6 +135,9 @@ export async function queryAccountQuota(
         },
         body: JSON.stringify({ project: projectId }),
       });
+      if (response.status === 401) {
+        throw new AccountAuthenticationError("Google quota lookup rejected the access token");
+      }
       if (response.status < 200 || response.status >= 300) continue;
       const root = object(JSON.parse(response.body));
       const models = object(root?.models);
@@ -176,22 +187,12 @@ export async function queryAccountQuota(
             : null,
         },
       };
-    } catch {
+    } catch (error) {
+      if (error instanceof AccountAuthenticationError) throw error;
       // Continue next endpoint
     }
   }
-
-  return {
-    projectId,
-    quota: {
-      planLabel,
-      limitReached: false,
-      coolingUntilMs: null,
-      updatedAtMs: Date.now(),
-      claude: null,
-      gemini: null,
-    },
-  };
+  throw new Error("Google quota lookup failed on all endpoints; retry shortly");
 }
 
 function object(value: unknown): Record<string, unknown> | null {
@@ -380,21 +381,28 @@ export function presentAccount(resource: ResourceSnapshot): ResourceView {
 export async function refreshAccount(
   resource: ResourceSnapshot,
   context: PluginContext,
-): Promise<ResourcePatch> {
+): Promise<ResourceRefreshResult> {
   const data = accountData(resource);
-  // Fetch real-time quota and project ID
-  const projectId = data.projectId ?? "bamboo-precept-lgxtn";
-  const result = await queryAccountQuota(data.accessToken, context.network);
-
-  const updatedData: AccountData = {
-    ...data,
-    projectId: result.projectId || projectId,
-    quota: result.quota ?? data.quota,
-  };
-  return {
-    privateData: updatedData as unknown as JsonValue,
-    state: { status: "ready" },
-  };
+  try {
+    const result = await queryAccountQuota(data.accessToken, context.network);
+    const updatedData: AccountData = {
+      ...data,
+      projectId: result.projectId,
+      quota: result.quota,
+    };
+    return {
+      status: "completed",
+      patch: {
+        privateData: updatedData as unknown as JsonValue,
+        state: { status: "ready" },
+      },
+    };
+  } catch (error) {
+    if (error instanceof AccountAuthenticationError) {
+      return { status: "auth-error", message: error.message };
+    }
+    throw error;
+  }
 }
 
 function firstText(source: Record<string, unknown>, keys: string[]): string | null {

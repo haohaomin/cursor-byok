@@ -104,6 +104,40 @@ Deno.test("Google invalid_grant requires a new login and is not retried", async 
   assert(calls === 1, "revoked refresh token must not be sent repeatedly");
 });
 
+Deno.test("Google can recover an invalid access token unless its refresh grant was revoked", async () => {
+  for (const expiresAtMs of [Date.now() - 1, null]) {
+    let calls = 0;
+    const context = {
+      signal: new AbortController().signal,
+      network: {
+        fetch: () => {
+          calls++;
+          return Promise.resolve({
+            status: 200,
+            headers: {},
+            body: JSON.stringify({ access_token: "recovered", expires_in: 3600 }),
+          });
+        },
+        stream: () => Promise.reject(new Error("unexpected stream")),
+      },
+    } satisfies PluginContext;
+    const patch = await prepareAccount(
+      snapshot(
+        { accessToken: "rejected", refreshToken: "still-valid", expiresAtMs },
+        { status: "invalid", message: "Access token expired" },
+      ),
+      null,
+      context,
+    );
+    assert(calls === 1, `expected recovery exchange, got ${calls}`);
+    assert(patch?.state?.status === "ready", "recoverable account must become ready");
+    assert(
+      (patch.privateData as Record<string, JsonValue>).accessToken === "recovered",
+      "recovered token must be persisted",
+    );
+  }
+});
+
 Deno.test("Google malformed refresh response cools down and preserves rotation", async () => {
   const context = {
     signal: new AbortController().signal,

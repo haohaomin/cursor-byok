@@ -37,12 +37,35 @@ pub(super) async fn fixture() -> (
     .unwrap();
     std::fs::write(
         directory.join("main.ts"),
-        include_str!("refresh_fixture.ts").replace(
-            "../../../plugins/build-in/grok-auth/resources.ts",
-            "./grok_resources.ts",
-        ),
+        include_str!("refresh_fixture.ts")
+            .replace(
+                "../../../plugins/build-in/grok-auth/resources.ts",
+                "./grok_resources.ts",
+            )
+            .replace("../../../plugins/build-in/antigravity-auth/", "./google/"),
     )
     .unwrap();
+    std::fs::create_dir_all(directory.join("google")).unwrap();
+    for (name, source) in [
+        (
+            "resources.ts",
+            include_str!("../../../plugins/build-in/antigravity-auth/resources.ts"),
+        ),
+        (
+            "credentials.ts",
+            include_str!("../../../plugins/build-in/antigravity-auth/credentials.ts"),
+        ),
+        (
+            "models.ts",
+            include_str!("../../../plugins/build-in/antigravity-auth/models.ts"),
+        ),
+        (
+            "google_oauth.ts",
+            include_str!("../../../plugins/build-in/antigravity-auth/google_oauth.ts"),
+        ),
+    ] {
+        std::fs::write(directory.join("google").join(name), source).unwrap();
+    }
     std::fs::write(
         directory.join("grok_resources.ts"),
         include_str!("../../../plugins/build-in/grok-auth/resources.ts"),

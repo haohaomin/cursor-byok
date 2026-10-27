@@ -38,9 +38,6 @@ export async function prepareAccount(
       state: { status: "invalid", message: data.refreshError },
     };
   }
-  if (!rejected && resource.state.status === "invalid") {
-    return { privateData: data as unknown as JsonValue, state: resource.state };
-  }
   if (data.refreshRetryAtMs && data.refreshRetryAtMs > now) {
     return {
       state: {
@@ -50,7 +47,7 @@ export async function prepareAccount(
       },
     };
   }
-  if (!rejected && !isTokenExpired(data)) return null;
+  if (!rejected && resource.state.status !== "invalid" && !isTokenExpired(data)) return null;
   if (!data.refreshToken) {
     return {
       state: { status: "invalid", message: "Google refresh token is missing; sign in again" },
