@@ -101,19 +101,6 @@ impl PluginRuntimeStatus {
 }
 
 impl PluginRuntime {
-    #[cfg(test)]
-    pub(super) fn for_test() -> Self {
-        Self {
-            inner: Arc::new(PluginRuntimeInner {
-                root: PathBuf::new(),
-                asset: None,
-                status: RwLock::new(PluginRuntimeStatus::unsupported()),
-                initializing: AtomicBool::new(false),
-                cancellation: Mutex::new(None),
-                task: Mutex::new(None),
-            }),
-        }
-    }
     pub fn managed() -> Result<Self> {
         Self::new(config::managed_data_dir()?.join("plugins").join("runtime"))
     }
