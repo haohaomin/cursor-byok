@@ -107,11 +107,9 @@ fn request(
         hard_timeout: Some(30_000),
         timeout_behavior: pb::TimeoutBehavior::Cancel as i32,
         file_output_threshold_bytes: Some((search::snapshot::MAX_OUTPUT_BYTES + 1024) as u64),
-        requested_sandbox_policy: Some(pb::SandboxPolicy {
-            r#type: pb::sandbox_policy::Type::WorkspaceReadonly as i32,
-            network_access: Some(false),
-            ..Default::default()
-        }),
+        // This collector is read-only. Let Cursor apply its configured Shell
+        // policy and approval flow, just as for ordinary Shell requests. Do not
+        // force an unavailable sandbox or request an unsandboxed escalation.
         close_stdin: true,
         conversation_id: Some(context.conversation_id.clone()),
         admin_command_denylist: context.admin_command_denylist.clone(),

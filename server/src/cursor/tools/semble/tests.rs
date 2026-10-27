@@ -51,7 +51,7 @@ fn inventory(id: u32) -> pb::ExecClientMessage {
 }
 
 #[tokio::test]
-async fn filesystem_search_starts_on_cursor_with_a_read_only_bounded_exec() {
+async fn filesystem_search_uses_cursor_policy_without_requesting_an_override() {
     let runtime = CursorToolRuntime::default();
     let (sender, _receiver) = tool_result_channel();
     let exec = unwrap_exec(
@@ -65,10 +65,9 @@ async fn filesystem_search_starts_on_cursor_with_a_read_only_bounded_exec() {
     };
     assert_eq!(args.working_directory, "/workspace");
     assert_eq!(args.timeout_behavior, pb::TimeoutBehavior::Cancel as i32);
-    assert_eq!(
-        args.requested_sandbox_policy.unwrap().r#type,
-        pb::sandbox_policy::Type::WorkspaceReadonly as i32
-    );
+    // Ordinary Shell succeeds on the tested remote host with its configured
+    // policy; forcing WorkspaceReadonly fails before this collector starts.
+    assert!(args.requested_sandbox_policy.is_none());
     assert!(!args.skip_approval);
     assert_eq!(runtime.running_exec_ids().await, vec![exec.id]);
     runtime.drain_running().await;
