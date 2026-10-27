@@ -31,6 +31,10 @@
 
 `codex/remote-semble` 整合主线 `2cbd4a58f9694f2bc71b3b866743163580ba3169`，包含 #504 重复输入处理与 #511 SQLite 空间回收修复。两个冲突仅涉及 CI 和维护清单：保留 Semble 原生采集/快照测试，同时保留 SQLite 原生存储测试及各问题最新状态。没有改动 Semble 的审批策略。
 
-组合后的本机 `cargo test --workspace --all-targets` 为 **510 项通过、0 项失败、1 项忽略**；`cargo clippy --workspace --all-targets -- -D warnings`、`cargo fmt --all -- --check` 及暂存差异检查通过。跨平台 CI 需以此次整合提交的独立结果为准，不能沿用整合前的结果。
+组合后的本机 `cargo test --workspace --all-targets` 为 **510 项通过、0 项失败、1 项忽略**；`cargo clippy --workspace --all-targets -- -D warnings`、`cargo fmt --all -- --check` 及暂存差异检查通过。忽略项为需要缓存真实 Semble 模型的主机命令集成测试，不代表真实 Cursor UI 已被验证。
+
+整合提交 `7707b0d792b8621ccaf3b2139c4ba4cd0b160d86` 已推送，其 [CI 40455365194](https://github.com/haohaomin/cursor-byok/actions/runs/40455365194) 四组全部通过：Linux **508 项通过、1 项忽略**；Windows/macOS 各 **28 项通过**，包括 22 项采集/过滤/快照测试及 6 项 SQLite 测试；前端类型检查与构建通过。这是组合代码的独立验证结果，没有沿用整合前 CI。
 
 用户展开窗口后再次尝试真实审批验收：可以截取正常大小的 Cursor 窗口，但点击设置后仅窗口标题变化，设置内容没有出现；命令面板快捷键也未生效。随后坐标点击和重新绑定窗口均返回 macOS ScreenCaptureKit `-3812`。本轮未发送 Agent 测试请求，没有观察到审批弹窗，也没有审批后的执行记录，**不能计为审批验收通过**。本轮未启动隔离测试服务、未切换正式代理或修改审批设置；该边界继续待验收。
+
+复核正式后端 `/__byok-api__/healthz` 为 204，Cursor 设置 SHA-256 仍为上述 `1c86e40d…`，正式代理配置仍指向 `127.0.0.1:49642`。开发分支保持未合入 main、未发布。
