@@ -37,4 +37,15 @@ server/src/search/snapshot/
 - `cargo clippy --package cursor-server --all-targets -- -D warnings`：通过。
 - `cargo fmt --all -- --check`、`git diff --check`：通过。
 
-本提交的跨平台 CI 结果在完成后补记。自动化不能代替真实 Cursor 的审批操作；本轮没有发送 Agent 请求、改动正式代理或生产数据，也没有执行 20 分钟任务。
+代码提交 `75caeaefa743815c2051d1f91df1eace92fc8092`（采集隔离）及其父提交 `d1084f3`（HTTP 测试直连）已推送到 `codex/remote-semble`。[CI 40577400975](https://github.com/haohaomin/cursor-byok/actions/runs/40577400975) 核对 head 为上述完整代码 SHA，四组全部成功：
+
+| 作业 | 结果 |
+| --- | --- |
+| Rust Linux | 工作区 **510 项通过、0 失败、1 忽略**；格式及 Clippy 通过 |
+| Windows | 原生采集 14、选择与快照 10、SQLite 6，合计 **30 项通过**；Clippy 通过 |
+| macOS | 原生采集 14、选择与快照 10、SQLite 6，合计 **30 项通过**；Clippy 通过 |
+| 前端 | 类型检查与生产构建通过 |
+
+逐项核验 CI 日志，两项新增 `real_host_does_not_import_*` 在 Linux、Windows、macOS 均实际执行并通过；没有用本机结果替代 Windows 命令运行。随后仅追加此 Markdown 验证结果，不改变已测代码。
+
+本轮还重新尝试访问 Cursor，界面工具明确返回 **Mac 已锁定，自动解锁失败**，已向用户请求解锁。因此真实审批继续待验收，自动化不能代替它。本轮没有发送 Agent 请求、改动正式代理或生产数据，也没有执行 20 分钟任务。
