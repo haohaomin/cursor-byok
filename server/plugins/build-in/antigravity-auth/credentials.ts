@@ -32,7 +32,7 @@ export async function prepareAccount(
   const rejected = rejectedResource !== null &&
     accountData(rejectedResource).accessToken === data.accessToken;
   const now = Date.now();
-  if (!rejected && data.refreshError) {
+  if (data.refreshError) {
     return {
       privateData: data as unknown as JsonValue,
       state: { status: "invalid", message: data.refreshError },
@@ -41,7 +41,7 @@ export async function prepareAccount(
   if (!rejected && resource.state.status === "invalid") {
     return { privateData: data as unknown as JsonValue, state: resource.state };
   }
-  if (!rejected && data.refreshRetryAtMs && data.refreshRetryAtMs > now) {
+  if (data.refreshRetryAtMs && data.refreshRetryAtMs > now) {
     return {
       state: {
         status: "cooling",
@@ -73,10 +73,12 @@ export async function prepareAccount(
       }).toString(),
     });
   } catch {
+    const retryAtMs = Date.now() + 15_000;
     return {
+      privateData: { ...data, refreshRetryAtMs: retryAtMs } as unknown as JsonValue,
       state: {
         status: "cooling",
-        retryAtMs: Date.now() + 15_000,
+        retryAtMs,
         message: "Google token refresh network error; retry shortly",
       },
     };

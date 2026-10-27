@@ -96,12 +96,11 @@ Deno.test("Google invalid_grant requires a new login and is not retried", async 
     context,
   );
   assert(patch?.state?.status === "invalid", "revoked Google token should require login");
-  const rejectedAgain = await prepareAccount(
-    snapshot(patch.privateData as JsonValue, patch.state),
-    null,
-    context,
-  );
-  assert(rejectedAgain?.state?.status === "invalid", "revoked token state should remain invalid");
+  const saved = snapshot(patch.privateData as JsonValue, patch.state);
+  for (const rejected of [null, saved]) {
+    const rejectedAgain = await prepareAccount(saved, rejected, context);
+    assert(rejectedAgain?.state?.status === "invalid", "revoked token state should remain invalid");
+  }
   assert(calls === 1, "revoked refresh token must not be sent repeatedly");
 });
 
@@ -166,4 +165,35 @@ Deno.test("Google opaque access tokens receive a fallback expiry", async () => {
     typeof privateData.expiresAtMs === "number" && privateData.expiresAtMs > Date.now(),
     "opaque access token needs a fallback expiry",
   );
+});
+
+Deno.test("Google refresh cooldown survives network errors and delayed rejected requests", async () => {
+  for (const mode of ["network", "http", "malformed"] as const) {
+    let calls = 0;
+    const resource = snapshot({
+      accessToken: "expired",
+      refreshToken: "refresh",
+      expiresAtMs: Date.now() - 1,
+    });
+    const context = {
+      signal: new AbortController().signal,
+      network: {
+        fetch: () => {
+          calls++;
+          if (mode === "network") return Promise.reject(new Error("connection lost"));
+          return Promise.resolve({ status: mode === "http" ? 503 : 200, headers: {}, body: "{}" });
+        },
+        stream: () => Promise.reject(new Error("unexpected stream")),
+      },
+    } satisfies PluginContext;
+    const first = await prepareAccount(resource, null, context);
+    assert(first?.state?.status === "cooling", "refresh failure must enter cooldown");
+    const saved = snapshot(first.privateData ?? resource.privateData, first.state);
+    for (const rejected of [null, resource]) {
+      const second = await prepareAccount(saved, rejected, context);
+      assert(second?.state?.status === "cooling", "later requests must respect cooldown");
+      assert(second.state.retryAtMs === first.state.retryAtMs, "retry deadline must not slide");
+    }
+    assert(calls === 1, `${mode}: expected one refresh during cooldown, got ${calls}`);
+  }
 });

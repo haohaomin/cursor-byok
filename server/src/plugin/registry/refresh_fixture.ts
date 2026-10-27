@@ -44,6 +44,12 @@ export default defineProviderPlugin({
       }
       output.emit({ type: "text-delta", text: (input.resource!.privateData as TestData).token });
       output.emit({ type: "done", reason: "stop" });
+      if (scenario === "late-quota-patch") {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        return { status: "completed", patch: {
+          privateData: { ...(input.resource!.privateData as TestData), quota: 75 },
+        } };
+      }
       return { status: "completed" };
     },
   }],
