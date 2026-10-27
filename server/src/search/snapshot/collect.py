@@ -19,6 +19,8 @@ MAX_RULE_TOTAL = 262144
 MAX_MANIFEST_BYTES = 4 * 1024 * 1024
 MAX_FILE_BYTES = 1000000
 MAX_BATCH_BYTES = 2 * 1024 * 1024
+PAGE_BYTES = 256 * 1024
+MAX_RESPONSE_BYTES = 5 * 1024 * 1024
 DEADLINE = time.monotonic() + 20
 
 
@@ -218,6 +220,20 @@ def read_batch(root, paths, fingerprint):
     return output
 
 
+def response_page(result, request):
+    payload = encode(result)
+    digest = hashlib.sha256(payload).hexdigest()
+    offset = request["offset"]
+    expected = request["response_sha256"]
+    if (type(offset) is not int or not 0 <= offset < len(payload)
+            or offset % PAGE_BYTES != 0 or len(payload) > MAX_RESPONSE_BYTES):
+        raise ValueError("invalid workspace response offset or size")
+    if (offset == 0 and expected is not None) or (offset > 0 and expected != digest):
+        raise ValueError("workspace response changed between pages; start a new search")
+    return dict(offset=offset, total=len(payload), sha256=digest,
+                data=base64.b64encode(payload[offset:offset + PAGE_BYTES]).decode("ascii"))
+
+
 def main():
     try:
         if sys.version_info < (3, 9):
@@ -234,10 +250,11 @@ def main():
             result = dict(ok=True, files=bodies, fingerprint=request["fingerprint"])
         else:
             raise ValueError("unknown collection operation")
-        sys.stdout.buffer.write(encode(result) + b"\n")
+        sys.stdout.buffer.write(encode(response_page(result, request)) + b"\n")
         return 0
     except (ValueError, OSError, KeyError, TypeError, UnicodeError, subprocess.SubprocessError) as error:
-        sys.stdout.buffer.write(encode(dict(ok=False, error=str(error))) + b"\n")
+        sys.stdout.buffer.write(encode(dict(error=str(error))) + b"\n")
+        sys.stderr.write(str(error) + "\n")
         return 2
 
 

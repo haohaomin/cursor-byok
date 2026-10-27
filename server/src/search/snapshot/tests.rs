@@ -11,16 +11,16 @@ fn collector_rejects_changed_roots_unrequested_bodies_and_duplicates() {
     ]}});
     let mut other = inventory.clone();
     other["inventory"]["root"] = json!("/other");
-    assert!(collector.accept(&other.to_string()).is_err());
-    assert!(collector.accept(&inventory.to_string()).unwrap().is_none());
+    assert!(collector.accept_payload(other).is_err());
+    assert!(collector.accept_payload(inventory).unwrap().is_none());
     let request = collector.command().unwrap();
     assert!(request.len() < 60_000);
     let wrong =
         json!({"ok":true,"fingerprint":fingerprint,"files":[{"path":"private.rs","data":"YWJj"}]});
-    assert!(collector.accept(&wrong.to_string()).is_err());
+    assert!(collector.accept_payload(wrong).is_err());
     let correct =
         json!({"ok":true,"fingerprint":fingerprint,"files":[{"path":"public.rs","data":"YWJj"}]});
-    let files = collector.accept(&correct.to_string()).unwrap().unwrap();
+    let files = collector.accept_payload(correct).unwrap().unwrap();
     assert_eq!(files[0].bytes, b"abc");
 }
 
@@ -245,6 +245,102 @@ mod host {
                 .len(),
             140
         );
+    }
+
+    #[test]
+    fn real_host_pages_large_bodies_below_cursor_inline_output_limit() {
+        let (_parent, root) = fixture();
+        let bytes = vec![b'x'; 950_000];
+        fs::write(root.join("large.rs"), &bytes).unwrap();
+        let mut collector =
+            Collector::new(root.to_string_lossy().into_owned(), vec![ContentType::Code]);
+        let mut rounds = 0;
+        let files = loop {
+            let output = run(&collector);
+            assert!(output.status.success());
+            assert!(
+                output.stdout.len() < 512 * 1024,
+                "a single Exec must stay below Cursor's 1 MiB inline limit: {} bytes",
+                output.stdout.len()
+            );
+            rounds += 1;
+            if let Some(files) = collector
+                .accept(std::str::from_utf8(&output.stdout).unwrap())
+                .unwrap()
+            {
+                break files;
+            }
+            assert!(rounds < 20);
+        };
+        assert!(rounds > 2, "large source must use multiple response pages");
+        assert_eq!(files.len(), 1);
+        assert_eq!(files[0].bytes, bytes);
+    }
+
+    #[test]
+    fn real_host_pages_large_inventory_without_reducing_workspace_capacity() {
+        let (_parent, root) = fixture();
+        for i in 0..5000 {
+            fs::write(
+                root.join(format!("file_{i:04}_{}.rs", "n".repeat(180))),
+                b"fn f() {}",
+            )
+            .unwrap();
+        }
+        let mut collector =
+            Collector::new(root.to_string_lossy().into_owned(), vec![ContentType::Code]);
+        let mut rounds = 0;
+        while matches!(collector.phase, Phase::Inventory) {
+            let output = run(&collector);
+            assert!(
+                output.status.success(),
+                "{}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            assert!(output.stdout.len() < 512 * 1024);
+            assert!(collector
+                .accept(std::str::from_utf8(&output.stdout).unwrap())
+                .unwrap()
+                .is_none());
+            rounds += 1;
+            assert!(rounds < 20);
+        }
+        assert!(rounds > 1);
+        let Phase::Reading {
+            requested,
+            remaining,
+            ..
+        } = collector.phase
+        else {
+            panic!()
+        };
+        assert_eq!(
+            requested.len() + remaining.iter().map(Vec::len).sum::<usize>(),
+            5000
+        );
+    }
+
+    #[test]
+    fn real_host_rejects_changed_large_response_between_pages() {
+        let (_parent, root) = fixture();
+        fs::write(root.join("large.rs"), vec![b'x'; 950_000]).unwrap();
+        let mut collector =
+            Collector::new(root.to_string_lossy().into_owned(), vec![ContentType::Code]);
+        for _ in 0..2 {
+            let output = run(&collector);
+            assert!(output.status.success());
+            assert!(collector
+                .accept(std::str::from_utf8(&output.stdout).unwrap())
+                .unwrap()
+                .is_none());
+        }
+        fs::write(root.join("large.rs"), vec![b'y'; 950_000]).unwrap();
+        let output = run(&collector);
+        assert!(!output.status.success());
+        assert!(collector
+            .accept(std::str::from_utf8(&output.stdout).unwrap())
+            .unwrap_err()
+            .contains("changed"));
     }
 
     #[test]

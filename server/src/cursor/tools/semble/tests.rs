@@ -30,17 +30,22 @@ fn unwrap_exec(message: pb::AgentServerMessage) -> pb::ExecServerMessage {
 }
 
 fn inventory(id: u32) -> pb::ExecClientMessage {
+    use base64::Engine;
+    use sha2::{Digest, Sha256};
+    let payload = json!({"ok":true,"fingerprint":"a".repeat(64),"inventory":{
+    "root":"/workspace","rules":[],"entries":[
+        {"path":"auth.rs","is_dir":false,"size":12,"git_match":"none"}
+    ]}})
+    .to_string();
     pb::ExecClientMessage {
         id,
         message: Some(pb::exec_client_message::Message::ShellResult(
             pb::ShellResult {
                 result: Some(pb::shell_result::Result::Success(pb::ShellSuccess {
                     exit_code: 0,
-                    stdout: json!({"ok":true,"fingerprint":"a".repeat(64),"inventory":{
-                    "root":"/workspace","rules":[],"entries":[
-                        {"path":"auth.rs","is_dir":false,"size":12,"git_match":"none"}
-                    ]}})
-                    .to_string(),
+                    stdout: json!({"offset":0,"total":payload.len(),
+                        "sha256":hex::encode(Sha256::digest(payload.as_bytes())),
+                        "data":base64::engine::general_purpose::STANDARD.encode(payload.as_bytes())}).to_string(),
                     ..Default::default()
                 })),
                 ..Default::default()
@@ -300,9 +305,16 @@ async fn real_model_host_exec_round_trip_search_and_related() {
                 String::from_utf8_lossy(&output.stdout)
             );
             let stdout = String::from_utf8(output.stdout).unwrap();
-            assert!(!stdout.contains("PRIVATE_BODY_MUST_NOT_TRANSFER"));
             let wire: serde_json::Value = serde_json::from_str(&stdout).unwrap();
-            if let Some(bodies) = wire.get("files").and_then(serde_json::Value::as_array) {
+            // This small fixture fits one page per phase. Inspect the decoded
+            // payload, not the base64 envelope, for excluded source bodies.
+            use base64::Engine;
+            let bytes = base64::engine::general_purpose::STANDARD
+                .decode(wire["data"].as_str().unwrap())
+                .unwrap();
+            assert!(!String::from_utf8_lossy(&bytes).contains("PRIVATE_BODY_MUST_NOT_TRANSFER"));
+            let payload: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+            if let Some(bodies) = payload.get("files").and_then(serde_json::Value::as_array) {
                 assert!(bodies.iter().all(|body| body["path"] != "private.rs"));
             }
             let reply = pb::ExecClientMessage {

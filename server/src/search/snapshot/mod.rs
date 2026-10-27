@@ -10,17 +10,21 @@ use semble_core::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-pub(crate) const MAX_OUTPUT_BYTES: usize = 5 * 1024 * 1024;
+// Cursor has a separate 1 MiB inline stdout limit. Each response page, including
+// base64 and its envelope, stays below half that limit.
+pub(crate) const MAX_OUTPUT_BYTES: usize = 512 * 1024;
 const MAX_BATCH_BYTES: u64 = 2 * 1024 * 1024;
 const MAX_FILE_BYTES: u64 = 1_000_000;
 
 mod command;
+mod transfer;
 pub(crate) use command::{normalize_root, valid_root, windows_root};
 
 pub(crate) struct Collector {
     root: String,
     content: Vec<ContentType>,
     phase: Phase,
+    transfer: transfer::Transfer,
 }
 
 enum Phase {
@@ -45,11 +49,12 @@ impl Collector {
             root: normalize_root(&root),
             content,
             phase: Phase::Inventory,
+            transfer: transfer::Transfer::default(),
         }
     }
 
     pub(crate) fn command(&self) -> Result<String, String> {
-        let request = match &self.phase {
+        let mut request = match &self.phase {
             Phase::Inventory => json!({"operation":"inventory", "root":self.root}),
             Phase::Reading {
                 fingerprint,
@@ -60,6 +65,7 @@ impl Collector {
                 "paths":requested.iter().map(|(path,_)|path).collect::<Vec<_>>(),
             }),
         };
+        self.transfer.request(&mut request);
         command::build(&self.root, &request)
     }
 
@@ -67,8 +73,15 @@ impl Collector {
         if output.len() > MAX_OUTPUT_BYTES {
             return Err("Semble collection output exceeds the transport size limit".into());
         }
-        let value: Value = serde_json::from_str(output)
+        let Some(payload) = self.transfer.accept(output)? else {
+            return Ok(None);
+        };
+        let value: Value = serde_json::from_slice(&payload)
             .map_err(|error| format!("Invalid workspace collection result: {error}"))?;
+        self.accept_payload(value)
+    }
+
+    fn accept_payload(&mut self, value: Value) -> Result<Option<Vec<SnapshotFile>>, String> {
         if value.get("ok").and_then(Value::as_bool) != Some(true) {
             return Err(value
                 .get("error")
