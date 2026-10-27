@@ -1,4 +1,5 @@
 import { defineProviderPlugin } from "cursor-byok:plugin";
+import { prepareAccount } from "./credentials.ts";
 import { antigravityAuthorizationCodeOAuth } from "./oauth.ts";
 import { antigravityProvider } from "./provider.ts";
 import { credentialImport, presentAccount, refreshAccount, RESOURCE_TYPE } from "./resources.ts";
@@ -14,6 +15,10 @@ export default defineProviderPlugin({
     add: [antigravityAuthorizationCodeOAuth],
     import: credentialImport,
     present: presentAccount,
-    refresh: async (resource, context) => ({ status: "completed", patch: await refreshAccount(resource, context) }),
+    refresh: async (resource, context) => ({
+      status: "completed",
+      patch: await refreshAccount(resource, context),
+    }),
+    prepare: prepareAccount,
   }],
 });
