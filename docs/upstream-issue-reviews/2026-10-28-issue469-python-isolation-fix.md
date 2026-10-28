@@ -49,3 +49,22 @@ server/src/search/snapshot/
 逐项核验 CI 日志，两项新增 `real_host_does_not_import_*` 在 Linux、Windows、macOS 均实际执行并通过；没有用本机结果替代 Windows 命令运行。随后仅追加此 Markdown 验证结果，不改变已测代码。
 
 本轮还重新尝试访问 Cursor，界面工具明确返回 **Mac 已锁定，自动解锁失败**，已向用户请求解锁。因此真实审批继续待验收，自动化不能代替它。本轮没有发送 Agent 请求、改动正式代理或生产数据，也没有执行 20 分钟任务。
+
+## 最新分支的实际 SSH 主机复测
+
+2026-10-28 在 `f90cb668497da2bf0bcc30298b1d504d6df30995` 上补测实际 `aliyun-server` Linux 主机。这里的 `python3` 为 **3.6.8**，生产命令按既有探测顺序选中 **Python 3.13.13**。测试直接编译当前 `Collector` 模块，由它生成每阶段命令并验证返回分页、指纹及正文；通过 SSH 在临时工作区执行原始命令，没有另写采集算法。见[脱敏证据](2026-10-28-issue469-ssh-isolation-evidence.json)和[命令生成与校验夹具](reproductions/issue469_remote_collector.rs)。
+
+| 远端场景 | 实际结果 |
+| --- | --- |
+| 工作区含 `base64.py`、`json.py`、`sitecustomize.py`，用 `.cursorignore` 排除，同时设置含同名模块的 `PYTHONPATH` | 元数据及正文各执行一次，均退出 0；只返回 `receipt.rs`，同名模块内的失败标记未触发 |
+| 工作区只有 `receipt.rs`，`PYTHONPATH` 仍指向含失败标记的 `base64.py` | 两阶段均退出 0，只返回 `receipt.rs` |
+
+两组都返回 66 字节的预期源码，SHA-256 均为 `ed96d7d25eb2698908b839cdaa8f4c7cd185f661ff33fd384316ef2cc41ee4c6`。四份响应的分页长度及摘要均通过校验；工作区顶层条目保持不变，两个工作区和环境模块目录均未生成 `__pycache__`。带本轮标记的远端临时目录已删除。
+
+这项结果证明最新采集器在实际 SSH 主机上的解释器选择、导入隔离及两阶段传输。**命令由 SSH 工具发送，没有经过 Cursor Agent、模型调用或审批弹窗，不能计为 Cursor 端到端验收。** Windows Cursor UI 仍待验证。
+
+### 本轮真实审批阻塞
+
+Mac 解锁后可读取设置，实际 Run Mode 为 **Allowlist (with Sandbox)**，Command Allowlist 含 `python3`。这不能仅凭先前的“已改为逐次审批”确认审批必然出现，也不是认定本次采集命令必然被自动批准的证据。
+
+新建独立空白窗口后，原生菜单可以操作，但坐标点击继续返回 `noWindowsAvailable`，点击设置后窗口标题与实际渲染内容不一致。未成功发送测试提示、未观察到批准或拒绝弹窗。已构建最新隔离服务夹具，但没有启动它，也没有切换代理、修改审批模式、复制正式凭据数据库或重启 Cursor。尝试关闭空白窗口同样返回上述错误，窗口是否关闭未确认。正式后端健康检查为 204；20 分钟任务未执行。
