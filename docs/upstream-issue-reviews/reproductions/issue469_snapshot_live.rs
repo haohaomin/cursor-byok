@@ -1,9 +1,12 @@
+// Copy to server/examples/ before compiling. Starts only an isolated listener and
+// proxy; configuring and restoring Cursor settings belongs to the test operator.
+use cursor_server::{api, config, cursor, store, Error, Result};
 use cursor_server::{
     cursor::{
         prompting::{PromptAssets, PromptCompiler},
         TransportRegistry,
     },
-    local_app::CursorHarness,
+    local_app::CaState,
     network::NetworkClients,
     plugin::{PluginRegistry, PluginRuntime},
     provider::ProviderRouter,
@@ -12,11 +15,23 @@ use cursor_server::{
 };
 use std::{sync::Arc, time::Duration};
 
+#[allow(dead_code)]
+#[path = "../src/local_app/ca/mod.rs"]
+mod ca;
+#[allow(dead_code)]
+#[path = "../src/local_app/proxy.rs"]
+mod proxy;
+
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let root = std::env::args().nth(1).unwrap();
     if root == "decode" {
         return decode_trace().await;
+    }
+    let source_revision = std::env::args().nth(2).ok_or("expected source revision")?;
+    if source_revision.len() != 40 || !source_revision.bytes().all(|byte| byte.is_ascii_hexdigit())
+    {
+        return Err("expected a full source commit SHA".into());
     }
     tracing_subscriber::fmt()
         .with_env_filter("cursor_server=info")
@@ -44,23 +59,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
     let backend = listener.local_addr()?;
     let task = tokio::spawn(async move { axum::serve(listener, router).await.unwrap() });
-    let harness = CursorHarness::new(store)?;
-    harness.set_backend_addr(backend);
-    let status = harness.set_enabled(true).await?;
-    let session = serde_json::json!({"pid":std::process::id(),"backend":backend.to_string(),"proxy":status.proxy_url,"source":"semble-snapshot-2956bbf+cursor-policy"});
+    let mut proxy = proxy::ProxyRuntime::default();
+    let tab_mode = Arc::new(parking_lot::RwLock::new(store.tab_settings().await?.mode));
+    let (proxy_url, _) = proxy
+        .start(backend, ca::CaManager::managed()?.load()?, 0, tab_mode)
+        .await?;
+    let session = serde_json::json!({"pid":std::process::id(),"backend":backend.to_string(),"proxy":proxy_url,"source_revision":source_revision});
     std::fs::write(
         root.join("live-session.json"),
         serde_json::to_vec_pretty(&session)?,
     )?;
     println!("READY {session}");
     tokio::signal::ctrl_c().await?;
-    harness.disable().await?;
+    proxy.stop().await;
     registry.shutdown().await;
     task.abort();
     Ok(())
 }
 
-async fn decode_trace() -> Result<(), Box<dyn std::error::Error>> {
+async fn decode_trace() -> std::result::Result<(), Box<dyn std::error::Error>> {
     use cursor_server::cursor::protocol::proto::{agent::v1 as pb, aiserver::v1 as ai};
     use prost::Message;
     use sqlx::Row;

@@ -63,8 +63,23 @@ server/src/search/snapshot/
 
 这项结果证明最新采集器在实际 SSH 主机上的解释器选择、导入隔离及两阶段传输。**命令由 SSH 工具发送，没有经过 Cursor Agent、模型调用或审批弹窗，不能计为 Cursor 端到端验收。** Windows Cursor UI 仍待验证。
 
-### 本轮真实审批阻塞
+### 首次真实审批尝试
 
 Mac 解锁后可读取设置，实际 Run Mode 为 **Allowlist (with Sandbox)**，Command Allowlist 含 `python3`。这不能仅凭先前的“已改为逐次审批”确认审批必然出现，也不是认定本次采集命令必然被自动批准的证据。
 
 新建独立空白窗口后，原生菜单可以操作，但坐标点击继续返回 `noWindowsAvailable`，点击设置后窗口标题与实际渲染内容不一致。未成功发送测试提示、未观察到批准或拒绝弹窗。已构建最新隔离服务夹具，但没有启动它，也没有切换代理、修改审批模式、复制正式凭据数据库或重启 Cursor。尝试关闭空白窗口同样返回上述错误，窗口是否关闭未确认。正式后端健康检查为 204；20 分钟任务未执行。
+
+### 解锁后续测：隔离服务可用，真实审批仍未验收
+
+后续在 `c7c03945a45db1722a77e3fb5b325d7fc092c037` 基线上改进[实测服务夹具](reproductions/issue469_snapshot_live.rs)：移除会接管 Cursor 配置的 `CursorHarness`，直接复用生产代理和 CA 模块，只启动独立的后端与代理。夹具不再负责修改设置或重启 Cursor；操作者在确认测试窗口可用后才配置路由，并负责恢复。运行时要求传入完整源码 SHA，替换原先写死的旧版本标签。
+
+将夹具复制到 `server/examples/issue469_approval_live_20261028.rs` 后，`cargo build --package cursor-server --example issue469_approval_live_20261028` 及定向 rustfmt 检查通过。通过 SQLite backup API 创建权限受限的数据库副本，实际启动并停止隔离服务，结果见[结构化证据](2026-10-28-issue469-approval-attempt.json)：
+
+- 隔离后端健康检查为 **204**；本机代理的 HTTPS `NetworkService/IsConnected` 探测为 **200**，使用已有本机 CA 验证证书。
+- 启动前、运行中和停止后，Cursor 主进程 PID 均为 `19578`；设置文件 SHA-256 完全一致，正式代理没有切换。
+- SSH 连接及合成目录正常；曾通过原生菜单进入 SSH 窗口，但未成功打开新的测试目录并发送提示。用户确认解锁后，界面捕获仍连续报 `ScreenCaptureKit -3811`，重建界面工具会话也未恢复。
+- 隔离数据库的 `cursor_run_traces` 始终为 **0**。未发送 Agent 请求，**批准、拒绝两项均未验收**；健康检查不能替代真实审批证据。
+
+远程验收继续沿用已验证的 `cursorAgentHost.remoteInferenceRoute=always` 本机转发路径。辅助远端直连代理的 TLS 探测因远端缺少本机 CA 而失败，但本轮未进入该路径的 Cursor 请求，不能据此归因 #469。没有上传 CA、关闭 TLS 验证或写入远端 Machine 设置。
+
+结束时隔离进程已正常退出，独立端口关闭，含凭据的临时数据库副本、设置备份、临时 example 和带标记的远端合成目录已清理；没有活动 SSH 转发。正式后端仍为 **204**。界面工具不可用，测试窗口是否关闭无法核验。用户确认没有 OAuth 测试账号，真实 OAuth 验收保留未完成。未运行 20 分钟任务；本次仅改测试夹具与记录，不代表生产功能完成验收，也未合入 main 或发布。
