@@ -6,7 +6,7 @@
 
 ## 结论
 
-已将 #494 的非插件本地化功能适配到当前 fork，准备提交个人 fork PR。没有直接合入上游 README 和旧词条：当前 fork 默认中文 README、独立更新源、无广告界面和 Remote SSH 文案与上游不同，俄语 README 已按本 fork 的维护入口重写。
+已将 #494 的非插件本地化功能适配到当前 fork，并提交个人 fork [PR #18](https://github.com/haohaomin/cursor-byok/pull/18)。没有直接合入上游 README 和旧词条：当前 fork 默认中文 README、独立更新源、无广告界面和 Remote SSH 文案与上游不同，俄语 README 已按本 fork 的维护入口重写。
 
 ## 当前执行路径
 
@@ -47,6 +47,7 @@ README-RU.md                                    108  # 本 fork 俄语入口
 - `npm --prefix apps/desktop run check`：TypeScript、Node 配置检查和 Vite production build 全部通过。
 - 独立目录校验：`zh-CN`、`en-US`、`pt-BR`、`ru-RU` 均为 469 个键，所有译文非空，占位符名称逐项一致。
 - `git diff --check`：通过。
+- PR #18 CI：Linux、Windows、macOS 和 Frontend 全部通过；Sourcery review 按仓库配置跳过。记录：[CI run 42105125861](https://github.com/haohaomin/cursor-byok/actions/runs/42105125861)。
 
 构建仍会输出既有的动态导入和大 chunk 警告；没有新增错误。尚未使用真实 Russian 系统语言启动已安装 Tauri 包，需在 PR 合并或发布前做一次设置页切换确认。
 

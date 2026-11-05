@@ -14,7 +14,7 @@
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [上游 #494](https://github.com/leookun/cursor-byok/pull/494) / `d44e5fe92451` | 增加俄语桌面本地化 | 已按当前 fork 的 469 个 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和静态 i18n 校验；俄语 README 改用本 fork 的维护入口。`npm run check`、i18n 扫描和占位符校验通过；真实安装包 UI 切换待发布前复核。 |
+| [个人 fork PR #18](https://github.com/haohaomin/cursor-byok/pull/18)（上游 [#494](https://github.com/leookun/cursor-byok/pull/494)） / `508d157` | 增加俄语桌面本地化 | 已按当前 fork 的 469 个 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和静态 i18n 校验；俄语 README 改用本 fork 的维护入口。本地 `npm run check`、i18n 扫描、占位符校验通过；PR #18 的 Linux、Windows、macOS、Frontend CI 全部通过。真实安装包 UI 切换待发布前复核。 |
 
 ## 2026-10-27 新增候选
 
