@@ -14,7 +14,7 @@
 
 | 上游 PR / 本 fork 状态 | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [#345](https://github.com/leookun/cursor-byok/pull/345) / 待提交 | 全局 Cursor 规则持久化和注入 | 当前 fork 已有规则存储、同步和上下文合并；本次只补齐本地 `FetchRelevantKnowledgeForConversation` 端点与代理分流。定向、完整服务端测试、Clippy、格式检查均通过；真实 Cursor UI/账号/远程 SSH 未验收。详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
+| [上游 #345](https://github.com/leookun/cursor-byok/pull/345) / [本 fork #22](https://github.com/haohaomin/cursor-byok/pull/22) / `7dda5f1` | 全局 Cursor 规则持久化和注入 | 当前 fork 已有规则存储、同步和上下文合并；本次只补齐本地 `FetchRelevantKnowledgeForConversation` 端点与代理分流。定向、完整服务端测试、Clippy、格式检查均通过；真实 Cursor UI/账号/远程 SSH 未验收。详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
 
 ## 2026-10-27 新增候选
 
