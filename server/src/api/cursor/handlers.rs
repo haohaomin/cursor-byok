@@ -149,6 +149,10 @@ fn router_with_proxy(
             post(knowledge::remove),
         )
         .route(
+            "/aiserver.v1.AiService/FetchRelevantKnowledgeForConversation",
+            post(knowledge::relevant),
+        )
+        .route(
             analytics::BOOTSTRAP_STATSIG_PATH,
             post(analytics::bootstrap_statsig),
         )
