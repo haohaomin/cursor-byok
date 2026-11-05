@@ -47,13 +47,13 @@ pub(crate) async fn compile_user_message_action(
         .iter()
         .map(|message| message.text.trim())
         .filter(|text| !text.is_empty())
-        .map(str::to_string)
+        .map(context::neutralize_prompt_body)
         .collect::<Vec<_>>();
     action_context.extend(
         user.subagent_system_reminder
             .iter()
             .filter(|text| !text.is_empty())
-            .cloned(),
+            .map(|text| context::neutralize_prompt_body(text)),
     );
     let empty_context = pb::RequestContext::default();
     compile(
@@ -111,7 +111,8 @@ pub(crate) async fn compile_injection(
                     parts: vec![crate::model::ContentPart::Text {
                         text: format!(
                             "<system_context_injection>\n<producer>{}</producer>\n{}\n</system_context_injection>",
-                            context.producer, context.content
+                            context::neutralize_prompt_body(&context.producer),
+                            context::neutralize_prompt_body(&context.content)
                         ),
                     }],
                 },
@@ -206,7 +207,7 @@ async fn compile_with_timestamp(
         ),
         ("ACTION_CONTEXT", section(action_context.to_string())),
         ("TIMESTAMP", timestamp),
-        ("USER_QUERY", user.text.clone()),
+        ("USER_QUERY", context::neutralize_prompt_body(&user.text)),
         ("DEBUG_SERVER_ENDPOINT", String::new()),
         ("DEBUG_LOG_PATH", String::new()),
         ("DEBUG_SESSION_ID", String::new()),
@@ -285,7 +286,7 @@ pub async fn compile_background(
     let text = format!(
         "<timestamp>{timestamp}</timestamp>\n{}\n<user_query>{}</user_query>",
         action_context.trim(),
-        user.text
+        context::neutralize_prompt_body(&user.text)
     );
     let message = message(event_id, user, text.clone(), blobs).await?;
     Ok((message, text))
@@ -340,7 +341,8 @@ fn open_files(user: &pb::UserMessage) -> String {
         for file in &ide.recently_viewed_files {
             output.push_str(&format!(
                 "- {} (total lines: {})\n",
-                file.path, file.total_lines
+                context::neutralize_prompt_body(&file.path),
+                file.total_lines
             ));
         }
         output.push('\n');
