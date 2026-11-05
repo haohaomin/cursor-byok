@@ -10,6 +10,12 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
+## 2026-11-06 本 fork PR #17
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#17](https://github.com/haohaomin/cursor-byok/pull/17) / `b0a8e50` | 运行时覆盖手动和自动压缩提示词 | 选择性实现当前 Rust 架构的服务端路径；本地 `cursor-server` 全部测试 255✓、14 个忽略，Clippy/格式检查通过；PR CI 运行 `42098864508`、`42098964651` 的 Frontend、Linux、Windows、macOS 全部通过。未实现上游正文声称的桌面 Config 页面；详细边界见[验证记录](history/pull-requests/2026-11-06-pr343-runtime-compaction.md)。 |
+
 ## 2026-10-27 新增候选
 
 下表以每项最新记录为准；仅标为初筛的条目不表示已逐行审计或验证作者的测试声明。#514 读取了固定 head 的完整 diff、讨论、reviews 和 checks；后三者均为空，无可用上游 CI 结论。#513、#498 的后续处理分别链接到独立证据。
@@ -73,9 +79,9 @@
 | [#364](https://github.com/leookun/cursor-byok/pull/364) | 工具调用 ID 上限 64→256 | C | 1；+6/-6 | 未见 | 冲突 1 | 高且有明确反对依据：上游作者指出部分 provider 最大只接受 64，不能全局放宽。 **下一步：**不合原补丁；先复现长 ID 问题并验证各 provider 的限制。 |
 | [#354](https://github.com/leookun/cursor-byok/pull/354) | 重复自动压缩与工具输出截断 | C | 6；+505/-77 | 未见 | 冲突 5 | 高：同时改自动压缩、事件 ID 和 provider 历史投影；与 #378 重叠并有多处冲突。 **下一步：**合并需求后统一设计；验证多轮压缩、完整结果持久化及历史前缀稳定。 |
 | [#353](https://github.com/leookun/cursor-byok/pull/353) | 压缩保留空间可配置 | C | 11；+433/-64 | 未见 | 冲突 10 | 高：旧设置 UI/共享 API/存储与引擎冲突；会影响上下文阈值。 **下一步：**先明确与 #378/#460 的阈值关系，再移植并测试边界。 |
-| [#350](https://github.com/leookun/cursor-byok/pull/350) | 自定义上下文窗口优先 | C | 7；+69/-38 | 未见 | 冲突 6 | 中偏高：旧模型编辑器与 model_catalog 已变化，存在多处删除/修改冲突。 **下一步：**按当前模型目录移植；验证窗口显示、选择与压缩阈值一致。 |
+| [#350](https://github.com/leookun/cursor-byok/pull/350) | ✅ 已选择性实现：自定义上下文窗口优先 | C | 7；+69/-38 | 本地服务端 255✓；桌面检查✓；个人 fork [PR #16](https://github.com/haohaomin/cursor-byok/pull/16) CI 全✓ | 已按当前 `model_catalog` 和 `ModelConfig` 路径重实现，尚未合入 | 配置上下文排在第一项并成为默认变体，保存的上下文值优先于 Cursor 选择；详见个人 fork PR #16。 |
 | [#345](https://github.com/leookun/cursor-byok/pull/345) | 全局 Cursor 规则持久化和注入 | C | 7；+527/-8 | 未见 | 冲突 5 | 高：旧 handlers/prompting 路径；当前已有 knowledge 服务和 local rules 合并。 **下一步：**先比较现有覆盖，避免重复注入或改变会话内前缀；只移植缺失行为。 |
-| [#343](https://github.com/leookun/cursor-byok/pull/343) | 运行时覆盖压缩提示词 | C | 4；+63/-9 | 未见 | 冲突 4 | 中偏高：当前 head 已是作者建议的精简实现，非描述中的完整配置 UI，但仍与新编译路径冲突。 **下一步：**按实际 4 文件 diff 移植 prompts/compaction.md 支持，验证手动和自动压缩。 |
+| [#343](https://github.com/leookun/cursor-byok/pull/343) | ✅ 已选择性实现：运行时覆盖压缩提示词 | C | 4；+63/-9 | 本地 `cursor-server` 255✓、14 个忽略；PR #17 CI 全平台✓ | 已提交个人 fork [PR #17](https://github.com/haohaomin/cursor-byok/pull/17)，尚未合入 | 当前实现读取 `~/.cursor-byok-v3/prompts/compaction.md`；文件缺失或空白时使用内置提示词，读取错误包含路径。只移植实际服务端 diff，不声称已实现上游正文中的桌面 Config 页面。 |
 | [#360](https://github.com/leookun/cursor-byok/pull/360) | Grok/Codex OAuth 与账号池旧实现 | D | 41；+7565/-369 | 未见 | 冲突 28 | 高：旧订阅模块、前端及两项迁移；当前已有内置 Grok/Codex 插件。 **下一步：**不直接合并；需求映射到当前插件体系。 |
 | [#312](https://github.com/leookun/cursor-byok/pull/312) | Windows/macOS 发布签名旧构建 | D | 5；+127/-7 | 未见 | 冲突 5 | 高：Wails/Taskfile 方案与现有 Tauri Actions 发布流程不匹配。 **下一步：**不直接合并；沿用现有独立签名与更新源。 |
 | [#293](https://github.com/leookun/cursor-byok/pull/293) | Shell 审批恢复等待 | D | 4；+484/-1 | 未见 | 冲突 3 | 旧 Go internal/backend 路径已退出当前架构。 **下一步：**仅提取测试场景，检查现有 Rust 审批恢复。 |
