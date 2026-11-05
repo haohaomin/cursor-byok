@@ -195,10 +195,10 @@ impl ModelConfig {
     pub fn configure(&self, model: &mut super::ModelSpec) {
         model.display_name = Some(self.display_name.clone());
         model.strip_images = self.strip_images;
-        // A request-selected context is authoritative.  Use the saved model
-        // value only when Cursor did not send a context parameter.
-        if model.context_window_tokens.is_none() {
-            model.context_window_tokens = self.context_window_tokens;
+        // A configured context is authoritative for this model. Cursor's
+        // picker still supplies a value when no custom context is configured.
+        if let Some(context_window_tokens) = self.context_window_tokens {
+            model.context_window_tokens = Some(context_window_tokens);
         }
         let configured_effort = match self.model_type {
             ModelType::OpenAi => self.reasoning_effort.clone(),
@@ -448,6 +448,51 @@ mod tests {
         config.configure(&mut model);
 
         assert_eq!(model.reasoning, ReasoningSpec::default());
+    }
+
+    #[test]
+    fn configured_context_overrides_cursor_context_selection() {
+        let config = ModelConfig {
+            model_hash: "test".into(),
+            sort_order: 0,
+            display_name: "Test model".into(),
+            group_name: None,
+            model_type: ModelType::OpenAi,
+            base_url: "https://api.example.com".into(),
+            use_full_url: false,
+            api_key: "test".into(),
+            tooltip_data: String::new(),
+            model_id: "test".into(),
+            reasoning_effort: None,
+            openai_endpoint: OPENAI_CHAT_ENDPOINT.into(),
+            openai_extra_params_enabled: false,
+            openai_extra_params: empty_object(),
+            custom_headers_enabled: false,
+            strip_images: false,
+            custom_headers: empty_object(),
+            anthropic_extra_params_enabled: false,
+            anthropic_extra_params: empty_object(),
+            context_window_tokens: Some(272_000),
+            max_completion_tokens: None,
+            anthropic_max_tokens: None,
+            anthropic_thinking_effort: None,
+            thinking_budget_tokens: None,
+            created_at_ms: 0,
+            updated_at_ms: 0,
+        };
+        let mut selected = ModelSpec::new("test");
+        selected.context_window_tokens = Some(800_000);
+
+        config.configure(&mut selected);
+
+        assert_eq!(selected.context_window_tokens, Some(272_000));
+
+        let mut default_config = config;
+        default_config.context_window_tokens = None;
+        let mut selected_without_custom = ModelSpec::new("test");
+        selected_without_custom.context_window_tokens = Some(800_000);
+        default_config.configure(&mut selected_without_custom);
+        assert_eq!(selected_without_custom.context_window_tokens, Some(800_000));
     }
 }
 
