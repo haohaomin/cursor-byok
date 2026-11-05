@@ -103,18 +103,16 @@ pub fn merge_replay_states(
                     });
                 }
             }
-            "cursor_opaque" => {
-                if states.iter().all(|state| state.value.is_string()) {
-                    return Some(ProviderReplayState {
-                        provider_kind: provider_kind.into(),
-                        value: json!({
-                            "signatures": states
-                                .iter()
-                                .map(|state| state.value.clone())
-                                .collect::<Vec<_>>()
-                        }),
-                    });
-                }
+            "cursor_opaque" if states.iter().all(|state| state.value.is_string()) => {
+                return Some(ProviderReplayState {
+                    provider_kind: provider_kind.into(),
+                    value: json!({
+                        "signatures": states
+                            .iter()
+                            .map(|state| state.value.clone())
+                            .collect::<Vec<_>>()
+                    }),
+                });
             }
             _ => {}
         }
