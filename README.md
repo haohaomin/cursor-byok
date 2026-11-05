@@ -6,7 +6,7 @@
 
 免费开源 · 无广告 · macOS / Windows / Linux
 
-[English](./README-EN.md) · [下载最新版](https://github.com/haohaomin/cursor-byok/releases/latest) · [快速开始](#快速开始) · [维护进度](#持续维护与上游问题处理) · [文档](docs/README.md) · [免责声明](#免责声明) · [问题反馈](https://github.com/haohaomin/cursor-byok/issues)
+[English](./README-EN.md) · [Русский](./README-RU.md) · [下载最新版](https://github.com/haohaomin/cursor-byok/releases/latest) · [快速开始](#快速开始) · [维护进度](#持续维护与上游问题处理) · [文档](docs/README.md) · [免责声明](#免责声明) · [问题反馈](https://github.com/haohaomin/cursor-byok/issues)
 
 [![Release](https://img.shields.io/github/v/release/haohaomin/cursor-byok?style=flat-square)](https://github.com/haohaomin/cursor-byok/releases/latest)
 [![CI](https://github.com/haohaomin/cursor-byok/actions/workflows/ci.yml/badge.svg)](https://github.com/haohaomin/cursor-byok/actions/workflows/ci.yml)

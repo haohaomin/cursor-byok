@@ -10,6 +10,12 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
+## 2026-11-06 本 fork PR #494 适配
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [上游 #494](https://github.com/leookun/cursor-byok/pull/494) / `d44e5fe92451` | 增加俄语桌面本地化 | 已按当前 fork 的 469 个 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和静态 i18n 校验；俄语 README 改用本 fork 的维护入口。`npm run check`、i18n 扫描和占位符校验通过；真实安装包 UI 切换待发布前复核。 |
+
 ## 2026-10-27 新增候选
 
 下表以每项最新记录为准；仅标为初筛的条目不表示已逐行审计或验证作者的测试声明。#514 读取了固定 head 的完整 diff、讨论、reviews 和 checks；后三者均为空，无可用上游 CI 结论。#513、#498 的后续处理分别链接到独立证据。
