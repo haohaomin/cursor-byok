@@ -2,7 +2,7 @@
 
 ## 结论
 
-已在当前 `origin/main` 上选择性重实现上游 [#350](https://github.com/leookun/cursor-byok/pull/350) 的核心行为，并准备独立个人 fork PR。没有合入上游旧模型目录、旧 protobuf 字段或与本仓库无关的刷新逻辑。
+已在当前 `origin/main` 上选择性重实现上游 [#350](https://github.com/leookun/cursor-byok/pull/350) 的核心行为，并提交个人 fork [PR #16](https://github.com/haohaomin/cursor-byok/pull/16)（提交 `51d2527`）。没有合入上游旧模型目录、旧 protobuf 字段或与本仓库无关的刷新逻辑。
 
 配置了模型上下文窗口后：
 
@@ -37,5 +37,6 @@ server/src/model/configuration.rs
 - `cargo test --locked -p cursor-server --all-targets -- --nocapture`：255 项单元测试通过，14 项忽略；所有集成测试二进制通过。
 - `npm run i18n:scan`：通过。
 - `npm run check`：通过，包含 TypeScript、Node 类型检查和生产构建。
+- PR #16 的 GitHub Actions 运行 `42093544734`：Frontend、Linux、Windows、macOS 全部通过；Sourcery review 按仓库配置跳过。
 
 尚未进行真实 Cursor 窗口和供应商请求验收；该限制不影响本地协议和配置逻辑测试。
