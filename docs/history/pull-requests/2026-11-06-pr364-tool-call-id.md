@@ -14,6 +14,8 @@
 - 超过 64 字节的 ID 使用完整 ID 的 SHA-256 十六进制值，结果固定为 64 个 ASCII 字节；
 - assistant tool call 与对应 tool result 使用同一个稳定映射，不再因共享前 64 字节而碰撞。
 
+本 fork 的实现已提交为 [PR #19](https://github.com/haohaomin/cursor-byok/pull/19)，提交 `da01711`；其 Linux、Windows、macOS 和 Frontend CI 均通过。
+
 这样保留了 OpenAI、Anthropic 及兼容代理共同可接受的 64 字节边界，同时解决长 ID 被简单截断后无法匹配工具结果的问题。实现没有把 provider 特例散落到各适配器，仍由统一的 provider 规范化层处理。
 
 ## 代码边界
