@@ -14,7 +14,7 @@
 
 | 上游 PR / 本 fork 分支 | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [#375](https://github.com/leookun/cursor-byok/pull/375) / `codex/issue375-resume-progress` | ResumeAction 上下文和无进展恢复 | 不直接采用旧 `request/` 路径；迁移到当前 `compile/` 路径，服务端全量目标测试、Clippy、格式检查通过。待创建个人 fork PR；真实 Cursor UI 未验收。详见[验证记录](history/pull-requests/2026-11-06-pr375-resume-progress.md)。 |
+| 上游 [#375](https://github.com/leookun/cursor-byok/pull/375) / 本 fork [PR #20](https://github.com/haohaomin/cursor-byok/pull/20) / `codex/issue375-resume-progress` | ResumeAction 上下文和无进展恢复 | 不直接采用旧 `request/` 路径；迁移到当前 `compile/` 路径，服务端全量目标测试、Clippy、格式检查通过。PR #20 已创建，真实 Cursor UI 未验收。详见[验证记录](history/pull-requests/2026-11-06-pr375-resume-progress.md)。 |
 
 ## 2026-10-27 新增候选
 
