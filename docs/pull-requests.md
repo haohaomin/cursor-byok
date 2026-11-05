@@ -14,7 +14,7 @@
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [#21](https://github.com/haohaomin/cursor-byok/pull/21) / 待提交 | 上游 #229 的提示词正文结构标签注入防护 | 按当前 Rust `cursor/compile` 路径重实现；规则、选中文件、终端、用户查询、后台通知和执行计划正文只中和结构性闭合标签，保留源码可读性。服务端 255 项库测试、全部目标测试、三组定向回归、Clippy 与格式检查通过；真实 Cursor UI/账号未验收。详见[验证记录](history/pull-requests/2026-11-06-pr229-prompt-injection.md)。 |
+| [#21](https://github.com/haohaomin/cursor-byok/pull/21) / `3b5ce52` | 上游 #229 的提示词正文结构标签注入防护 | 按当前 Rust `cursor/compile` 路径重实现；规则、选中文件、终端、用户查询、后台通知和执行计划正文只中和结构性闭合标签，保留源码可读性。服务端 255 项库测试、全部目标测试、三组定向回归、Clippy 与格式检查通过；真实 Cursor UI/账号未验收。详见[验证记录](history/pull-requests/2026-11-06-pr229-prompt-injection.md)。 |
 
 ## 2026-10-27 新增候选
 
