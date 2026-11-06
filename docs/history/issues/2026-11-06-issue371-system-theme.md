@@ -62,3 +62,7 @@ npm run tauri:build -- --debug --no-bundle -- \
 ```
 
 浏览器中的系统主题由 Playwright 模拟；没有把它称为已安装 Tauri 应用、原生系统主题切换或 Windows/Linux GUI 验收。演示 API 不包含真实账号与管理 API 验证，早期出现的 favicon 404 及演示端点缺失不作为主题行为的测试结果。此变更不涉及插件、Cursor 协议或数据库；没有发布桌面版本。
+
+## 合入记录
+
+[PR #26](https://github.com/haohaomin/cursor-byok/pull/26) 于 2026-11-06 合入 main，提交 `3a6d50fbdba9e8a534b17e292d71f1bdd5d31ead`。最终 head `a4eb3a1402df80e180ef57f6b210ecd52fd6b458` 的两套 CI 均通过；合并后的 [main CI](https://github.com/haohaomin/cursor-byok/actions/runs/42157993648) 也通过。合入不扩大上述实机验收范围，未发布新版本。

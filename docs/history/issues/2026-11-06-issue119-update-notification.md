@@ -48,3 +48,5 @@ apps/desktop/src/
 结构化结果见 [验收证据](2026-11-06-issue119-update-notification-evidence.json)。测试时钟由 Playwright 推进，6 小时不是实钟等待；没有真实更新下载、安装或签名验证。未验收正式安装应用重启，localStorage 的记忆范围是同一个前端 origin；更换服务端口或清空 WebView 数据后可能再次提示，不能宣称跨 origin 的全局永久忽略。
 
 测试浏览器、Vite 和临时入口已清理，原始日志与截图在 `/tmp/cursor-byok-issue119-20261106/`。未修改正式用户数据，也未发布版本。
+
+集成复测：接入 main `73126d46bedac174e6449f2a45240a2955852bcb` 后，重复提示回归、820×558 的手动更新入口、i18n 扫描、前端检查和原生 debug 构建再次通过。

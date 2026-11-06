@@ -53,5 +53,12 @@
     "native updater network, signing, download or install",
     "persistence after changing frontend origin or clearing WebView data"
   ],
-  "storage_scope": "current frontend origin, like existing theme/language preferences"
+  "storage_scope": "current frontend origin, like existing theme/language preferences",
+  "integration": {
+    "main": "73126d46bedac174e6449f2a45240a2955852bcb",
+    "reload_regression": "passed",
+    "minimum_manual_update_entry": "visible and enabled",
+    "npm_check": "passed",
+    "native_debug_build": "passed with documented local SQLx override"
+  }
 }
