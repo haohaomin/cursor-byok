@@ -940,11 +940,6 @@
       "refs": [
         {
           "file": "features/models/CursorModelEditor.tsx",
-          "line": 174,
-          "column": 49
-        },
-        {
-          "file": "features/models/CursorModelEditor.tsx",
           "line": 176,
           "column": 50
         },
@@ -4455,6 +4450,18 @@
         }
       ]
     },
+    "ae48333d3301c608": {
+      "source": "配置后优先使用自定义上下文；留空时使用默认值。",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/models/CursorModelEditor.tsx",
+          "line": 174,
+          "column": 49
+        }
+      ]
+    },
     "aecb952b1e6cce36": {
       "source": "关闭后隐藏 Dock 栏图标，仍可通过菜单栏图标打开应用。",
       "kind": "text",
@@ -5382,7 +5389,7 @@
         {
           "file": "features/models/CursorModelEditor.tsx",
           "line": 174,
-          "column": 121
+          "column": 135
         },
         {
           "file": "features/models/CursorModelEditor.tsx",

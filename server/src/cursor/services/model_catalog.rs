@@ -229,20 +229,32 @@ const EFFORTS: [(&str, &str); 5] = [
 ];
 const DEFAULT_CONTEXT: &str = "200k";
 
-fn context_options(context_window_tokens: Option<u64>) -> Vec<(String, String)> {
-    let mut contexts = CONTEXTS
-        .into_iter()
-        .map(|(value, display_name)| (value.to_owned(), display_name.to_owned()))
-        .collect::<Vec<_>>();
-    if let Some(tokens) = context_window_tokens {
-        let value = tokens.to_string();
-        let duplicate = contexts
+fn configured_context(context_window_tokens: Option<u64>) -> Option<(String, String)> {
+    context_window_tokens.map(|tokens| {
+        CONTEXTS
             .iter()
-            .any(|(existing, _)| parse_token_count(existing) == Some(tokens));
-        if !duplicate {
-            contexts.push((value, format!("{} (Custom)", format_token_count(tokens))));
-        }
+            .find(|(value, _)| parse_token_count(value) == Some(tokens))
+            .map(|(value, display_name)| (value.to_string(), display_name.to_string()))
+            .unwrap_or_else(|| (tokens.to_string(), format_token_count(tokens)))
+    })
+}
+
+fn context_options(context_window_tokens: Option<u64>) -> Vec<(String, String)> {
+    let configured = configured_context(context_window_tokens);
+    let mut contexts = Vec::with_capacity(CONTEXTS.len() + configured.is_some() as usize);
+    if let Some(configured) = configured.as_ref() {
+        contexts.push(configured.clone());
     }
+    contexts.extend(
+        CONTEXTS
+            .into_iter()
+            .filter(|(value, _)| {
+                configured
+                    .as_ref()
+                    .is_none_or(|(configured_value, _)| configured_value != value)
+            })
+            .map(|(value, display_name)| (value.to_owned(), display_name.to_owned())),
+    );
     contexts
 }
 
@@ -452,6 +464,9 @@ fn unary_payload(body: &Bytes) -> Result<(bool, &[u8])> {
 
 fn available_model(model: &ModelConfig) -> AvailableModel {
     let contexts = context_options(model.context_window_tokens);
+    let default_context = configured_context(model.context_window_tokens)
+        .map(|(value, _)| value)
+        .unwrap_or_else(|| DEFAULT_CONTEXT.to_owned());
     let tooltip = model_tooltip(model);
     let variants = model_variants(
         &model.model_hash,
@@ -459,6 +474,7 @@ fn available_model(model: &ModelConfig) -> AvailableModel {
         &tooltip,
         &contexts,
         true,
+        &default_context,
     );
     let legacy_slugs = variants
         .iter()
@@ -585,6 +601,7 @@ fn model_variants(
     tooltip: &TooltipData,
     contexts: &[(String, String)],
     thinking: bool,
+    default_context: &str,
 ) -> Vec<ModelVariant> {
     // 非思考模型没有 Effort 轴,变体网格只剩 Context × Fast。
     let efforts: &[Option<(&str, &str)>] = if thinking {
@@ -599,7 +616,7 @@ fn model_variants(
         &[None]
     };
     let mut variants = Vec::with_capacity(contexts.len() * efforts.len() * 2);
-    for (context, context_name) in contexts {
+    for (context, _) in contexts {
         for effort in efforts {
             for fast in [false, true] {
                 variants.push(model_variant(
@@ -607,9 +624,9 @@ fn model_variants(
                     display_name,
                     tooltip,
                     context,
-                    context_name,
                     *effort,
                     fast,
+                    default_context,
                 ));
             }
         }
@@ -622,19 +639,19 @@ fn model_variant(
     display_name: &str,
     tooltip: &TooltipData,
     context: &str,
-    context_name: &str,
     effort: Option<(&str, &str)>,
     fast: bool,
+    default_context: &str,
 ) -> ModelVariant {
     let mut suffix = Vec::with_capacity(3);
-    if context != DEFAULT_CONTEXT {
-        suffix.push(context_name);
+    if context != default_context {
+        suffix.push(context_display_name(context));
     }
     if let Some((_, effort_name)) = effort {
-        suffix.push(effort_name);
+        suffix.push(effort_name.to_owned());
     }
     if fast {
-        suffix.push("Fast");
+        suffix.push("Fast".to_owned());
     }
     let suffix = suffix.join(" ");
     let display_name = if suffix.is_empty() {
@@ -645,7 +662,7 @@ fn model_variant(
         )
     };
     let is_default =
-        context == DEFAULT_CONTEXT && !fast && effort.is_none_or(|(effort, _)| effort == "high");
+        context == default_context && !fast && effort.is_none_or(|(effort, _)| effort == "high");
     let mut parameter_values = vec![ModelParameterValue {
         id: "context".into(),
         value: context.into(),
@@ -684,6 +701,15 @@ fn model_variant(
     }
 }
 
+fn context_display_name(context: &str) -> String {
+    CONTEXTS
+        .iter()
+        .find(|(value, _)| *value == context)
+        .map(|(_, display_name)| (*display_name).to_owned())
+        .or_else(|| parse_token_count(context).map(format_token_count))
+        .unwrap_or_else(|| context.to_owned())
+}
+
 fn model_tooltip(model: &ModelConfig) -> TooltipData {
     TooltipData {
         markdown_content: Some(model.tooltip_data.clone()),
@@ -696,7 +722,14 @@ fn available_plugin_model(model: &PluginModelDescriptor) -> AvailableModel {
     };
     // Effort 与上下文档位由宿主统一提供,与内置模型一致;插件不再声明这两项。
     let contexts = context_options(None);
-    let variants = model_variants(&model.id, &model.display_name, &tooltip, &contexts, true);
+    let variants = model_variants(
+        &model.id,
+        &model.display_name,
+        &tooltip,
+        &contexts,
+        true,
+        DEFAULT_CONTEXT,
+    );
     let legacy_slugs = variants
         .iter()
         .filter_map(|variant| variant.legacy_slug.clone())
@@ -859,5 +892,44 @@ mod tests {
             nudge.models_with_no_default_switch,
             vec!["local-model-hash"]
         );
+    }
+
+    #[test]
+    fn configured_context_is_first_and_has_no_custom_suffix() {
+        let contexts = context_options(Some(272_000));
+        assert_eq!(contexts[0], ("272000".into(), "272K".into()));
+        assert_eq!(contexts[1], ("200k".into(), "200K".into()));
+        assert!(!contexts[0].1.contains("Custom"));
+    }
+
+    #[test]
+    fn configured_builtin_context_reuses_the_builtin_value() {
+        assert_eq!(
+            configured_context(Some(200_000)),
+            Some(("200k".into(), "200K".into()))
+        );
+        assert_eq!(context_options(Some(200_000)).len(), CONTEXTS.len());
+    }
+
+    #[test]
+    fn configured_context_is_the_default_model_variant() {
+        let mut model = model();
+        model.context_window_tokens = Some(272_000);
+        let available = available_model(&model);
+        let default = available
+            .variants
+            .iter()
+            .find(|variant| variant.is_default_non_max_config == Some(true))
+            .expect("configured context default variant");
+        assert_eq!(
+            default
+                .parameter_values
+                .iter()
+                .find(|parameter| parameter.id == "context")
+                .map(|parameter| parameter.value.as_str()),
+            Some("272000")
+        );
+        assert!(default.display_name.contains("High"));
+        assert!(!default.display_name.contains("272K"));
     }
 }
