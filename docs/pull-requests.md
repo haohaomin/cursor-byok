@@ -16,6 +16,12 @@
 | --- | --- | --- |
 | [#23](https://github.com/haohaomin/cursor-byok/pull/23) / `dfea8ef` | 自动压缩摘要模型永久挂起后无法继续 | 保留现有压缩屏障、重复压缩和回退摘要，只加入 30 秒 deadline 与超时回退；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr378-compaction-timeout.md)。 |
 
+## 2026-11-06 本 fork PR #22
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#22](https://github.com/haohaomin/cursor-byok/pull/22) / `7dda5f1` | 全局 Cursor 规则的本地相关规则协议入口 | 复用现有规则存储、同步和上下文合并，只补 `FetchRelevantKnowledgeForConversation` 路由与代理分流；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
+
 ## 2026-11-06 上游 PR #375 的选择性实现
 
 | 上游 PR / 本 fork 分支 | 解决目标与范围 | 采用方式与验证边界 |
