@@ -16,6 +16,12 @@
 | --- | --- | --- |
 | [#18](https://github.com/haohaomin/cursor-byok/pull/18) / `508d157` | 增加俄语桌面本地化 | 按当前 fork 的 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和 i18n 校验；本地检查与四平台 CI 通过。真实安装包 UI 切换待发布前复核。 |
 
+## 2026-11-06 本 fork PR #17
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#17](https://github.com/haohaomin/cursor-byok/pull/17) / `b0a8e50` | 运行时覆盖手动和自动压缩提示词 | 选择性实现当前 Rust 架构的服务端路径；本地 `cursor-server` 全部测试 255✓、14 个忽略，Clippy/格式检查通过；PR CI 的 Frontend、Linux、Windows、macOS 全部通过。未实现上游正文声称的桌面 Config 页面；详细边界见[验证记录](history/pull-requests/2026-11-06-pr343-runtime-compaction.md)。 |
+
 ## 2026-11-06 本 fork PR #21
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
