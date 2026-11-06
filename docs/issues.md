@@ -144,7 +144,7 @@
 | --- | --- | --- | --- | --- |
 | ☐ | [#486](https://github.com/leookun/cursor-byok/issues/486) Linux RPM 无法在 Rocky Linux 9.5 安装：缺少 libwebkit2gtk-4.1.so.0 | B | 待现版复测 | Rocky 9.5 缺 WebKitGTK 4.1；核对发行版依赖与可支持的打包方式，需 Linux 环境。 |
 | ☐ | [#436](https://github.com/leookun/cursor-byok/issues/436) Linux(fedora) 托盘右键菜单没有显示出来 | B | 待现版复测 | 需 Fedora 桌面环境实测托盘菜单，记录桌面协议及依赖。 |
-| ☐（局部已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组布局 PR #30 已合入；截断按钮首次操作修复待最终 CI | 分组布局的 12 组 60 次状态检查通过，见 [布局修复](history/issues/2026-11-06-issue339-model-test-layout.md)；截断按钮首次点击/键盘激活已先复现再修复，8 组页面回归及提示边界通过，见 [交互修复](history/issues/2026-11-06-truncated-button-interaction.md)。表格悬停穿透/数字箭头此前 Chromium 未复现，原生 GUI 待验。 |
+| ☐（局部已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组布局 PR #30 与截断按钮 PR #31 均已合入，最终 CI 通过 | 分组布局的 12 组 60 次状态检查通过，见 [布局修复](history/issues/2026-11-06-issue339-model-test-layout.md)；截断按钮首次点击/键盘激活已先复现再修复，8 组页面回归及提示边界通过，见 [交互修复](history/issues/2026-11-06-truncated-button-interaction.md)。表格悬停穿透/数字箭头此前 Chromium 未复现，原生 GUI 待验。 |
 | ☐ | [#323](https://github.com/leookun/cursor-byok/issues/323) beta版更新所有模型配置全部丢失 | B | 待现版复测 | 旧 beta 升级后配置丢失的报告；先识别数据目录/版本，仅用数据副本验证。 |
 | ☐ | [#314](https://github.com/leookun/cursor-byok/issues/314) [Bug] macOS v0.0.49 首次启动后，通过菜单栏退出会导致应用卡死无响应 | B | 待现版复测 | 报告版本 0.0.49；先确认当前架构仍可复现首次启动退出卡死。 |
 | ☐ | [#283](https://github.com/leookun/cursor-byok/issues/283) 与原账号切换问题 | B | 待现版复测 | 旧版账号/设置损坏报告；仅用数据副本测试接管与恢复，禁止用删除数据库作为修复。 |
@@ -161,7 +161,7 @@
 | ☐ | [#324](https://github.com/leookun/cursor-byok/issues/324) 使用上的一些小痛点。 | B | 待现版复测 | 拆分配置复制、密钥显示和模型哈希冲突；先复现冲突，避免混合改动。 |
 | ☐ | [#471](https://github.com/leookun/cursor-byok/issues/471) 需求：增加一个配置备份功能 | C | 需求待评估 | 定义导出/导入字段、密钥处理和覆盖策略；先确认当前版本已有能力。 |
 | ☐ | [#417](https://github.com/leookun/cursor-byok/issues/417) 增加自定义定价 | C | 需求待评估 | 与 #150 的自定义价格需求归组，确认币种、计价单位和历史统计规则。 |
-| ☐ | [#254](https://github.com/leookun/cursor-byok/issues/254) 支持配置tab-server的baseurl，而不是内置一个 | C | 需求待评估 | 先核对当前 TAB 路由和自定义地址能力，避免重复已有配置。 |
+| ☐（现版已支持） | [#254](https://github.com/leookun/cursor-byok/issues/254) 支持配置tab-server的baseurl，而不是内置一个 | C | 既有功能无需重写；路由、持久化及设置页受控验证通过 | 16 个 TAB RPC 的前缀/query/二进制转发、SQLite 重连、地址切换、流式交付与非法配置保护共 4 项测试通过；设置页接线已测。未修改生产代码；真实 Cursor TAB、HTTPS 服务及控制面账号未验，见 [核查与边界](history/issues/2026-11-06-issue254-tab-baseurl-check.md)。 |
 | ☐ | [#150](https://github.com/leookun/cursor-byok/issues/150) 提几个意见看看需求能否实现。 | C | 需求待评估 | 与 #417/#107 归组，明确自定义价格和按模型分项统计。 |
 | ☐ | [#146](https://github.com/leookun/cursor-byok/issues/146) Docker支持 | C | 需求待评估 | 明确桌面/纯服务部署目标后评估容器支持。 |
 | ☐ | [#107](https://github.com/leookun/cursor-byok/issues/107) 请问能不能在用量统计时候加个模型的分类 | C | 需求待评估 | 先核对现版分模型用量统计，另行确认 commit 模型路由。 |

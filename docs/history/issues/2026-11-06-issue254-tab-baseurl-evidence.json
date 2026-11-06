@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-06",
+  "issue": {
+    "number": 254,
+    "state": "OPEN",
+    "title": "支持配置tab-server的baseurl，而不是内置一个",
+    "body_empty": true,
+    "account_comment_not_verified": true
+  },
+  "related_pr": {
+    "number": 377,
+    "state": "CLOSED",
+    "merged": false,
+    "scope": "official account restoration for direct TAB; not adopted"
+  },
+  "server_test_base": "574f2f4f3da4eef6b980b70931a2d256d81a8952",
+  "ui_test_base": "6602157d512d01591567bb00e561fef3a2cceb0e",
+  "server_source_unchanged_between_bases": true,
+  "production_changes": [],
+  "rust_tests": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0,
+    "runtime_seconds": 0.24,
+    "names": [
+      "invalid_custom_addresses_leave_the_last_valid_setting_unchanged",
+      "custom_tab_response_stream_is_not_buffered_until_completion",
+      "changing_custom_target_takes_effect_on_the_existing_router",
+      "persisted_custom_base_forwards_every_tab_rpc_with_prefix_query_and_binary_body"
+    ],
+    "tab_rpc_count": 16,
+    "invalid_addresses_rejected": 6
+  },
+  "ui": {
+    "blankWrites": 0,
+    "failureKeepsEditor": true,
+    "directHidesAddress": true,
+    "retainedAddress": "http://127.0.0.1:45123/team/tab",
+    "writes": [
+      {
+        "mode": "custom",
+        "address": "http://127.0.0.1:45123/team/tab///"
+      },
+      {
+        "mode": "custom",
+        "address": "http://127.0.0.1:45123/team/tab/replacement"
+      },
+      {
+        "mode": "direct",
+        "address": "http://127.0.0.1:45123/team/tab"
+      },
+      {
+        "mode": "custom",
+        "address": "http://127.0.0.1:45123/team/tab"
+      }
+    ],
+    "geometry": {
+      "left": 230,
+      "right": 802,
+      "documentWidth": 820,
+      "viewport": 820
+    }
+  },
+  "checks": {
+    "targeted_cargo_test_exit": 0,
+    "targeted_clippy_exit": 0,
+    "cargo_fmt_check_exit": 0,
+    "local_sqlx_parameter": "profile.dev.package.sqlx-macros.strip=\"none\""
+  },
+  "source_sha256": {
+    "server/tests/tab_routing.rs": "abd12f28d59bf120c1309fc43f37559a2bd65367d4ec107d042529ff173b7a66",
+    "server/src/cursor/services/tab.rs": "87659212d655c7e84d39aa3f63b02cb72b06fc0a88b6a10a22046f47d7952abd",
+    "server/src/api/cursor/proxy.rs": "126f3995934611324acd7ed623f0c7739c23e26e8fe86cfaf180d50b37c2a5a1",
+    "server/src/store/settings.rs": "8b451dcdae72045066f1a8ab5f986aaf446e5fe0f2ae42274aa5f712199d6c8e",
+    "server/src/network.rs": "3461efd272674e0cf7ea0fd514cdc597cd038e169a1fc6a347d542b6316ff7dd"
+  },
+  "limitations": [
+    "Browser management API responses are synthetic",
+    "No actual Cursor TAB completion",
+    "No installed native application UI",
+    "No official/public TAB service",
+    "No HTTPS certificate or control-plane account acceptance"
+  ],
+  "artifacts": "/tmp/cursor-byok-issue254-20261106"
+}

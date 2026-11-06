@@ -46,3 +46,5 @@ apps/desktop/src/shared/ui/
 ## 与分组布局修复组合验证
 
 PR #30 合入后，整合 main `574f2f4f3da4eef6b980b70931a2d256d81a8952`，冲突仅在 Issue #339 清单行。两个按钮组件的 SHA-256 与原验收源码一致；组合代码的 8 组首次交互及 12 组、60 次分组布局状态检查均通过，类型/生产构建及相同参数的 Tauri debug 构建再次通过。Playwright `pageerror` 计数为 0，但开发服务器仍记录既有 ResizeObserver 循环通知，不代表全应用无异常。更新后的 PR #31 仍需独立 CI，未发布版本。
+
+后续核对：PR #31 最终 head `cbac599da05705abe1f6cb486f215fb0b955de6b` 的 PR/push 两套四组 CI 全部通过，2026-11-06 09:20 UTC 已合入 main `6602157d512d01591567bb00e561fef3a2cceb0e`。原生 GUI 等边界保持原结论，未发布版本。
