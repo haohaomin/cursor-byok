@@ -1,0 +1,450 @@
+{
+  "date": "2026-11-06",
+  "baseline_commit": "1de8e4258c7a37e421fe0fc2d2e19807cbc729ed",
+  "integrated_base": "574f2f4f3da4eef6b980b70931a2d256d81a8952",
+  "environment": {
+    "browser": "Playwright Chromium",
+    "viewport": [
+      820,
+      558
+    ],
+    "locale": "en-US",
+    "api": "synthetic held preview/import requests; no production data"
+  },
+  "baseline": {
+    "failure": "focus not returned",
+    "results": [
+      {
+        "entry": "settings",
+        "scenario": "pointer-cancel",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "settings",
+        "scenario": "keyboard-escape",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "settings",
+        "scenario": "preview-error",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "settings",
+        "scenario": "success",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET",
+            "POST"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "empty",
+        "scenario": "pointer-cancel",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "empty",
+        "scenario": "keyboard-escape",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "empty",
+        "scenario": "preview-error",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": true,
+          "originalFocused": false,
+          "requests": [
+            "GET"
+          ]
+        },
+        "passed": false
+      },
+      {
+        "entry": "empty",
+        "scenario": "success",
+        "pending": {
+          "active": "BUTTON",
+          "focused": true,
+          "requests": [
+            "GET"
+          ]
+        },
+        "after": {
+          "active": "BODY",
+          "activeText": "BODY",
+          "aria": null,
+          "originalConnected": false,
+          "originalFocused": false,
+          "requests": [
+            "GET",
+            "POST"
+          ]
+        },
+        "passed": false
+      }
+    ]
+  },
+  "first_candidate_edges": {
+    "failure": "focus edge",
+    "result": {
+      "initial": "Confirm import",
+      "tab": "Cancel",
+      "shiftTab": "Confirm import",
+      "busy": {
+        "contained": false,
+        "active": "BODY",
+        "disabled": true
+      },
+      "importError": {
+        "contained": false,
+        "activeText": "BODY"
+      },
+      "afterErrorCancel": true,
+      "userFocusPreserved": true,
+      "synchronousReturn": true
+    }
+  },
+  "final_regression": [
+    {
+      "entry": "settings",
+      "scenario": "pointer-cancel",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Review and import",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "settings",
+      "scenario": "keyboard-escape",
+      "pending": {
+        "active": "BODY",
+        "focused": false,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Review and import",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "settings",
+      "scenario": "preview-error",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Review and import",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "settings",
+      "scenario": "success",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Review and import",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET",
+          "POST"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "empty",
+      "scenario": "pointer-cancel",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Import legacy configuration",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "empty",
+      "scenario": "keyboard-escape",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Import legacy configuration",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "empty",
+      "scenario": "preview-error",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "Import legacy configuration",
+        "aria": null,
+        "originalConnected": true,
+        "originalFocused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "entry": "empty",
+      "scenario": "success",
+      "pending": {
+        "active": "BUTTON",
+        "focused": true,
+        "requests": [
+          "GET"
+        ]
+      },
+      "after": {
+        "active": "BUTTON",
+        "activeText": "",
+        "aria": "Add model",
+        "originalConnected": false,
+        "originalFocused": false,
+        "requests": [
+          "GET",
+          "POST"
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "final_edges": {
+    "initial": "Confirm import",
+    "tab": "Cancel",
+    "shiftTab": "Confirm import",
+    "busy": {
+      "contained": true,
+      "active": "DIV",
+      "disabled": true
+    },
+    "importError": {
+      "contained": true,
+      "activeText": "Confirm import"
+    },
+    "afterErrorCancel": true,
+    "userFocusPreserved": true,
+    "synchronousReturn": true
+  },
+  "retry": {
+    "during": {
+      "contained": true,
+      "requests": [
+        "GET",
+        "POST"
+      ]
+    },
+    "after": {
+      "active": "Add model",
+      "requests": [
+        "GET",
+        "POST",
+        "POST"
+      ],
+      "dialogCount": 0
+    }
+  },
+  "checks": {
+    "npm_check_exit": 0,
+    "tauri_debug_exit": 0,
+    "sqlx_build_parameter": "profile.dev.package.sqlx-macros.strip=\"none\""
+  },
+  "source_sha256": {
+    "apps/desktop/src/shared/ui/Modal.tsx": "1c884e72aa9fc632dd610d012f22cd31adac5d6cebad3298c2d7937a53456e7d",
+    "apps/desktop/src/shared/ui/ConfirmDialog.tsx": "68f1cf7e991989db83e67b758896a6a7693ca45fd2fb88f18c2ef731542458d1",
+    "apps/desktop/src/features/models/LegacyModelImport.tsx": "4a7a0b119b24703c0e705df6b30d8f881115c6987c14b4359962a09c582b97c3",
+    "apps/desktop/src/features/models/CursorGates.tsx": "115b66d14b6110f9a0f3b11d47e59a2777b2524b465aeb1133314873425b0eff",
+    "apps/desktop/src/features/models/CursorSettingsPage.tsx": "da6c6ed1f36d64abf5ce66aa0dc65a994ce8e157a850e6198400fd55966e5fe9"
+  },
+  "limitations": [
+    "No real legacy configuration import",
+    "No installed macOS GUI test",
+    "No Windows/Linux GUI test"
+  ],
+  "artifact_directory": "/tmp/cursor-byok-import-focus-20261106"
+}

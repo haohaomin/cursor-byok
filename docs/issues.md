@@ -152,7 +152,7 @@
 | ☐ | [#371](https://github.com/leookun/cursor-byok/issues/371) follow the system theme and set it as default. | C | PR #26 已合入；浏览器、构建及四组 CI 通过，原生应用待验 | 默认跟随系统、实时切换、显式选择保存及首屏主题已补齐。7 组首屏检查、10 次运行时核对、四语言检查及带本机 SQLx 工具链参数的 Tauri debug 构建通过；未发布，见 [修复与边界](history/issues/2026-11-06-issue371-system-theme.md)。 |
 | ☐（实现与局部实测完成） | [#134](https://github.com/leookun/cursor-byok/issues/134) 添加一个打开cursor 的快捷键按钮 | C | PR #27 已合入；macOS 原生分发、四语言布局及四组 CI 通过 | 复用 opener，仅允许 `cursor://`；普通浏览器隐藏。820×558 复测修复俄语工具栏挤出，原生权限失败及其他 URI 拒绝已验。冷启动、缺少 handler、Windows/Linux GUI 未验，见 [实现与验收](history/issues/2026-11-06-issue134-open-cursor.md)。 |
 | ☐（已修复待原生验收） | [#119](https://github.com/leookun/cursor-byok/issues/119) 有个小建议，更新提示关闭之后就不要弹出来了，可以用户手动点击 版本更新 | C | 已复现刷新后重复提醒并修复；浏览器与构建通过 | 记住最后自动提醒的版本，新版本仍提醒，设置更新入口保留；刷新、定时检查、存储读写失败及最小窗口通过。真实安装包重启未验，跨 origin 不保留，见 [修复与边界](history/issues/2026-11-06-issue119-update-notification.md)。 |
-| ☐ | [#370](https://github.com/leookun/cursor-byok/issues/370) Import modal scrollbar is not working | D | PR #29 已合入；浏览器、构建及最终提交四组 CI 通过 | 120 个模型时内部视口被撑高导致滚动失效；修正两层高度收缩，滚轮/拖拽、短内容、表格/详情回归通过。原报告正文为空，原生 GUI 与焦点恢复仍有边界，见 [修复记录](history/issues/2026-11-06-issue370-modal-scroll.md)。 |
+| ☐ | [#370](https://github.com/leookun/cursor-byok/issues/370) Import modal scrollbar is not working | D | PR #29 已合入；浏览器、构建及最终提交四组 CI 通过 | 120 个模型时内部视口被撑高导致滚动失效；修正两层高度收缩，滚轮/拖拽、短内容、表格/详情回归通过。原报告正文为空，原生 GUI 待验；异步导入焦点已另行 [复现修复并测试](history/issues/2026-11-06-import-dialog-focus.md)，见 [滚动修复记录](history/issues/2026-11-06-issue370-modal-scroll.md)。 |
 
 ### 配置与统计需求（8 项）
 
