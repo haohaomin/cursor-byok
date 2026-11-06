@@ -675,8 +675,8 @@ async fn provider_overflow_refusal_compacts_and_retries_once() {
 #[tokio::test]
 async fn assistant_terminated_history_is_sent_with_a_user_tail() {
     // Cursor can resume a conversation whose committed history already ends
-    // with the assistant. Anthropic refuses that as a prefill, so the run
-    // appends a provider-visible continuation without persisting it.
+    // with the assistant. An explicit ResumeAction adds a stable hidden
+    // continuation prompt before the next provider call.
     let (_directory, store) = fixtures::temp_store().await;
     let model = store
         .create_model(&windowed_model("tail-model", None))
@@ -726,7 +726,15 @@ async fn assistant_terminated_history_is_sent_with_a_user_tail() {
     assert_eq!(requests.len(), 2);
     let tail = requests[1].history.last().unwrap();
     assert_eq!(tail.role, Role::User);
-    assert_eq!(tail.message_id, "runtime:continue");
+    assert_eq!(tail.message_id, "resume-prompt:tail-resume");
+    assert!(matches!(
+        &tail.content,
+        ProjectedContent::Parts(parts)
+            if parts.iter().any(|part| matches!(
+                part,
+                ContentPart::Text { text } if text.contains("<resume>")
+            ))
+    ));
     assert_eq!(
         requests[1].history[..requests[1].history.len() - 1]
             .iter()
@@ -744,8 +752,11 @@ async fn assistant_terminated_history_is_sent_with_a_user_tail() {
         stored
             .iter()
             .all(|message| message.message_id != "runtime:continue"),
-        "the continuation tail is provider-visible only and never persisted"
+        "the generic continuation tail is not needed after an explicit ResumeAction"
     );
+    assert!(stored
+        .iter()
+        .any(|message| message.message_id == "resume-prompt:tail-resume"));
 }
 
 #[derive(Debug, Default, serde::Deserialize)]
