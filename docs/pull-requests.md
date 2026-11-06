@@ -4,6 +4,16 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-06 已合并 PR 的测试状态
+
+本 fork 最近合并的 #12、#14、#15、#16、#17、#18、#19、#20、#21、#22、#23，最终 PR 提交的 Frontend、Rust Linux、Desktop Rust Windows/macOS 检查均通过。合并后 main `b6936e885db61` 的 [CI](https://github.com/haohaomin/cursor-byok/actions/runs/42147293009) 也全部通过。
+
+这里的“通过”是自动化测试与构建结果。真实 Cursor UI、真实 provider 账号、远程 SSH、审批交互仍以各项独立验收记录为准，不能由绿色 CI 推断完成。远程审批 [PR #13](https://github.com/haohaomin/cursor-byok/pull/13) 仍未合并。
+
+## 2026-11-06 上游 PR #237 的独立实现
+
+本地标题生成与元数据保存已在 `codex/issue237-conversation-title` 实现。新增 9 项回归、工作区全量 563 项测试和 Clippy 通过，14 项插件环境测试按原配置忽略；真实 Cursor 自动改名尚未验收。来源、数据库升级和请求隔离边界见[验证记录](history/pull-requests/2026-11-06-pr237-conversation-title.md)。
+
 ## 2026-11-04 本 fork PR #10
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
@@ -14,7 +24,7 @@
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [#18](https://github.com/haohaomin/cursor-byok/pull/18) / `508d157` | 增加俄语桌面本地化 | 按当前 fork 的 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和 i18n 校验；本地检查与四平台 CI 通过。真实安装包 UI 切换待发布前复核。 |
+| [#18](https://github.com/haohaomin/cursor-byok/pull/18) / `08bf3ba` | 增加俄语桌面本地化 | 按当前 fork 的 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和 i18n 校验；本地检查与四组 CI 通过，已合入 main。真实安装包 UI 切换待发布前复核。 |
 
 ## 2026-11-06 本 fork PR #23
 
@@ -116,7 +126,7 @@
 | [#312](https://github.com/leookun/cursor-byok/pull/312) | Windows/macOS 发布签名旧构建 | D | 5；+127/-7 | 未见 | 冲突 5 | 高：Wails/Taskfile 方案与现有 Tauri Actions 发布流程不匹配。 **下一步：**不直接合并；沿用现有独立签名与更新源。 |
 | [#293](https://github.com/leookun/cursor-byok/pull/293) | Shell 审批恢复等待 | D | 4；+484/-1 | 未见 | 冲突 3 | 旧 Go internal/backend 路径已退出当前架构。 **下一步：**仅提取测试场景，检查现有 Rust 审批恢复。 |
 | [#245](https://github.com/leookun/cursor-byok/pull/245) | 编排工具、Projects 与协议同步 | D | 26；+2872/-212 | 未见 | 冲突 18 | 旧 Go 后端及旧 prompt/proto 路径；变更面较广。 **下一步：**按当前 protocols/cursor 和 Rust 功能逐项比较。 |
-| [#237](https://github.com/leookun/cursor-byok/pull/237) | 会话标题生成和持久化 | D | 9；+331/-9 | 未见 | 冲突 7 | 旧 Go forwarder/host 与 proto 路径冲突。 **下一步：**如当前仍有问题，在 Rust 服务内修复。 |
+| [#237](https://github.com/leookun/cursor-byok/pull/237) | 会话标题生成和持久化 | D（Rust 独立实现） | 原 PR：9；+331/-9 | 原 PR 未见；本地 563 项测试通过 | 不直接移植旧 Go 路径 | 补齐本地 NameTab 和早到元数据保存；新增 9 项回归，数据库升级和公共路由已验证，真实 Cursor UI 待验收。见[记录](history/pull-requests/2026-11-06-pr237-conversation-title.md)。 |
 | [#229](https://github.com/leookun/cursor-byok/pull/229) | 提示词结构标签注入防护 | D | 3；+166/-8 | 未见 | 冲突 2 | 安全意图值得保留，但补丁落在旧 Go prompt 编译器。 **下一步：**把攻击样例迁入当前提示词测试后评估，勿复活旧模块。 |
 | [#227](https://github.com/leookun/cursor-byok/pull/227) | Shell 前台超时和错误报告 | D | 5；+14/-10 | 未见 | 冲突 5 | 旧 Go forwarder/model/mitm 路径。 **下一步：**按当前工具运行时验证超时和错误传播。 |
 | [#216](https://github.com/leookun/cursor-byok/pull/216) | 思考链、AOS、代理和 UI 综合增强 | D | 423；+61346/-14030 | 未见 | 冲突 109 | 极高：423 文件；上游作者已要求拆分，含旧构建、后端、前端与证书路径。 **下一步：**拒绝整体合入；按单一功能重做，不导入证书材料。 |
