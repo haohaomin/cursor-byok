@@ -10,6 +10,12 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
+## 2026-11-06 本 fork PR #18
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#18](https://github.com/haohaomin/cursor-byok/pull/18) / `508d157` | 增加俄语桌面本地化 | 按当前 fork 的 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和 i18n 校验；本地检查与四平台 CI 通过。真实安装包 UI 切换待发布前复核。 |
+
 ## 2026-11-06 本 fork PR #23
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
