@@ -16,6 +16,12 @@
 | --- | --- | --- |
 | [#23](https://github.com/haohaomin/cursor-byok/pull/23) / `dfea8ef` | 自动压缩摘要模型永久挂起后无法继续 | 保留现有压缩屏障、重复压缩和回退摘要，只加入 30 秒 deadline 与超时回退；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr378-compaction-timeout.md)。 |
 
+## 2026-11-06 本 fork PR #17
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#17](https://github.com/haohaomin/cursor-byok/pull/17) / `b0a8e50` | 运行时覆盖手动和自动压缩提示词 | 选择性实现当前 Rust 架构的服务端路径；本地 `cursor-server` 全部测试 255✓、14 个忽略，Clippy/格式检查通过；PR CI 的 Frontend、Linux、Windows、macOS 全部通过。未实现上游正文声称的桌面 Config 页面；详细边界见[验证记录](history/pull-requests/2026-11-06-pr343-runtime-compaction.md)。 |
+
 ## 2026-11-06 本 fork PR #21
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |

@@ -858,6 +858,8 @@ impl RunEngine {
         model.max_output_tokens = Some(super::compaction::OUTPUT_TOKENS);
         model.reasoning.enabled = false;
         model.reasoning.effort = None;
+        let instructions =
+            super::compaction::instructions().map_err(|error| RunOutcome::Failed(error.into()))?;
         let invocation = crate::model::ModelInvocation {
             call_id: format!("{}:{provider_call_index}", prepared.run_id),
             run_id: prepared.run_id.to_string(),
@@ -866,7 +868,7 @@ impl RunEngine {
             provider_call_index,
             request: crate::model::ModelRequest {
                 prompt: crate::model::PromptSpec {
-                    instructions: super::compaction::INSTRUCTIONS.into(),
+                    instructions,
                     tools: Vec::new(),
                 },
                 model,
