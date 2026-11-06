@@ -56,3 +56,5 @@ Playwright 使用真实页面和演示数据；仅为显示原生按钮模拟 Ta
 - `cargo fmt --all -- --check`、`git diff --check`：通过。
 
 原生 opener 成功表示请求已分发给系统，不保证每个平台都能检测缺失的 URI handler。未退出用户 Cursor 来测试冷启动，未验收 Windows/Linux GUI 或未安装 Cursor 的操作系统行为。验收应用、浏览器会话和 Vite 服务已关闭；未替换正式安装包、修改 Cursor 安装文件或发布新版本。
+
+集成复测：接入 main `3a6d50fbdba9e8a534b17e292d71f1bdd5d31ead` 的系统主题支持后，再次完成四语言浏览器场景、亮色截图、前端检查及原生 debug 构建，均通过；四种语言均为 473 个键，没有缺失或空译文。

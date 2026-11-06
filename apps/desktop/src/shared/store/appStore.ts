@@ -26,8 +26,12 @@ export type AppSnapshot = {
 };
 
 const savedTheme = (): ThemeId => {
-  const saved = localStorage.getItem("cursor-byok.theme");
-  return isThemeId(saved) ? saved : "default-dark";
+  try {
+    const saved = localStorage.getItem("cursor-byok.theme");
+    return isThemeId(saved) ? saved : "system";
+  } catch {
+    return "system";
+  }
 };
 
 let snapshot: AppSnapshot = {
@@ -305,7 +309,12 @@ export const appStore = {
     }
   },
   selectTheme(theme: ThemeId) {
-    localStorage.setItem("cursor-byok.theme", theme);
+    try {
+      if (theme === "system") localStorage.removeItem("cursor-byok.theme");
+      else localStorage.setItem("cursor-byok.theme", theme);
+    } catch {
+      // The preference still applies for this session when storage is unavailable.
+    }
     applyTheme(theme);
     update({ theme });
   },

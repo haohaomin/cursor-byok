@@ -1,0 +1,310 @@
+{
+  "date": "2026-11-06",
+  "issue": "https://github.com/leookun/cursor-byok/issues/371",
+  "baseline_commit": "4e90dce850219947e945093de7ee246e85514198",
+  "final_base_commit": "d7b370b508b030741f4898c925a4fbc7bdbf866d",
+  "environment": {
+    "browser": "Playwright Chromium",
+    "viewport": {
+      "width": 820,
+      "height": 558
+    },
+    "api": "existing demo fixture",
+    "system_theme": "emulated prefers-color-scheme; OS settings untouched"
+  },
+  "baseline": {
+    "systemDark": false,
+    "preference": null,
+    "renderedTheme": "default-dark",
+    "buttons": []
+  },
+  "first_paint": [
+    {
+      "preference": null,
+      "system": "light",
+      "expected": "default-light",
+      "actual": {
+        "theme": "default-light",
+        "scheme": "light",
+        "background": "#fcfcfc",
+        "meta": "#fcfcfc",
+        "appStarted": false
+      },
+      "passed": true
+    },
+    {
+      "preference": null,
+      "system": "dark",
+      "expected": "default-dark",
+      "actual": {
+        "theme": "default-dark",
+        "scheme": "dark",
+        "background": "#141414",
+        "meta": "#141414",
+        "appStarted": false
+      },
+      "passed": true
+    },
+    {
+      "preference": "default-dark",
+      "system": "light",
+      "expected": "default-dark",
+      "actual": {
+        "theme": "default-dark",
+        "scheme": "dark",
+        "background": "#141414",
+        "meta": "#141414",
+        "appStarted": false
+      },
+      "passed": true
+    },
+    {
+      "preference": "default-light",
+      "system": "dark",
+      "expected": "default-light",
+      "actual": {
+        "theme": "default-light",
+        "scheme": "light",
+        "background": "#fcfcfc",
+        "meta": "#fcfcfc",
+        "appStarted": false
+      },
+      "passed": true
+    },
+    {
+      "preference": "system",
+      "system": "light",
+      "expected": "default-light",
+      "actual": {
+        "theme": "default-light",
+        "scheme": "light",
+        "background": "#fcfcfc",
+        "meta": "#fcfcfc",
+        "appStarted": false
+      },
+      "passed": true
+    },
+    {
+      "preference": "invalid",
+      "system": "light",
+      "expected": "default-light",
+      "actual": {
+        "theme": "default-light",
+        "scheme": "light",
+        "background": "#fcfcfc",
+        "meta": "#fcfcfc",
+        "appStarted": false
+      },
+      "passed": true
+    },
+    {
+      "preference": null,
+      "system": "light",
+      "expected": "default-light",
+      "blocked": true,
+      "actual": {
+        "theme": "default-light",
+        "scheme": "light",
+        "background": "#fcfcfc",
+        "meta": "#fcfcfc",
+        "appStarted": false
+      },
+      "passed": true
+    }
+  ],
+  "runtime_observations": [
+    {
+      "observation": "fixed-default.txt",
+      "observed": {
+        "systemDark": false,
+        "preference": null,
+        "renderedTheme": "default-light",
+        "scheme": "light",
+        "background": "rgb(245, 245, 245)",
+        "selected": [
+          "跟随系统"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "observation": "system-dark.txt",
+      "observed": {
+        "theme": "default-dark",
+        "scheme": "dark",
+        "meta": "#141414",
+        "preference": null
+      },
+      "passed": true
+    },
+    {
+      "observation": "manual-light.txt",
+      "observed": {
+        "theme": "default-light",
+        "preference": "default-light"
+      },
+      "passed": true
+    },
+    {
+      "observation": "manual-ignore-system.txt",
+      "observed": {
+        "theme": "default-light",
+        "systemDark": true,
+        "preference": "default-light"
+      },
+      "passed": true
+    },
+    {
+      "observation": "persistence.txt",
+      "observed": {
+        "theme": "default-light",
+        "preference": "default-light"
+      },
+      "passed": true
+    },
+    {
+      "observation": "final-manual-dark.txt",
+      "observed": {
+        "theme": "default-dark",
+        "systemDark": false,
+        "preference": "default-dark"
+      },
+      "passed": true
+    },
+    {
+      "observation": "final-dark-persistence.txt",
+      "observed": {
+        "theme": "default-dark",
+        "preference": "default-dark"
+      },
+      "passed": true
+    },
+    {
+      "observation": "final-system-restored.txt",
+      "observed": {
+        "theme": "default-light",
+        "preference": null,
+        "selected": [
+          "Системная тема"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "observation": "final-system-dark.txt",
+      "observed": {
+        "theme": "default-dark",
+        "preference": null
+      },
+      "passed": true
+    },
+    {
+      "observation": "final-system-reload.txt",
+      "observed": {
+        "theme": "default-dark",
+        "preference": null,
+        "selected": [
+          "Системная тема"
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "locale_labels": {
+    "zh-CN": [
+      "跟随系统主题",
+      "深色",
+      "浅色"
+    ],
+    "en-US": [
+      "Use system theme",
+      "Dark",
+      "Light"
+    ],
+    "pt-BR": [
+      "Usar tema do sistema",
+      "Escuro",
+      "Claro"
+    ],
+    "ru-RU": [
+      "Системная тема",
+      "Тёмная",
+      "Светлая"
+    ]
+  },
+  "validation": {
+    "frontend_check": "passed",
+    "locale_catalogs": "471 matching keys in all four locales, no empty translations",
+    "native_debug_build": "passed with command-only profile.dev.package.sqlx-macros.strip=\"none\"; Rust 1.94.1 on macOS 27",
+    "installed_native_ui": "not tested"
+  },
+  "layout": {
+    "viewport": {
+      "width": 820,
+      "height": 558
+    },
+    "buttons": [
+      {
+        "text": "跟随系统主题",
+        "rect": {
+          "x": 245,
+          "y": 365.5,
+          "width": 108,
+          "height": 30,
+          "top": 365.5,
+          "right": 353,
+          "bottom": 395.5,
+          "left": 245
+        }
+      },
+      {
+        "text": "深色",
+        "rect": {
+          "x": 361,
+          "y": 365.5,
+          "width": 52,
+          "height": 30,
+          "top": 365.5,
+          "right": 413,
+          "bottom": 395.5,
+          "left": 361
+        }
+      },
+      {
+        "text": "浅色",
+        "rect": {
+          "x": 421,
+          "y": 365.5,
+          "width": 52,
+          "height": 30,
+          "top": 365.5,
+          "right": 473,
+          "bottom": 395.5,
+          "left": 421
+        }
+      }
+    ],
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 820,
+      "height": 30,
+      "top": 0,
+      "right": 820,
+      "bottom": 30,
+      "left": 0
+    },
+    "nav": {
+      "x": 9,
+      "y": 31,
+      "width": 202,
+      "height": 518,
+      "top": 31,
+      "right": 211,
+      "bottom": 549,
+      "left": 9
+    },
+    "documentScrollY": 0,
+    "documentWidth": 820
+  }
+}

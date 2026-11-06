@@ -418,7 +418,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 286,
+          "line": 287,
           "column": 26
         }
       ]
@@ -839,7 +839,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 290,
+          "line": 291,
           "column": 131
         }
       ]
@@ -1034,7 +1034,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 313,
+          "line": 314,
           "column": 24
         }
       ]
@@ -1215,7 +1215,7 @@
         },
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 305,
+          "line": 306,
           "column": 22
         },
         {
@@ -1570,7 +1570,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 315,
+          "line": 316,
           "column": 42
         }
       ]
@@ -1635,7 +1635,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 297,
+          "line": 298,
           "column": 14
         }
       ]
@@ -1821,18 +1821,6 @@
         }
       ]
     },
-    "4125fc7ba333524c": {
-      "source": "默认亮色",
-      "kind": "text",
-      "placeholders": [],
-      "refs": [
-        {
-          "file": "features/settings/SettingsPage.tsx",
-          "line": 281,
-          "column": 52
-        }
-      ]
-    },
     "42655ed8e4108ae2": {
       "source": "输入（非缓存）",
       "kind": "text",
@@ -1940,6 +1928,18 @@
           "file": "features/settings/AppLifecycleSettingsCard.tsx",
           "line": 128,
           "column": 17
+        }
+      ]
+    },
+    "484092c739e4a3f9": {
+      "source": "跟随系统主题",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/settings/SettingsPage.tsx",
+          "line": 282,
+          "column": 34
         }
       ]
     },
@@ -3063,12 +3063,12 @@
       "refs": [
         {
           "file": "shared/store/appStore.ts",
-          "line": 246,
+          "line": 250,
           "column": 23
         },
         {
           "file": "shared/store/appStore.ts",
-          "line": 253,
+          "line": 257,
           "column": 25
         }
       ]
@@ -3152,7 +3152,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 306,
+          "line": 307,
           "column": 23
         }
       ]
@@ -4329,6 +4329,18 @@
         }
       ]
     },
+    "a6b75d0680322a61": {
+      "source": "深色",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/settings/SettingsPage.tsx",
+          "line": 282,
+          "column": 72
+        }
+      ]
+    },
     "a748cc074f78de00": {
       "source": "查看详情",
       "kind": "text",
@@ -4413,6 +4425,18 @@
           "file": "features/models/CursorModelEditor.tsx",
           "line": 169,
           "column": 25
+        }
+      ]
+    },
+    "aa0819dfc4d8d782": {
+      "source": "浅色",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/settings/SettingsPage.tsx",
+          "line": 282,
+          "column": 82
         }
       ]
     },
@@ -4786,7 +4810,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 289,
+          "line": 290,
           "column": 22
         }
       ]
@@ -4946,20 +4970,8 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 290,
+          "line": 291,
           "column": 31
-        }
-      ]
-    },
-    "bb7efdcb6af6e805": {
-      "source": "默认暗色",
-      "kind": "text",
-      "placeholders": [],
-      "refs": [
-        {
-          "file": "features/settings/SettingsPage.tsx",
-          "line": 281,
-          "column": 40
         }
       ]
     },
@@ -5706,7 +5718,7 @@
         },
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 325,
+          "line": 326,
           "column": 30
         },
         {
@@ -6677,7 +6689,7 @@
       "refs": [
         {
           "file": "features/settings/SettingsPage.tsx",
-          "line": 316,
+          "line": 317,
           "column": 38
         }
       ]

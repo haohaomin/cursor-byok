@@ -144,5 +144,16 @@
     "browser_session": "closed",
     "fixture_files": "moved outside repository",
     "production_accounts_or_proxy_settings": "unchanged"
+  },
+  "integration": {
+    "main": "3a6d50fbdba9e8a534b17e292d71f1bdd5d31ead",
+    "four_locale_browser_suite": "passed again after merging system-theme support",
+    "i18n_catalogs": {
+      "entries": 473,
+      "matching_keys": true,
+      "empty_translations": 0
+    },
+    "npm_check": "passed",
+    "native_debug_build": "passed with documented SQLx command override"
   }
 }
