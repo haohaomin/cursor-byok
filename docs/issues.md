@@ -144,7 +144,7 @@
 | --- | --- | --- | --- | --- |
 | ☐ | [#486](https://github.com/leookun/cursor-byok/issues/486) Linux RPM 无法在 Rocky Linux 9.5 安装：缺少 libwebkit2gtk-4.1.so.0 | B | 待现版复测 | Rocky 9.5 缺 WebKitGTK 4.1；核对发行版依赖与可支持的打包方式，需 Linux 环境。 |
 | ☐ | [#436](https://github.com/leookun/cursor-byok/issues/436) Linux(fedora) 托盘右键菜单没有显示出来 | B | 待现版复测 | 需 Fedora 桌面环境实测托盘菜单，记录桌面协议及依赖。 |
-| ☐（分组布局已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组结果位移已修复；四语言浏览器与构建通过，待 CI / 原生 GUI | 名称/操作与 ID/结果分为固定两行，12 组 60 次状态检查通过；表格/箭头此前 Chromium 未复现，平铺截断按钮首次点击由独立 [PR #31](https://github.com/haohaomin/cursor-byok/pull/31) 修复，尚未合入。见 [修复与边界](history/issues/2026-11-06-issue339-model-test-layout.md)。 |
+| ☐（局部已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组布局 PR #30 已合入；截断按钮首次操作修复待最终 CI | 分组布局的 12 组 60 次状态检查通过，见 [布局修复](history/issues/2026-11-06-issue339-model-test-layout.md)；截断按钮首次点击/键盘激活已先复现再修复，8 组页面回归及提示边界通过，见 [交互修复](history/issues/2026-11-06-truncated-button-interaction.md)。表格悬停穿透/数字箭头此前 Chromium 未复现，原生 GUI 待验。 |
 | ☐ | [#323](https://github.com/leookun/cursor-byok/issues/323) beta版更新所有模型配置全部丢失 | B | 待现版复测 | 旧 beta 升级后配置丢失的报告；先识别数据目录/版本，仅用数据副本验证。 |
 | ☐ | [#314](https://github.com/leookun/cursor-byok/issues/314) [Bug] macOS v0.0.49 首次启动后，通过菜单栏退出会导致应用卡死无响应 | B | 待现版复测 | 报告版本 0.0.49；先确认当前架构仍可复现首次启动退出卡死。 |
 | ☐ | [#283](https://github.com/leookun/cursor-byok/issues/283) 与原账号切换问题 | B | 待现版复测 | 旧版账号/设置损坏报告；仅用数据副本测试接管与恢复，禁止用删除数据库作为修复。 |

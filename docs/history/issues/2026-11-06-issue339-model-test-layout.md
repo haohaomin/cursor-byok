@@ -61,3 +61,5 @@ apps/desktop/src/features/models/
 ## 与最新主线组合验证
 
 PR #29 合入后，将 main `1de8e4258c7a37e421fe0fc2d2e19807cbc729ed` 整合到本分支；冲突仅为 Issue #339 清单行，保留分组布局修复及独立按钮交互补丁的边界。组合代码重新通过 12 组、60 次布局状态检查，各组请求仍为 3 次 POST 和 1 次 DELETE，Playwright 的 `pageerror` 计数为 0，但开发服务器仍记录此前基线也出现的 ResizeObserver 循环通知，不能据此宣称全应用无异常；`npm run check` 与相同参数的 Tauri debug 构建再次通过。新提交仍须独立 CI，记录不表示 PR #30 已合入。
+
+后续核对：PR #30 最终 head `5bf20eb422d275903c514054aa4859e62471b5be` 的 PR/push 两套四组 CI 全部通过，2026-11-06 08:50 UTC 已合入 main `574f2f4f3da4eef6b980b70931a2d256d81a8952`。原生 GUI 与其他样式边界保持原结论，未发布版本。

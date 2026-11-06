@@ -1,0 +1,322 @@
+{
+  "date": "2026-11-06",
+  "baseline_commit": "3a5f51318279874805d99e8a57d4d2973826cbcc",
+  "integration_base": "574f2f4f3da4eef6b980b70931a2d256d81a8952",
+  "baseline": {
+    "failure": "first interaction lost",
+    "results": [
+      {
+        "mode": "pointer",
+        "width": {
+          "width": 41,
+          "total": 73
+        },
+        "nodeConnected": false,
+        "focusOnOriginal": false,
+        "methods": [],
+        "pending": 0
+      },
+      {
+        "mode": "keyboard",
+        "width": {
+          "width": 41,
+          "total": 73
+        },
+        "nodeConnected": false,
+        "focusOnOriginal": false,
+        "methods": [],
+        "pending": 0
+      }
+    ]
+  },
+  "fixed_first_interaction": [
+    {
+      "mode": "pointer",
+      "width": {
+        "width": 41,
+        "total": 73
+      },
+      "nodeConnected": true,
+      "focusOnOriginal": true,
+      "methods": [
+        "POST"
+      ],
+      "pending": 1
+    },
+    {
+      "mode": "keyboard",
+      "width": {
+        "width": 41,
+        "total": 73
+      },
+      "nodeConnected": true,
+      "focusOnOriginal": true,
+      "methods": [
+        "POST"
+      ],
+      "pending": 1
+    }
+  ],
+  "component_edges": {
+    "clipped": {
+      "visible": 40,
+      "total": 257
+    },
+    "pointer": {
+      "click": 1,
+      "focus": 1,
+      "enter": 1,
+      "disabled": 0,
+      "short": 0,
+      "generic": 0
+    },
+    "enter": {
+      "click": 2,
+      "focus": 2,
+      "enter": 1,
+      "disabled": 0,
+      "short": 0,
+      "generic": 0
+    },
+    "space": {
+      "click": 3,
+      "focus": 3,
+      "enter": 1,
+      "disabled": 0,
+      "short": 0,
+      "generic": 0
+    },
+    "expanded": {
+      "visible": 257,
+      "total": 257
+    },
+    "final": {
+      "click": 3,
+      "focus": 3,
+      "enter": 2,
+      "disabled": 0,
+      "short": 1,
+      "generic": 2
+    }
+  },
+  "app_matrix": {
+    "result": [
+      {
+        "locale": "en-US",
+        "mode": "pointer",
+        "width": {
+          "visible": 27,
+          "total": 27
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "en-US",
+        "mode": "keyboard",
+        "width": {
+          "visible": 27,
+          "total": 27
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "pt-BR",
+        "mode": "pointer",
+        "width": {
+          "visible": 36,
+          "total": 40
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "pt-BR",
+        "mode": "keyboard",
+        "width": {
+          "visible": 36,
+          "total": 40
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "ru-RU",
+        "mode": "pointer",
+        "width": {
+          "visible": 41,
+          "total": 73
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "ru-RU",
+        "mode": "keyboard",
+        "width": {
+          "visible": 41,
+          "total": 73
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "zh-CN",
+        "mode": "pointer",
+        "width": {
+          "visible": 28,
+          "total": 28
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      },
+      {
+        "locale": "zh-CN",
+        "mode": "keyboard",
+        "width": {
+          "visible": 28,
+          "total": 28
+        },
+        "state": {
+          "same": true,
+          "focus": true,
+          "methods": [
+            "POST"
+          ]
+        },
+        "after": {
+          "same": true,
+          "methods": [
+            "POST",
+            "DELETE"
+          ]
+        }
+      }
+    ],
+    "pageErrors": []
+  },
+  "checks": {
+    "npm_check": {
+      "exit_code": 0,
+      "log": "/tmp/cursor-byok-truncated-button-20261106/npm-check.log"
+    },
+    "tauri_debug_build": {
+      "exit_code": 0,
+      "log": "/tmp/cursor-byok-truncated-button-20261106/tauri-build.log",
+      "local_sqlx_parameter": "profile.dev.package.sqlx-macros.strip=\"none\""
+    }
+  },
+  "tested_source_sha256": {
+    "apps/desktop/src/shared/ui/TruncatedButton.tsx": "3545585afcfd5d5fe16e287327cd64c18ed95161e484547900603d21491c5705",
+    "apps/desktop/src/shared/ui/TooltipTrigger.tsx": "af6d9f8e9a74b2b1dd5b78d9a7601c1077a772ba1679324d1b757c389b942b47"
+  },
+  "not_covered": [
+    "Installed macOS GUI",
+    "Windows and Linux GUI",
+    "Real provider requests",
+    "Stationary-pointer resize remeasurement"
+  ],
+  "artifact_directory": "/tmp/cursor-byok-truncated-button-20261106",
+  "latest_main_integration": {
+    "base": "574f2f4f3da4eef6b980b70931a2d256d81a8952",
+    "conflicts": [
+      "docs/issues.md"
+    ],
+    "button_cases": 8,
+    "grouped_layout_cases": 12,
+    "grouped_layout_states": 60,
+    "playwright_page_errors": [],
+    "source_unchanged": true,
+    "npm_check_exit": 0,
+    "tauri_debug_exit": 0,
+    "log_directory": "/tmp/cursor-byok-truncated-button-20261106",
+    "log_prefix": "integration-",
+    "vite_diagnostics": "The shared dev-server log contains existing ResizeObserver loop notifications; zero Playwright pageerror does not establish an error-free application",
+    "vite_log": "/tmp/cursor-byok-import-focus-20261106/vite.log"
+  }
+}
