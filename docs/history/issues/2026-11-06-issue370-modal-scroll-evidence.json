@@ -1,0 +1,476 @@
+{
+  "date": "2026-11-06",
+  "baseline_commit": "73126d46bedac174e6449f2a45240a2955852bcb",
+  "upstream_issue": {
+    "number": 370,
+    "state": "OPEN",
+    "body": "",
+    "comments": 0,
+    "related_pr_search": "scroll: no results"
+  },
+  "environment": {
+    "browser": "Playwright Chromium on macOS",
+    "app": "real React application with synthetic management API responses",
+    "viewports": [
+      [
+        820,
+        558
+      ],
+      [
+        1200,
+        800
+      ]
+    ],
+    "native": "Tauri debug build only; not installed application acceptance"
+  },
+  "baseline": {
+    "failure": "import viewport does not scroll",
+    "before": {
+      "height": 7212,
+      "scrollHeight": 7212,
+      "top": 0
+    },
+    "after": {
+      "height": 7212,
+      "scrollHeight": 7212,
+      "top": 0
+    }
+  },
+  "fixed": {
+    "before": {
+      "height": 410,
+      "scrollHeight": 7212,
+      "top": 0
+    },
+    "after": {
+      "height": 410,
+      "scrollHeight": 7212,
+      "top": 1200
+    },
+    "footerBefore": {
+      "x": 25,
+      "y": 482,
+      "width": 770,
+      "height": 51
+    },
+    "footerAfter": {
+      "x": 25,
+      "y": 482,
+      "width": 770,
+      "height": 51
+    }
+  },
+  "modal_boundaries": {
+    "dragged": {
+      "top": 6801.5,
+      "height": 410,
+      "total": 7212
+    },
+    "last": {
+      "x": 53,
+      "y": 388,
+      "width": 163.9375,
+      "height": 16.5
+    },
+    "trackTop": 0,
+    "fixedBefore": {
+      "header": {
+        "x": 25,
+        "y": 31,
+        "width": 770,
+        "height": 41
+      },
+      "footer": {
+        "x": 25,
+        "y": 482,
+        "width": 770,
+        "height": 51
+      }
+    },
+    "fixedAfter": {
+      "header": {
+        "x": 25,
+        "y": 31,
+        "width": 770,
+        "height": 41
+      },
+      "footer": {
+        "x": 25,
+        "y": 482,
+        "width": 770,
+        "height": 51
+      }
+    },
+    "focusAfterDismiss": {
+      "tag": "BODY",
+      "text": ""
+    },
+    "cases": [
+      {
+        "size": {
+          "width": 1200,
+          "height": 800
+        },
+        "dialog": {
+          "x": 60,
+          "y": 30,
+          "width": 1080,
+          "height": 746
+        },
+        "viewport": {
+          "height": 652,
+          "total": 7212
+        },
+        "footer": {
+          "x": 61,
+          "y": 724,
+          "width": 1078,
+          "height": 51
+        }
+      },
+      {
+        "size": {
+          "width": 820,
+          "height": 558
+        },
+        "dialog": {
+          "x": 24,
+          "y": 30,
+          "width": 772,
+          "height": 504
+        },
+        "viewport": {
+          "height": 410,
+          "total": 7212
+        },
+        "footer": {
+          "x": 25,
+          "y": 482,
+          "width": 770,
+          "height": 51
+        }
+      },
+      {
+        "count": 1,
+        "dialog": {
+          "x": 24,
+          "y": 110,
+          "width": 772,
+          "height": 344
+        },
+        "viewport": {
+          "height": 250,
+          "total": 250,
+          "top": 0
+        }
+      },
+      {
+        "count": 0,
+        "dialog": {
+          "x": 24,
+          "y": 136.25,
+          "width": 772,
+          "height": 291.5
+        },
+        "viewport": {
+          "height": 198,
+          "total": 198,
+          "top": 0
+        }
+      }
+    ]
+  },
+  "shared_consumers": {
+    "table": {
+      "x": 900,
+      "y": 320,
+      "actionBefore": {
+        "x": 729,
+        "y": 110,
+        "width": 72,
+        "height": 36
+      },
+      "actionAfter": {
+        "x": 729,
+        "y": 110,
+        "width": 72,
+        "height": 36
+      },
+      "hover": {
+        "background": "rgb(243, 243, 243)",
+        "position": "sticky"
+      },
+      "columnsBefore": {
+        "x": 231,
+        "y": 77,
+        "width": 142.875,
+        "height": 33
+      },
+      "columnsAfter": {
+        "x": -669,
+        "y": 77,
+        "width": 142.875,
+        "height": 33
+      },
+      "headerBefore": {
+        "x": 0,
+        "y": 0,
+        "width": 820,
+        "height": 30
+      },
+      "headerAfter": {
+        "x": 0,
+        "y": 0,
+        "width": 820,
+        "height": 30
+      }
+    },
+    "detailBefore": {
+      "height": 558,
+      "total": 778,
+      "top": 0
+    },
+    "detailAfter": {
+      "height": 558,
+      "total": 778,
+      "top": 219.5
+    }
+  },
+  "locale_layout_checks": [
+    {
+      "locale": "en-US",
+      "before": {
+        "x": 595.25,
+        "y": 148.75,
+        "width": 40.8828125,
+        "height": 24
+      },
+      "during": {
+        "x": 341.8984375,
+        "y": 187,
+        "width": 40.8828125,
+        "height": 24
+      },
+      "after": {
+        "x": 296.25,
+        "y": 187,
+        "width": 40.8828125,
+        "height": 24
+      },
+      "stable": false,
+      "scrolled": {
+        "document": 0,
+        "regions": [
+          209
+        ]
+      }
+    },
+    {
+      "locale": "pt-BR",
+      "before": {
+        "x": 589.15625,
+        "y": 148.75,
+        "width": 53.640625,
+        "height": 24
+      },
+      "during": {
+        "x": 362.40625,
+        "y": 187,
+        "width": 53.640625,
+        "height": 24
+      },
+      "after": {
+        "x": 309.0078125,
+        "y": 187,
+        "width": 53.640625,
+        "height": 24
+      },
+      "stable": false,
+      "scrolled": {
+        "document": 0,
+        "regions": [
+          209
+        ]
+      }
+    },
+    {
+      "locale": "ru-RU",
+      "before": {
+        "x": 342.3046875,
+        "y": 187,
+        "width": 82.5,
+        "height": 24
+      },
+      "during": {
+        "x": 403.046875,
+        "y": 187,
+        "width": 82.5,
+        "height": 24
+      },
+      "after": {
+        "x": 342.3046875,
+        "y": 187,
+        "width": 82.5,
+        "height": 24
+      },
+      "stable": true,
+      "scrolled": {
+        "document": 0,
+        "regions": [
+          243
+        ]
+      }
+    },
+    {
+      "locale": "zh-CN",
+      "before": {
+        "x": 639,
+        "y": 148.75,
+        "width": 44,
+        "height": 24
+      },
+      "during": {
+        "x": 639,
+        "y": 148.75,
+        "width": 44,
+        "height": 24
+      },
+      "after": {
+        "x": 639,
+        "y": 148.75,
+        "width": 44,
+        "height": 24
+      },
+      "stable": true,
+      "scrolled": {
+        "document": 0,
+        "regions": [
+          175
+        ]
+      }
+    }
+  ],
+  "unchanged_baseline_followups": {
+    "results": [
+      {
+        "locale": "en-US",
+        "before": {
+          "x": 595.25,
+          "y": 148.75,
+          "width": 40.8828125,
+          "height": 24
+        },
+        "during": {
+          "x": 341.8984375,
+          "y": 187,
+          "width": 40.8828125,
+          "height": 24
+        },
+        "after": {
+          "x": 296.25,
+          "y": 187,
+          "width": 40.8828125,
+          "height": 24
+        },
+        "stable": false,
+        "scrolled": {
+          "document": 0,
+          "regions": [
+            209
+          ]
+        }
+      },
+      {
+        "locale": "pt-BR",
+        "before": {
+          "x": 589.15625,
+          "y": 148.75,
+          "width": 53.640625,
+          "height": 24
+        },
+        "during": {
+          "x": 362.40625,
+          "y": 187,
+          "width": 53.640625,
+          "height": 24
+        },
+        "after": {
+          "x": 309.0078125,
+          "y": 187,
+          "width": 53.640625,
+          "height": 24
+        },
+        "stable": false,
+        "scrolled": {
+          "document": 0,
+          "regions": [
+            209
+          ]
+        }
+      },
+      {
+        "locale": "zh-CN",
+        "before": {
+          "x": 639,
+          "y": 148.75,
+          "width": 44,
+          "height": 24
+        },
+        "during": {
+          "x": 639,
+          "y": 148.75,
+          "width": 44,
+          "height": 24
+        },
+        "after": {
+          "x": 639,
+          "y": 148.75,
+          "width": 44,
+          "height": 24
+        },
+        "stable": true,
+        "scrolled": {
+          "document": 0,
+          "regions": [
+            175
+          ]
+        }
+      }
+    ],
+    "focus": {
+      "tag": "BODY",
+      "text": ""
+    }
+  },
+  "checks": {
+    "npm_check": "passed",
+    "tauri_debug_no_bundle": "passed with profile.dev.package.sqlx-macros.strip=none override",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "No native Windows/Linux or installed macOS GUI acceptance",
+    "No real legacy file or import write; preview response has 120 synthetic models",
+    "Escape closes and Tab/Shift+Tab trap focus, but existing async import returns focus to BODY after dismiss",
+    "Issue 339 English/Portuguese model result wrapping exists both before and after this change",
+    "Existing ResizeObserver loop notifications appeared during grouped list/language changes both before patch and during baseline recheck; not a clean-console acceptance"
+  ],
+  "artifacts": "/tmp/cursor-byok-issue370-20261106/",
+  "integration": {
+    "base": "3a5f51318279874805d99e8a57d4d2973826cbcc",
+    "conflicts": [
+      "docs/issues.md: adjacent status rows only"
+    ],
+    "browser_scroll_regression": "passed",
+    "npm_check": "passed",
+    "tauri_debug_build": "passed",
+    "prior_head_ci": {
+      "head": "0e390e23e9312f163c39f3f315230e9fa9ddefa9",
+      "runs": [
+        42164200220,
+        42164160279
+      ],
+      "conclusion": "success"
+    },
+    "merged_head_ci": "pending new run"
+  }
+}
