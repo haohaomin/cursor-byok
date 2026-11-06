@@ -7,12 +7,19 @@
 
 .takeoverActions {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 7px;
+
+  > button {
+    flex-shrink: 0;
+  }
 }
 
 .takeoverStatus {
-  min-width: 39px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--vscode-descriptionForeground);
   font-size: type.$font-size-xs;
   text-align: right;
@@ -21,11 +28,15 @@
 
 .groupActions {
   display: flex;
+  min-width: 0;
   align-items: center;
   overflow: hidden;
   border-radius: 5px;
 
   button {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     height: 25px;
     padding: 0 8px;
     color: var(--vscode-descriptionForeground);
