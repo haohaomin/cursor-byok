@@ -149,7 +149,7 @@
 | ☐ | [#314](https://github.com/leookun/cursor-byok/issues/314) [Bug] macOS v0.0.49 首次启动后，通过菜单栏退出会导致应用卡死无响应 | B | 待现版复测 | 报告版本 0.0.49；先确认当前架构仍可复现首次启动退出卡死。 |
 | ☐ | [#283](https://github.com/leookun/cursor-byok/issues/283) 与原账号切换问题 | B | 待现版复测 | 旧版账号/设置损坏报告；仅用数据副本测试接管与恢复，禁止用删除数据库作为修复。 |
 | ☐ | [#256](https://github.com/leookun/cursor-byok/issues/256) windows有一定概率闪退 | B | 待现版复测 | 旧版 Windows 闪退日志；需现版崩溃堆栈和 Windows 环境。 |
-| ☐ | [#371](https://github.com/leookun/cursor-byok/issues/371) follow the system theme and set it as default. | C | 需求待评估 | 先核对现版跟随系统主题是否已支持，再决定是否仍有需求。 |
+| ☐ | [#371](https://github.com/leookun/cursor-byok/issues/371) follow the system theme and set it as default. | C | 已实现；浏览器与构建通过，原生应用待验 | 默认跟随系统、实时切换、显式选择保存及首屏主题已补齐。7 组首屏检查、10 次运行时核对、四语言检查及带本机 SQLx 工具链参数的 Tauri debug 构建通过；未发布，见 [修复与边界](history/issues/2026-11-06-issue371-system-theme.md)。 |
 | ☐ | [#134](https://github.com/leookun/cursor-byok/issues/134) 添加一个打开cursor 的快捷键按钮 | C | 需求待评估 | 先确认现版是否已有启动 Cursor 的入口，再评估额外快捷操作。 |
 | ☐ | [#119](https://github.com/leookun/cursor-byok/issues/119) 有个小建议，更新提示关闭之后就不要弹出来了，可以用户手动点击 版本更新 | C | 需求待评估 | 核对当前更新提示关闭后的记忆策略，区分本次关闭和跳过某版本。 |
 | ☐ | [#370](https://github.com/leookun/cursor-byok/issues/370) Import modal scrollbar is not working | D | 待补信息 | 正文为空；补导入弹窗截图、平台和滚动复现步骤。 |
