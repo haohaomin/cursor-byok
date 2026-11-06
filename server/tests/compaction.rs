@@ -328,6 +328,74 @@ async fn automatic_compaction_preflights_provider_input_and_records_rebuilt_toke
 }
 
 #[tokio::test]
+async fn stalled_automatic_compaction_falls_back_and_continues() {
+    let (_directory, store) = fixtures::temp_store().await;
+    let model = store
+        .create_model(&windowed_model("stalled-compaction", Some(100_000)))
+        .await
+        .unwrap();
+    let provider = fake_provider::FakeProvider::default();
+    provider.push(text_response(&"x".repeat(400_000), 150_000, 1_000));
+    provider.push_pending();
+    provider.push(text_response(
+        "continued after stalled compaction",
+        20_000,
+        20,
+    ));
+    let assets = PromptAssets::load(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("prompt/cursor")
+            .as_path(),
+    )
+    .unwrap();
+    let registry = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(assets),
+    );
+
+    let first = run(
+        &registry,
+        "stalled-first",
+        user_request(
+            "stalled-compaction-conversation",
+            "stalled-user-1",
+            "start",
+            &model.model_hash,
+            None,
+        ),
+    )
+    .await;
+    let second = run_with_timeout(
+        &registry,
+        "stalled-second",
+        user_request(
+            "stalled-compaction-conversation",
+            "stalled-user-2",
+            "continue",
+            &model.model_hash,
+            first.checkpoints.last().cloned(),
+        ),
+        Duration::from_secs(35),
+    )
+    .await;
+
+    assert!(matches!(second.end_stream, EndStream::Success {}));
+    assert_eq!(second.summary_started, 1);
+    assert_eq!(second.summary_completed, 1);
+    let stored = store
+        .load_current_messages(&ConversationId::new("stalled-compaction-conversation"))
+        .await
+        .unwrap();
+    assert!(serde_json::to_string(&stored)
+        .unwrap()
+        .contains("Durable recent conversation state"));
+    assert_eq!(provider.requests().len(), 3);
+    assert!(provider.requests()[1].prompt.tools.is_empty());
+    assert!(!provider.requests()[2].prompt.tools.is_empty());
+}
+
+#[tokio::test]
 async fn incremental_preflight_uses_conversation_anchor_across_model_switch() {
     let (_directory, store) = fixtures::temp_store().await;
     let model_a = store
@@ -717,6 +785,15 @@ async fn run(
     request_id: &str,
     request: pb::AgentClientMessage,
 ) -> Output {
+    run_with_timeout(registry, request_id, request, Duration::from_secs(5)).await
+}
+
+async fn run_with_timeout(
+    registry: &TransportRegistry,
+    request_id: &str,
+    request: pb::AgentClientMessage,
+    frame_timeout: Duration,
+) -> Output {
     let handle = registry.get_or_create(request_id).await.unwrap();
     let mut receiver = handle.subscribe();
     handle
@@ -729,7 +806,7 @@ async fn run(
     let mut append_seqno = 1;
     let mut output = Output::default();
     loop {
-        let frame = tokio::time::timeout(Duration::from_secs(5), receiver.recv())
+        let frame = tokio::time::timeout(frame_timeout, receiver.recv())
             .await
             .unwrap()
             .unwrap();
