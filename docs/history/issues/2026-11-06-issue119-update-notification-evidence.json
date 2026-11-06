@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-06",
+  "issue": "https://github.com/leookun/cursor-byok/issues/119",
+  "baseline": "3a6d50fbdba9e8a534b17e292d71f1bdd5d31ead",
+  "environment": "Chromium, real React source, fixture management API and mocked native updater; Playwright clock advances notification/periodic timers",
+  "baseline_failure": "same update notice repeated after reload",
+  "fixed_reload": {
+    "first_notice": true,
+    "expired": true,
+    "reload_notification": false
+  },
+  "boundaries": [
+    {
+      "case": "periodic_same_version",
+      "notice": false,
+      "checks": 2
+    },
+    {
+      "case": "new_version",
+      "notice": true,
+      "saved": "1.3.0"
+    },
+    {
+      "case": "manual_install_entry",
+      "version": "1.3.0",
+      "enabled": true,
+      "clicked": false
+    },
+    {
+      "case": "storage_read_denied",
+      "initial_notice": true,
+      "repeated": false
+    },
+    {
+      "case": "storage_write_denied",
+      "initial_notice": true,
+      "repeated": false
+    }
+  ],
+  "minimum_viewport": [
+    820,
+    558
+  ],
+  "manual_update_button": {
+    "x": 688,
+    "y": 266.5,
+    "width": 97,
+    "height": 24,
+    "clicked": false
+  },
+  "not_tested": [
+    "real installed Tauri restart",
+    "native updater network, signing, download or install",
+    "persistence after changing frontend origin or clearing WebView data"
+  ],
+  "storage_scope": "current frontend origin, like existing theme/language preferences"
+}
