@@ -46,6 +46,7 @@ export function CursorSettingsPage() {
   const [groupApiKeyDraft, setGroupApiKeyDraft] = useState("");
   const [groupSettingsBusy, setGroupSettingsBusy] = useState(false);
   const activeModelTests = useRef(new Map<string, { testId: string; controller: AbortController; cancelling: boolean }>());
+  const addModelButton = useRef<HTMLButtonElement>(null);
   const caReady = cursorHarness?.ca === "ready";
   const cursorTakenOver = cursorHarness?.settings_applied ?? false;
   const takeoverLabel = cursorTakenOver ? t("关闭接管Cursor") : t("开启接管Cursor");
@@ -289,7 +290,7 @@ export function CursorSettingsPage() {
   };
   const content = <CursorCaProvider><CursorCaGate busy={cursorBusy} waitingForRefresh={waitingForCaRefresh} onInitialize={() => void initializeCa()} onRefresh={() => void refreshCa()}>
     <div className={styles.page}>
-      <LegacyModelImport>{({ busy: importingLegacyModels, previewing, open }) =>
+      <LegacyModelImport afterImportFocusRef={addModelButton}>{({ busy: importingLegacyModels, previewing, open }) =>
         <CursorModelProvider><CursorModelGate busy={cursorBusy || importingLegacyModels} previewingImport={previewing} onAdd={openNew} onImport={open}>{list}</CursorModelGate></CursorModelProvider>
       }</LegacyModelImport>
     </div>
@@ -329,7 +330,7 @@ export function CursorSettingsPage() {
     <PageActions>
       <OpenCursorButton />
       <TooltipTrigger label={t("Remote SSH 指南")}><button type="button" className={controls.secondary} aria-label={t("Remote SSH 指南")} onClick={() => setRemoteGuideOpen(true)}>SSH</button></TooltipTrigger>
-      <TooltipTrigger label={caReady ? t("添加模型") : t("请先初始化 CA")}><button className={controls.iconButton} aria-label={t("添加模型")} disabled={!caReady || cursorBusy} onClick={openNew}><Icon icon={addIcon} size="1.1em" /></button></TooltipTrigger>
+      <TooltipTrigger label={caReady ? t("添加模型") : t("请先初始化 CA")}><button ref={addModelButton} className={controls.iconButton} aria-label={t("添加模型")} disabled={!caReady || cursorBusy} onClick={openNew}><Icon icon={addIcon} size="1.1em" /></button></TooltipTrigger>
     </PageActions>
     <PageContent title="Cursor" sections={[{ key: "cursor-settings", estimatedHeight: estimatedModelHeight, content }]} />
     <CursorRemoteGuide open={remoteGuideOpen} onClose={() => setRemoteGuideOpen(false)} />
