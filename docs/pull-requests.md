@@ -10,6 +10,12 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
+## 2026-11-06 上游 PR #375 的选择性实现
+
+| 上游 PR / 本 fork 分支 | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| 上游 [#375](https://github.com/leookun/cursor-byok/pull/375) / 本 fork [PR #20](https://github.com/haohaomin/cursor-byok/pull/20) / `codex/issue375-resume-progress` | ResumeAction 上下文和无进展恢复 | 不直接采用旧 `request/` 路径；迁移到当前 `compile/` 路径，服务端全量目标测试、Clippy、格式检查通过。PR #20 已创建，真实 Cursor UI 未验收。详见[验证记录](history/pull-requests/2026-11-06-pr375-resume-progress.md)。 |
+
 ## 2026-10-27 新增候选
 
 下表以每项最新记录为准；仅标为初筛的条目不表示已逐行审计或验证作者的测试声明。#514 读取了固定 head 的完整 diff、讨论、reviews 和 checks；后三者均为空，无可用上游 CI 结论。#513、#498 的后续处理分别链接到独立证据。
