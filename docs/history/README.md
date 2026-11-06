@@ -72,6 +72,7 @@
 - [2026-10-27 · Issue #469 / PR #498：WebFetch 远程分页修复与实机验收](issues/2026-10-27-issue469-webfetch-fix.md)
 - [2026-10-27 · Issue #504：重复用户输入中断正在执行的工具](issues/2026-10-27-issue504-input-redelivery-fix.md)
 - [2026-10-27 · Issue #505：多个思考签名的恢复失败](issues/2026-10-27-issue505-check.md)
+- [2026-11-06 · Issue #505：保留多个 reasoning signature](issues/2026-11-06-issue505-fix.md)
 - [2026-10-27 · Issue #508 / PR #474：代理切换后重建 HTTP 客户端](issues/2026-10-27-issue508-fix.md)
 - [2026-10-27 · Issue #511：清理统计数据后回收 SQLite 文件空间](issues/2026-10-27-issue511-storage-fix.md)
 - [2026-10-27 · Semble：尊重 .cursorignore，并在查询前重新检查排除规则](issues/2026-10-27-semble-cursorignore-fix.md)
