@@ -10,11 +10,17 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
-## 2026-11-06 本 fork 选择性移植上游 PR #345
+## 2026-11-06 本 fork PR #22
 
-| 上游 PR / 本 fork 状态 | 解决目标与范围 | 采用方式与验证边界 |
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [上游 #345](https://github.com/leookun/cursor-byok/pull/345) / [本 fork #22](https://github.com/haohaomin/cursor-byok/pull/22) / `7dda5f1` | 全局 Cursor 规则持久化和注入 | 当前 fork 已有规则存储、同步和上下文合并；本次只补齐本地 `FetchRelevantKnowledgeForConversation` 端点与代理分流。定向、完整服务端测试、Clippy、格式检查均通过；真实 Cursor UI/账号/远程 SSH 未验收。详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
+| [#22](https://github.com/haohaomin/cursor-byok/pull/22) / `7dda5f1` | 全局 Cursor 规则的本地相关规则协议入口 | 复用现有规则存储、同步和上下文合并，只补 `FetchRelevantKnowledgeForConversation` 路由与代理分流；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
+
+## 2026-11-06 上游 PR #375 的选择性实现
+
+| 上游 PR / 本 fork 分支 | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| 上游 [#375](https://github.com/leookun/cursor-byok/pull/375) / 本 fork [PR #20](https://github.com/haohaomin/cursor-byok/pull/20) / `codex/issue375-resume-progress` | ResumeAction 上下文和无进展恢复 | 不直接采用旧 `request/` 路径；迁移到当前 `compile/` 路径，服务端全量目标测试、Clippy、格式检查通过。PR #20 已创建，真实 Cursor UI 未验收。详见[验证记录](history/pull-requests/2026-11-06-pr375-resume-progress.md)。 |
 
 ## 2026-10-27 新增候选
 
@@ -65,7 +71,7 @@
 | [#421](https://github.com/leookun/cursor-byok/pull/421) | ✅ 已完成：Responses 按输出项补全文本 | A（已完成，v1.0.6） | 原 PR 1；+79/-0 | 原 PR 4✓；组合 287 测试✓；CI 全✓ | 已合入个人 fork main（`e08cab5`） | 原 PR 的 3 个失败场景已补齐；真实 UI 验证通过，Skipped 独立修复一并发布。详见 [发布记录](history/releases.md#v106)。 |
 | [#479](https://github.com/leookun/cursor-byok/pull/479) | OpenCode 免费模型插件 | B | 12；+1211/-121 | 未见 | 无文本冲突 | 中：新外部服务及插件管理 UI；旧审查提出的端点、会话 ID、断言问题在当前 SHA 已有修正。 **下一步：**验证目录同步、Chat/Responses、限额、工具调用及原有插件 UI。 |
 | [#466](https://github.com/leookun/cursor-byok/pull/466) | Antigravity 额度与账号启停 | B | 15；+649/-119 | 未见 | 冲突 1 | 中：宿主 Disabled 状态、冷却选择及新接口；冲突仅在生成翻译目录，但运行语义仍需验证。 **下一步：**重新生成翻译；验证禁用账号不被回写启用、重启保留和所有账号冷却。 |
-| [#460](https://github.com/leookun/cursor-byok/pull/460) | 缺失 usage 时估算上下文 | B | 5；+306/-2 | 4✓ | 无文本冲突 | 中：估算值写入普通 usage；未知模型窗口默认 200k，不能当作真实容量或计费值。 **下一步：**核对部分/零 usage、失败与取消、统计展示和自动压缩阈值。 |
+| [#460](https://github.com/leookun/cursor-byok/pull/460) | 缺失 usage 时估算上下文 | B | 5；+306/-2 | 4✓ | 无文本冲突 | 本 fork 已在 `origin/main` 上选择性重实现并补集成回归；未知模型窗口默认 200k，真实 usage 保留，失败/取消不生成成功用量。实现与边界见[验证记录](history/pull-requests/2026-11-06-pr460-context-usage.md)。 |
 | [#459](https://github.com/leookun/cursor-byok/pull/459) | Grok OAuth 自动续期与思考强度 | B | 17；+1073/-59 | 未见 | 现版冲突已适配并补全 | [现版验证](history/issues/2026-10-27-issue445-check.md) 已复现并修复 #445；排除独立 reasoning 改动，补齐重置、模型取消与手动刷新。Grok 23 项脚本、最新 Linux/macOS 宿主各 37 项与 Windows 38 项通过；四组 CI 全通过，真实账号仍待验收。个人 fork PR #4 已合入 main，已随 v1.1.0 发布。 |
 | [#420](https://github.com/leookun/cursor-byok/pull/420) | MCP schema 整数约束规范化 | B（本地已合入） | 原 PR：1；+182/-31 | 本轮服务端 387 测试及 Clippy 通过 | 已合入并推送 main（`e2f17e0`） | 已补齐原补丁的大整数精度缺陷；合并保留空 schema、properties 和 required 修复，新增组合回归。v1.1.0 已包含该合入，未新增真实 UI 验证；上游仍 OPEN、仓库已归档。见 [合并记录](history/pull-requests/2026-10-19-branch-integration.md)。 |
 | [#483](https://github.com/leookun/cursor-byok/pull/483) | CodeBuddy CN 与后台自动签到 | C | 38；+4888/-211 | 未见 | 冲突 1 | 高：38 文件，新增宿主调度、锁、状态持久化、凭据刷新及导出策略；作者未测真实流式聊天。 **下一步：**单独验证调度取消/重启/跨日、账号并发与 token 日志保护，再测真实聊天。 |
@@ -76,10 +82,10 @@
 | [#433](https://github.com/leookun/cursor-byok/pull/433) | 所有 Cursor 请求经本地代理 | C | 2；+72/-4 | 未见 | 无文本冲突 | 高且有具体问题：若干云端/FileSync 接口无条件返回 400/404，早于 TAB Direct 分流；还强开 custom-protocol。 **下一步：**撤出硬编码拒绝和构建特性改动；测试账号云功能、TAB 三种模式及代理切换。 |
 | [#378](https://github.com/leookun/cursor-byok/pull/378) | 自动压缩持久化和恢复 | C | 8；+1082/-58 | 未见 | 冲突 3 | 高：checkpoint 发布屏障、重试/恢复和超时共同改变；当前引擎及输出模块冲突。 **下一步：**移植到现有生命周期；验证压缩后立即失败、重启恢复、前缀稳定性。 |
 | [#375](https://github.com/leookun/cursor-byok/pull/375) | ResumeAction 上下文与继续执行 | C | 5；+295/-18 | 未见 | 冲突 3 | 高：actor/请求编译路径已变化，涉及重复执行和无进展重试。 **下一步：**按现有 compile 模块移植；验证取消、重复 Resume、工具完成后的继续执行。 |
-| [#364](https://github.com/leookun/cursor-byok/pull/364) | 工具调用 ID 上限 64→256 | C | 1；+6/-6 | 未见 | 冲突 1 | 高且有明确反对依据：上游作者指出部分 provider 最大只接受 64，不能全局放宽。 **下一步：**不合原补丁；先复现长 ID 问题并验证各 provider 的限制。 |
+| [#364](https://github.com/leookun/cursor-byok/pull/364) | 工具调用 ID 上限 64→256 | C（选择性重实现） | 1 个生产文件；新增 4 项回归 | 本 fork 本地全目标通过；[PR #19](https://github.com/haohaomin/cursor-byok/pull/19) CI 全平台通过 | 冲突 1 | 不采用全局 256；保留 provider 的 64 字节边界，长 ID 用完整 SHA-256 十六进制值稳定映射，避免截断碰撞。实现与测试见[记录](history/pull-requests/2026-11-06-pr364-tool-call-id.md)。 |
 | [#354](https://github.com/leookun/cursor-byok/pull/354) | 重复自动压缩与工具输出截断 | C | 6；+505/-77 | 未见 | 冲突 5 | 高：同时改自动压缩、事件 ID 和 provider 历史投影；与 #378 重叠并有多处冲突。 **下一步：**合并需求后统一设计；验证多轮压缩、完整结果持久化及历史前缀稳定。 |
 | [#353](https://github.com/leookun/cursor-byok/pull/353) | 压缩保留空间可配置 | C | 11；+433/-64 | 未见 | 冲突 10 | 高：旧设置 UI/共享 API/存储与引擎冲突；会影响上下文阈值。 **下一步：**先明确与 #378/#460 的阈值关系，再移植并测试边界。 |
-| [#350](https://github.com/leookun/cursor-byok/pull/350) | 自定义上下文窗口优先 | C | 7；+69/-38 | 未见 | 冲突 6 | 中偏高：旧模型编辑器与 model_catalog 已变化，存在多处删除/修改冲突。 **下一步：**按当前模型目录移植；验证窗口显示、选择与压缩阈值一致。 |
+| [#350](https://github.com/leookun/cursor-byok/pull/350) | ✅ 已选择性实现：自定义上下文窗口优先 | C | 7；+69/-38（上游）；本 fork 9 个文件 | 上游未见；本地 255 单元测试及集成测试✓，桌面检查✓；个人 fork PR #16 CI 全✓ | 已提交个人 fork [PR #16](https://github.com/haohaomin/cursor-byok/pull/16) | 已按当前 `cursor/services/model_catalog` 和 `ModelConfig` 路径重实现；配置上下文排在第一项并成为默认变体，真实上下文选择不会覆盖保存值。未导入旧 protobuf 字段和无关刷新改动。详见[验证记录](history/pull-requests/2026-11-06-pr350-context-priority.md)。 |
 | [#345](https://github.com/leookun/cursor-byok/pull/345) | 全局 Cursor 规则持久化和注入 | C | 7；+527/-8 | 未见 | 冲突 5 | 高：旧 handlers/prompting 路径；当前已有 knowledge 服务和 local rules 合并。 **下一步：**先比较现有覆盖，避免重复注入或改变会话内前缀；只移植缺失行为。 |
 | [#343](https://github.com/leookun/cursor-byok/pull/343) | 运行时覆盖压缩提示词 | C | 4；+63/-9 | 未见 | 冲突 4 | 中偏高：当前 head 已是作者建议的精简实现，非描述中的完整配置 UI，但仍与新编译路径冲突。 **下一步：**按实际 4 文件 diff 移植 prompts/compaction.md 支持，验证手动和自动压缩。 |
 | [#360](https://github.com/leookun/cursor-byok/pull/360) | Grok/Codex OAuth 与账号池旧实现 | D | 41；+7565/-369 | 未见 | 冲突 28 | 高：旧订阅模块、前端及两项迁移；当前已有内置 Grok/Codex 插件。 **下一步：**不直接合并；需求映射到当前插件体系。 |

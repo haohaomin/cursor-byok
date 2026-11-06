@@ -308,6 +308,7 @@
   "ac69f68b7010ec79": "Baixar e instalar",
   "ad6a60ee93d3ba3e": "Carregando detalhes da chamada…",
   "ae2d0b7f79cea4a3": "Saída do modelo: {tokens} × ${price}/1M = {cost}",
+  "ae48333d3301c608": "O contexto personalizado configurado tem prioridade; deixe vazio para usar o padrão.",
   "aecb952b1e6cce36": "Oculta o ícone do Dock quando desativado. Você ainda pode abrir o aplicativo pelo ícone da barra de menus.",
   "aee88743413144a2": "Atualizar",
   "affb73206cfa035d": "Expira em: {time}",

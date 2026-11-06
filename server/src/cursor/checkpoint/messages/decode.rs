@@ -1,11 +1,12 @@
 //! Decodes Cursor checkpoint message data into canonical Messages.
 use base64::{engine::general_purpose::STANDARD, Engine};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 use crate::{
     model::{
-        CanonicalMessage, ContentPart, MessageContent, Origin, RecoveredToolRound, Role, ToolCall,
-        ToolCallContent, ToolResultContent, ToolRoundAssistant, ToolRoundId,
+        merge_replay_states, CanonicalMessage, ContentPart, MessageContent, Origin,
+        ProviderReplayState, RecoveredToolRound, Role, ToolCall, ToolCallContent,
+        ToolResultContent, ToolRoundAssistant, ToolRoundId,
     },
     store::BlobId,
     Error, Result,
@@ -171,7 +172,7 @@ fn decode_assistant(value: &Value, internal_id: &str) -> Result<MessageContent> 
     let mut text = String::new();
     let mut thinking = String::new();
     let mut calls = Vec::new();
-    let mut replay_state = None;
+    let mut signed_replay_parts = Vec::<(String, String)>::new();
     for part in value
         .get("content")
         .and_then(Value::as_array)
@@ -183,14 +184,10 @@ fn decode_assistant(value: &Value, internal_id: &str) -> Result<MessageContent> 
                 text.push_str(part.get("text").and_then(Value::as_str).unwrap_or_default())
             }
             Some("reasoning") => {
-                thinking.push_str(part.get("text").and_then(Value::as_str).unwrap_or_default());
+                let part_text = part.get("text").and_then(Value::as_str).unwrap_or_default();
+                thinking.push_str(part_text);
                 if let Some(signature) = part.get("signature").and_then(Value::as_str) {
-                    if replay_state.is_some() {
-                        return Err(Error::Protocol(
-                            "Cursor assistant has multiple reasoning signatures".into(),
-                        ));
-                    }
-                    replay_state = Some(decode_replay_state(signature)?);
+                    signed_replay_parts.push((part_text.into(), signature.into()));
                 }
             }
             Some("tool-call") => calls.push(ToolCallContent {
@@ -202,6 +199,30 @@ fn decode_assistant(value: &Value, internal_id: &str) -> Result<MessageContent> 
             _ => {}
         }
     }
+    let replay_state = match signed_replay_parts.as_slice() {
+        [] => None,
+        [(.., signature)] => Some(decode_replay_state(signature)?),
+        parts => {
+            let states = parts
+                .iter()
+                .map(|(_, signature)| decode_replay_state(signature))
+                .collect::<Result<Vec<_>>>()?;
+            if states
+                .iter()
+                .all(|state| state.provider_kind == "cursor_opaque")
+            {
+                Some(ProviderReplayState {
+                    provider_kind: "cursor_opaque".into(),
+                    value: json!({
+                        "signatures": parts.iter().map(|(_, signature)| signature).collect::<Vec<_>>(),
+                        "texts": parts.iter().map(|(text, _)| text).collect::<Vec<_>>(),
+                    }),
+                })
+            } else {
+                merge_replay_states(states)
+            }
+        }
+    };
     Ok(MessageContent::Assistant {
         text,
         thinking,
