@@ -363,6 +363,18 @@ async fn configured_plugin_models(registry: &TransportRegistry) -> Vec<PluginMod
     }
 }
 
+pub(super) async fn configured_default_model_id(registry: &TransportRegistry) -> Result<String> {
+    let models = registry.store().models().await?;
+    let plugins = configured_plugin_models(registry).await;
+    let id = default_model_id(&models, &plugins);
+    if id.is_empty() {
+        return Err(crate::Error::Config(
+            "configure a model before generating a conversation title".into(),
+        ));
+    }
+    Ok(id.to_owned())
+}
+
 fn default_model_details(
     models: &[ModelConfig],
     plugin_models: &[PluginModelDescriptor],

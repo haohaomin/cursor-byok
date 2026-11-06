@@ -88,11 +88,13 @@ impl Provider for ProviderRouter {
                     if routed.request.model.strip_images {
                         strip_images(&mut routed.request.history);
                     }
-                    routed.request.model.extra_params =
-                        super::request_template::render_json_strings(
-                            model.extra_params(),
-                            &invocation.conversation_id,
-                        );
+                    if routed.request.model.inherit_model_options {
+                        routed.request.model.extra_params =
+                            super::request_template::render_json_strings(
+                                model.extra_params(),
+                                &invocation.conversation_id,
+                            );
+                    }
                     routed.request.model.model_id = model.model_id.clone();
                     let recorder = start_recorder(&store, &invocation, &model.model_hash, &model.display_name, provider_type, &request_url, &model.model_id).await?;
                     let guard = recorder.cancel_on_drop();

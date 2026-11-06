@@ -194,6 +194,9 @@ impl ModelConfig {
 
     pub fn configure(&self, model: &mut super::ModelSpec) {
         model.display_name = Some(self.display_name.clone());
+        if !model.inherit_model_options {
+            return;
+        }
         model.strip_images = self.strip_images;
         // A configured context is authoritative for this model. Cursor's
         // picker still supplies a value when no custom context is configured.
@@ -560,6 +563,10 @@ pub struct ModelSpec {
     pub model_id: String,
     pub display_name: Option<String>,
     pub reasoning: ReasoningSpec,
+    /// Auxiliary calls can supply their own inference options without inheriting
+    /// conversation-model reasoning or free-form request overrides.
+    #[serde(default = "inherit_model_options")]
+    pub inherit_model_options: bool,
     pub latency: ModelLatency,
     pub max_output_tokens: Option<u64>,
     pub context_window_tokens: Option<u64>,
@@ -577,6 +584,7 @@ impl ModelSpec {
             model_id: model_id.into(),
             display_name: None,
             reasoning: ReasoningSpec::default(),
+            inherit_model_options: true,
             latency: ModelLatency::Standard,
             max_output_tokens: None,
             context_window_tokens: None,
@@ -585,4 +593,8 @@ impl ModelSpec {
             extra_params: serde_json::json!({}),
         }
     }
+}
+
+fn inherit_model_options() -> bool {
+    true
 }
