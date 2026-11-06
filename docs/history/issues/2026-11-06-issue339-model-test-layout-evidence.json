@@ -1,7 +1,7 @@
 {
   "date": "2026-11-06",
   "baseline_commit": "73126d46bedac174e6449f2a45240a2955852bcb",
-  "integrated_base": "3a5f51318279874805d99e8a57d4d2973826cbcc",
+  "integrated_base": "1de8e4258c7a37e421fe0fc2d2e19807cbc729ed",
   "upstream": {
     "issue": 339,
     "state": "OPEN",
@@ -952,5 +952,27 @@
     "Only the grouped model layout symptom of issue 339 is repaired; other reported styles have browser-only prior checks",
     "Existing truncated flat Russian button loses first click on unchanged base; layout retest pre-hovered the button and does not claim that interaction fixed"
   ],
-  "artifacts": "/tmp/cursor-byok-issue339-20261106/"
+  "artifacts": "/tmp/cursor-byok-issue339-20261106/",
+  "latest_main_integration": {
+    "base": "1de8e4258c7a37e421fe0fc2d2e19807cbc729ed",
+    "conflicts": [
+      "docs/issues.md"
+    ],
+    "cases": 12,
+    "states": 60,
+    "all_geometry_stable": true,
+    "all_requests_expected": true,
+    "playwright_page_errors": [],
+    "vite_diagnostics": [
+      "ResizeObserver loop completed with undelivered notifications; also observed on the earlier baseline, outside this layout fix"
+    ],
+    "npm_check_exit": 0,
+    "tauri_debug_exit": 0,
+    "log_directory": "/tmp/cursor-byok-issue339-20261106",
+    "log_prefix": "main-integration-",
+    "source_sha256": {
+      "apps/desktop/src/features/models/CursorModelCards.tsx": "df1b21edb210b77061ec874619141f47ac5c97d99818d40131dc0bc969d1a8a1",
+      "apps/desktop/src/features/models/CursorSettings.module.scss": "4c4040d5055112799a2df2402d0f9abd8f97aef65a9d7320f9228339b7f8093e"
+    }
+  }
 }

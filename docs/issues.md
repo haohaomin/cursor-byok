@@ -144,7 +144,7 @@
 | --- | --- | --- | --- | --- |
 | ☐ | [#486](https://github.com/leookun/cursor-byok/issues/486) Linux RPM 无法在 Rocky Linux 9.5 安装：缺少 libwebkit2gtk-4.1.so.0 | B | 待现版复测 | Rocky 9.5 缺 WebKitGTK 4.1；核对发行版依赖与可支持的打包方式，需 Linux 环境。 |
 | ☐ | [#436](https://github.com/leookun/cursor-byok/issues/436) Linux(fedora) 托盘右键菜单没有显示出来 | B | 待现版复测 | 需 Fedora 桌面环境实测托盘菜单，记录桌面协议及依赖。 |
-| ☐（分组布局已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组结果位移已修复；四语言浏览器与构建通过，待 CI / 原生 GUI | 名称/操作与 ID/结果分为固定两行，12 组 60 次状态检查通过；表格/箭头此前 Chromium 未复现，平铺截断按钮首次点击另待修。见 [修复与边界](history/issues/2026-11-06-issue339-model-test-layout.md)。 |
+| ☐（分组布局已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组结果位移已修复；四语言浏览器与构建通过，待 CI / 原生 GUI | 名称/操作与 ID/结果分为固定两行，12 组 60 次状态检查通过；表格/箭头此前 Chromium 未复现，平铺截断按钮首次点击由独立 [PR #31](https://github.com/haohaomin/cursor-byok/pull/31) 修复，尚未合入。见 [修复与边界](history/issues/2026-11-06-issue339-model-test-layout.md)。 |
 | ☐ | [#323](https://github.com/leookun/cursor-byok/issues/323) beta版更新所有模型配置全部丢失 | B | 待现版复测 | 旧 beta 升级后配置丢失的报告；先识别数据目录/版本，仅用数据副本验证。 |
 | ☐ | [#314](https://github.com/leookun/cursor-byok/issues/314) [Bug] macOS v0.0.49 首次启动后，通过菜单栏退出会导致应用卡死无响应 | B | 待现版复测 | 报告版本 0.0.49；先确认当前架构仍可复现首次启动退出卡死。 |
 | ☐ | [#283](https://github.com/leookun/cursor-byok/issues/283) 与原账号切换问题 | B | 待现版复测 | 旧版账号/设置损坏报告；仅用数据副本测试接管与恢复，禁止用删除数据库作为修复。 |
@@ -152,7 +152,7 @@
 | ☐ | [#371](https://github.com/leookun/cursor-byok/issues/371) follow the system theme and set it as default. | C | PR #26 已合入；浏览器、构建及四组 CI 通过，原生应用待验 | 默认跟随系统、实时切换、显式选择保存及首屏主题已补齐。7 组首屏检查、10 次运行时核对、四语言检查及带本机 SQLx 工具链参数的 Tauri debug 构建通过；未发布，见 [修复与边界](history/issues/2026-11-06-issue371-system-theme.md)。 |
 | ☐（实现与局部实测完成） | [#134](https://github.com/leookun/cursor-byok/issues/134) 添加一个打开cursor 的快捷键按钮 | C | PR #27 已合入；macOS 原生分发、四语言布局及四组 CI 通过 | 复用 opener，仅允许 `cursor://`；普通浏览器隐藏。820×558 复测修复俄语工具栏挤出，原生权限失败及其他 URI 拒绝已验。冷启动、缺少 handler、Windows/Linux GUI 未验，见 [实现与验收](history/issues/2026-11-06-issue134-open-cursor.md)。 |
 | ☐（已修复待原生验收） | [#119](https://github.com/leookun/cursor-byok/issues/119) 有个小建议，更新提示关闭之后就不要弹出来了，可以用户手动点击 版本更新 | C | 已复现刷新后重复提醒并修复；浏览器与构建通过 | 记住最后自动提醒的版本，新版本仍提醒，设置更新入口保留；刷新、定时检查、存储读写失败及最小窗口通过。真实安装包重启未验，跨 origin 不保留，见 [修复与边界](history/issues/2026-11-06-issue119-update-notification.md)。 |
-| ☐ | [#370](https://github.com/leookun/cursor-byok/issues/370) Import modal scrollbar is not working | D | 待补信息 | 正文为空；补导入弹窗截图、平台和滚动复现步骤。 |
+| ☐ | [#370](https://github.com/leookun/cursor-byok/issues/370) Import modal scrollbar is not working | D | PR #29 已合入；浏览器、构建及最终提交四组 CI 通过 | 120 个模型时内部视口被撑高导致滚动失效；修正两层高度收缩，滚轮/拖拽、短内容、表格/详情回归通过。原报告正文为空，原生 GUI 与焦点恢复仍有边界，见 [修复记录](history/issues/2026-11-06-issue370-modal-scroll.md)。 |
 
 ### 配置与统计需求（8 项）
 
