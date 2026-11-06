@@ -1,7 +1,7 @@
 {
   "date": "2026-11-06",
   "baseline_commit": "3a5f51318279874805d99e8a57d4d2973826cbcc",
-  "integration_base": "1de8e4258c7a37e421fe0fc2d2e19807cbc729ed",
+  "integration_base": "574f2f4f3da4eef6b980b70931a2d256d81a8952",
   "baseline": {
     "failure": "first interaction lost",
     "results": [
@@ -301,5 +301,22 @@
     "Real provider requests",
     "Stationary-pointer resize remeasurement"
   ],
-  "artifact_directory": "/tmp/cursor-byok-truncated-button-20261106"
+  "artifact_directory": "/tmp/cursor-byok-truncated-button-20261106",
+  "latest_main_integration": {
+    "base": "574f2f4f3da4eef6b980b70931a2d256d81a8952",
+    "conflicts": [
+      "docs/issues.md"
+    ],
+    "button_cases": 8,
+    "grouped_layout_cases": 12,
+    "grouped_layout_states": 60,
+    "playwright_page_errors": [],
+    "source_unchanged": true,
+    "npm_check_exit": 0,
+    "tauri_debug_exit": 0,
+    "log_directory": "/tmp/cursor-byok-truncated-button-20261106",
+    "log_prefix": "integration-",
+    "vite_diagnostics": "The shared dev-server log contains existing ResizeObserver loop notifications; zero Playwright pageerror does not establish an error-free application",
+    "vite_log": "/tmp/cursor-byok-import-focus-20261106/vite.log"
+  }
 }

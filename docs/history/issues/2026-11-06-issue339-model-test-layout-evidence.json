@@ -1,0 +1,978 @@
+{
+  "date": "2026-11-06",
+  "baseline_commit": "73126d46bedac174e6449f2a45240a2955852bcb",
+  "integrated_base": "1de8e4258c7a37e421fe0fc2d2e19807cbc729ed",
+  "upstream": {
+    "issue": 339,
+    "state": "OPEN",
+    "comments": 0,
+    "related_pr_search": "339 and 亮色 returned no standalone PR"
+  },
+  "environment": {
+    "browser": "Playwright Chromium on macOS",
+    "api": "synthetic management API and controllable connectivity responses",
+    "languages": [
+      "en-US",
+      "pt-BR",
+      "ru-RU",
+      "zh-CN"
+    ],
+    "viewports": [
+      [
+        820,
+        558
+      ],
+      [
+        1200,
+        800
+      ]
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ]
+  },
+  "baseline": {
+    "failure": "model actions move after connectivity result",
+    "results": [
+      {
+        "locale": "en-US",
+        "before": {
+          "x": 595.25,
+          "y": 148.75,
+          "width": 40.8828125,
+          "height": 24
+        },
+        "during": {
+          "x": 341.8984375,
+          "y": 187,
+          "width": 40.8828125,
+          "height": 24
+        },
+        "after": {
+          "x": 296.25,
+          "y": 187,
+          "width": 40.8828125,
+          "height": 24
+        },
+        "stable": false,
+        "scrolled": {
+          "document": 0,
+          "regions": [
+            209
+          ]
+        }
+      }
+    ]
+  },
+  "final_regression": [
+    {
+      "locale": "en-US",
+      "before": {
+        "x": 595.25,
+        "y": 144.5,
+        "width": 40.8828125,
+        "height": 24
+      },
+      "during": {
+        "x": 595.25,
+        "y": 144.5,
+        "width": 40.8828125,
+        "height": 24
+      },
+      "after": {
+        "x": 595.25,
+        "y": 144.5,
+        "width": 40.8828125,
+        "height": 24
+      },
+      "stable": true,
+      "scrolled": {
+        "document": 0,
+        "regions": [
+          210
+        ]
+      }
+    }
+  ],
+  "state_cases": [
+    {
+      "locale": "en-US",
+      "kind": "provider",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Edit",
+            "box": {
+              "x": 595.25,
+              "y": 144.5,
+              "width": 40.8828125,
+              "height": 24
+            }
+          },
+          {
+            "name": "Duplicate",
+            "box": {
+              "x": 644.1328125,
+              "y": 144.5,
+              "width": 77.078125,
+              "height": 24
+            }
+          },
+          {
+            "name": "Delete",
+            "box": {
+              "x": 729.2109375,
+              "y": 144.5,
+              "width": 57.7890625,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 107.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "en-US",
+      "kind": "type",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Edit",
+            "box": {
+              "x": 595.25,
+              "y": 144.5,
+              "width": 40.8828125,
+              "height": 24
+            }
+          },
+          {
+            "name": "Duplicate",
+            "box": {
+              "x": 644.1328125,
+              "y": 144.5,
+              "width": 77.078125,
+              "height": 24
+            }
+          },
+          {
+            "name": "Delete",
+            "box": {
+              "x": 729.2109375,
+              "y": 144.5,
+              "width": 57.7890625,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 107.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "en-US",
+      "kind": "plugin",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 153.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Settings",
+            "box": {
+              "x": 717.625,
+              "y": 164.5,
+              "width": 69.375,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 127.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "pt-BR",
+      "kind": "provider",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Editar",
+            "box": {
+              "x": 589.15625,
+              "y": 144.5,
+              "width": 53.640625,
+              "height": 24
+            }
+          },
+          {
+            "name": "Duplicar",
+            "box": {
+              "x": 650.796875,
+              "y": 144.5,
+              "width": 69.578125,
+              "height": 24
+            }
+          },
+          {
+            "name": "Excluir",
+            "box": {
+              "x": 728.375,
+              "y": 144.5,
+              "width": 58.625,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 88,
+        "width": 420,
+        "height": 76.5
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "pt-BR",
+      "kind": "type",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Editar",
+            "box": {
+              "x": 589.15625,
+              "y": 144.5,
+              "width": 53.640625,
+              "height": 24
+            }
+          },
+          {
+            "name": "Duplicar",
+            "box": {
+              "x": 650.796875,
+              "y": 144.5,
+              "width": 69.578125,
+              "height": 24
+            }
+          },
+          {
+            "name": "Excluir",
+            "box": {
+              "x": 728.375,
+              "y": 144.5,
+              "width": 58.625,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 88,
+        "width": 420,
+        "height": 76.5
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "pt-BR",
+      "kind": "plugin",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 153.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Configurações",
+            "box": {
+              "x": 676.7734375,
+              "y": 164.5,
+              "width": 110.2265625,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 108,
+        "width": 420,
+        "height": 76.5
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "ru-RU",
+      "kind": "provider",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Изменить",
+            "box": {
+              "x": 513.4296875,
+              "y": 144.5,
+              "width": 82.5,
+              "height": 24
+            }
+          },
+          {
+            "name": "Дублировать",
+            "box": {
+              "x": 603.9296875,
+              "y": 144.5,
+              "width": 104.5625,
+              "height": 24
+            }
+          },
+          {
+            "name": "Удалить",
+            "box": {
+              "x": 716.4921875,
+              "y": 144.5,
+              "width": 70.5078125,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 107.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "ru-RU",
+      "kind": "type",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Изменить",
+            "box": {
+              "x": 513.4296875,
+              "y": 144.5,
+              "width": 82.5,
+              "height": 24
+            }
+          },
+          {
+            "name": "Дублировать",
+            "box": {
+              "x": 603.9296875,
+              "y": 144.5,
+              "width": 104.5625,
+              "height": 24
+            }
+          },
+          {
+            "name": "Удалить",
+            "box": {
+              "x": 716.4921875,
+              "y": 144.5,
+              "width": 70.5078125,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 107.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "ru-RU",
+      "kind": "plugin",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 153.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "Настройки",
+            "box": {
+              "x": 697.640625,
+              "y": 164.5,
+              "width": 89.359375,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 127.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "zh-CN",
+      "kind": "provider",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "编辑",
+            "box": {
+              "x": 639,
+              "y": 144.5,
+              "width": 44,
+              "height": 24
+            }
+          },
+          {
+            "name": "复制",
+            "box": {
+              "x": 691,
+              "y": 144.5,
+              "width": 44,
+              "height": 24
+            }
+          },
+          {
+            "name": "删除",
+            "box": {
+              "x": 743,
+              "y": 144.5,
+              "width": 44,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 107.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "zh-CN",
+      "kind": "type",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 133.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "编辑",
+            "box": {
+              "x": 639,
+              "y": 144.5,
+              "width": 44,
+              "height": 24
+            }
+          },
+          {
+            "name": "复制",
+            "box": {
+              "x": 691,
+              "y": 144.5,
+              "width": 44,
+              "height": 24
+            }
+          },
+          {
+            "name": "删除",
+            "box": {
+              "x": 743,
+              "y": 144.5,
+              "width": 44,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 107.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    },
+    {
+      "locale": "zh-CN",
+      "kind": "plugin",
+      "idle": {
+        "row": {
+          "x": 243,
+          "y": 153.5,
+          "width": 546,
+          "height": 71
+        },
+        "actions": [
+          {
+            "name": "设置",
+            "box": {
+              "x": 743,
+              "y": 164.5,
+              "width": 44,
+              "height": 24
+            }
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "pending",
+        "success",
+        "error",
+        "cancelled"
+      ],
+      "all_geometry_equal_to_idle": true,
+      "tooltip": {
+        "x": 388,
+        "y": 127.5,
+        "width": 420,
+        "height": 57
+      },
+      "request_methods": [
+        "POST",
+        "POST",
+        "POST",
+        "DELETE"
+      ]
+    }
+  ],
+  "state_count": 60,
+  "page_errors_in_state_matrix": [],
+  "edges": {
+    "cases": [
+      {
+        "mode": "dark",
+        "size": {
+          "width": 820,
+          "height": 558
+        },
+        "before": {
+          "x": 513.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "pending": {
+          "x": 513.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "after": {
+          "x": 513.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "names": [
+          {
+            "width": 159,
+            "total": 1750,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          },
+          {
+            "width": 159,
+            "total": 1710,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          }
+        ]
+      },
+      {
+        "mode": "dark",
+        "size": {
+          "width": 1200,
+          "height": 800
+        },
+        "before": {
+          "x": 893.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "pending": {
+          "x": 893.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "after": {
+          "x": 893.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "names": [
+          {
+            "width": 539,
+            "total": 1750,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          },
+          {
+            "width": 539,
+            "total": 1710,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          }
+        ]
+      },
+      {
+        "mode": "light",
+        "size": {
+          "width": 820,
+          "height": 558
+        },
+        "before": {
+          "x": 513.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "pending": {
+          "x": 513.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "after": {
+          "x": 513.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "names": [
+          {
+            "width": 159,
+            "total": 1750,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          },
+          {
+            "width": 159,
+            "total": 1710,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          }
+        ]
+      },
+      {
+        "mode": "light",
+        "size": {
+          "width": 1200,
+          "height": 800
+        },
+        "before": {
+          "x": 893.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "pending": {
+          "x": 893.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "after": {
+          "x": 893.4296875,
+          "y": 144.5,
+          "width": 82.5,
+          "height": 24
+        },
+        "names": [
+          {
+            "width": 539,
+            "total": 1750,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          },
+          {
+            "width": 539,
+            "total": 1710,
+            "overflow": "ellipsis",
+            "titleMatches": true
+          }
+        ]
+      }
+    ],
+    "flatBefore": {
+      "x": 311.9453125,
+      "y": 209,
+      "width": 53.140625,
+      "height": 24
+    },
+    "flatAfter": {
+      "x": 311.9453125,
+      "y": 209,
+      "width": 53.140625,
+      "height": 24
+    },
+    "flatPreparation": "hover before click to settle existing truncated-button rendering"
+  },
+  "flat_first_click_baseline": {
+    "width": {
+      "width": 41,
+      "total": 73
+    },
+    "afterFirst": [],
+    "pending": 0
+  },
+  "checks": {
+    "i18n_scan": "passed; no generated/catalog changes",
+    "npm_check": "passed",
+    "tauri_debug_no_bundle": "passed using local sqlx-macros strip=none override",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "No real model provider calls or live plugin accounts",
+    "Native macOS GUI and Windows/Linux GUI untested; native result is a build",
+    "Only the grouped model layout symptom of issue 339 is repaired; other reported styles have browser-only prior checks",
+    "Existing truncated flat Russian button loses first click on unchanged base; layout retest pre-hovered the button and does not claim that interaction fixed"
+  ],
+  "artifacts": "/tmp/cursor-byok-issue339-20261106/",
+  "latest_main_integration": {
+    "base": "1de8e4258c7a37e421fe0fc2d2e19807cbc729ed",
+    "conflicts": [
+      "docs/issues.md"
+    ],
+    "cases": 12,
+    "states": 60,
+    "all_geometry_stable": true,
+    "all_requests_expected": true,
+    "playwright_page_errors": [],
+    "vite_diagnostics": [
+      "ResizeObserver loop completed with undelivered notifications; also observed on the earlier baseline, outside this layout fix"
+    ],
+    "npm_check_exit": 0,
+    "tauri_debug_exit": 0,
+    "log_directory": "/tmp/cursor-byok-issue339-20261106",
+    "log_prefix": "main-integration-",
+    "source_sha256": {
+      "apps/desktop/src/features/models/CursorModelCards.tsx": "df1b21edb210b77061ec874619141f47ac5c97d99818d40131dc0bc969d1a8a1",
+      "apps/desktop/src/features/models/CursorSettings.module.scss": "4c4040d5055112799a2df2402d0f9abd8f97aef65a9d7320f9228339b7f8093e"
+    }
+  }
+}

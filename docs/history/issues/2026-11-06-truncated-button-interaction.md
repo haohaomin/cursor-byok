@@ -42,3 +42,7 @@ apps/desktop/src/shared/ui/
 浏览器使用真实 React 页面与合成管理 API，测试请求不访问真实供应商；独立组件夹具不模拟组件实现。未验收已安装 macOS 应用或 Windows/Linux GUI，未操作正式账号或数据库，未发布版本。本修复不代替分组模型布局 PR #30，也不表示 Issue #339 的其他平台样式问题全部关闭。
 
 结构化结果见[测试证据](2026-11-06-truncated-button-interaction-evidence.json)。原始脚本、合成夹具、日志和截图保存在 `/tmp/cursor-byok-truncated-button-20261106/`。
+
+## 与分组布局修复组合验证
+
+PR #30 合入后，整合 main `574f2f4f3da4eef6b980b70931a2d256d81a8952`，冲突仅在 Issue #339 清单行。两个按钮组件的 SHA-256 与原验收源码一致；组合代码的 8 组首次交互及 12 组、60 次分组布局状态检查均通过，类型/生产构建及相同参数的 Tauri debug 构建再次通过。Playwright `pageerror` 计数为 0，但开发服务器仍记录既有 ResizeObserver 循环通知，不代表全应用无异常。更新后的 PR #31 仍需独立 CI，未发布版本。

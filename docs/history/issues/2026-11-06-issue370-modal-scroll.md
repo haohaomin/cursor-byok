@@ -65,3 +65,5 @@ CARGO_TARGET_DIR=/Users/renhao/works/cursor-byok/target \
 ## 集成检查
 
 PR #28 合入后，已将 main `3a5f51318279874805d99e8a57d4d2973826cbcc` 合入 [PR #29](https://github.com/haohaomin/cursor-byok/pull/29) 分支；冲突仅在 Issue 清单相邻记录，保留各自最新状态。组合代码的滚动失败回归、`npm run check` 与同参数 Tauri debug 构建再次通过。此前 head `0e390e23e9312f163c39f3f315230e9fa9ddefa9` 两套四组 CI 均通过，合并后的新 head 仍须等待其独立 CI；此记录不代表 PR 已合入。
+
+后续核对：PR #29 最终 head `57078dc2c78cd3a7a8a77049b40bae9f822747ab` 的 PR/push 两套四组 CI 全部通过，2026-11-06 08:16 UTC 已合入 main `1de8e4258c7a37e421fe0fc2d2e19807cbc729ed`。未发布新版本，原生 GUI 与焦点边界保持原结论。
