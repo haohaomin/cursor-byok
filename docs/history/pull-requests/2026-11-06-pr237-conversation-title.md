@@ -62,7 +62,7 @@ UpdateConversationMetadata 请求
 | --- | --- |
 | 新增标题与协议测试 | 7 项通过：独立调用、模型选择、输入边界、早到元数据、官方转发、失败处理、超时及 HTTP 请求参数 |
 | 新增存储测试 | 2 项通过：从 0011 升级、重启持久化、现有活动历史不变、跨 Store 并发更新、新库约束 |
-| `cargo test --locked --workspace --all-targets` | 563 项通过，0 失败，14 项插件环境测试按原配置忽略 |
+| `cargo test --locked --workspace --all-targets` | 563 项通过，0 失败；13 项需 Deno 的插件测试、1 项需缓存 Semble 模型的测试按原配置忽略 |
 | `cargo clippy --locked --workspace --all-targets -- -D warnings` | 通过 |
 | `cargo fmt --all -- --check`、`git diff --check` | 通过 |
 

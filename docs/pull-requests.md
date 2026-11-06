@@ -12,7 +12,11 @@
 
 ## 2026-11-06 上游 PR #237 的独立实现
 
-本地标题生成与元数据保存已在 `codex/issue237-conversation-title` 实现。新增 9 项回归、工作区全量 563 项测试和 Clippy 通过，14 项插件环境测试按原配置忽略；真实 Cursor 自动改名尚未验收。来源、数据库升级和请求隔离边界见[验证记录](history/pull-requests/2026-11-06-pr237-conversation-title.md)。
+本地标题生成与元数据保存已通过 [PR #24](https://github.com/haohaomin/cursor-byok/pull/24) 合入 main（`4e90dce`）。新增 9 项回归、工作区全量 563 项测试、Clippy 和 PR 四组 CI 通过；本地跳过 13 项需 Deno 的插件测试与 1 项需缓存 Semble 模型的测试。真实 Cursor 自动改名尚未验收。来源、数据库升级和请求隔离边界见[验证记录](history/pull-requests/2026-11-06-pr237-conversation-title.md)。
+
+## 2026-11-06 上游 PR #211 的选择性实现
+
+当前 Rust 已保留 Grep 正文；本轮只修复仍丢失的分页、总量与工作区信息。新测试修复前 4 项失败，修复后 5 项通过；完整服务端 503 项测试、Clippy 与格式检查通过，14 项环境测试按原配置忽略。当前 head 与历史快照不同；来源、执行路径及 Ls 未移植的边界见[验证记录](history/pull-requests/2026-11-06-pr211-grep-result-context.md)。
 
 ## 2026-11-04 本 fork PR #10
 
@@ -130,7 +134,7 @@
 | [#229](https://github.com/leookun/cursor-byok/pull/229) | 提示词结构标签注入防护 | D | 3；+166/-8 | 未见 | 冲突 2 | 安全意图值得保留，但补丁落在旧 Go prompt 编译器。 **下一步：**把攻击样例迁入当前提示词测试后评估，勿复活旧模块。 |
 | [#227](https://github.com/leookun/cursor-byok/pull/227) | Shell 前台超时和错误报告 | D | 5；+14/-10 | 未见 | 冲突 5 | 旧 Go forwarder/model/mitm 路径。 **下一步：**按当前工具运行时验证超时和错误传播。 |
 | [#216](https://github.com/leookun/cursor-byok/pull/216) | 思考链、AOS、代理和 UI 综合增强 | D | 423；+61346/-14030 | 未见 | 冲突 109 | 极高：423 文件；上游作者已要求拆分，含旧构建、后端、前端与证书路径。 **下一步：**拒绝整体合入；按单一功能重做，不导入证书材料。 |
-| [#211](https://github.com/leookun/cursor-byok/pull/211)（草稿） | 保留 grep/ls 结果 | D | 2；+304/-3 | 未见 | 冲突 1 | 草稿，旧 Go bridge 路径。 **下一步：**迁移必要测试场景到当前 Rust 工具结果模块。 |
+| [#211](https://github.com/leookun/cursor-byok/pull/211)（草稿） | 保留 grep/ls 结果 | D（Rust 选择性实现） | 原 PR：2；+304/-3 | 原 PR 未见；本地服务端 503 项通过 | 不直接移植旧 Go 路径 | 当前正文与大小限制已有；补齐分页、计数和范围标签，旧 Ls 不移植。最新 head `d280adae51f69`，详见[复现与验证](history/pull-requests/2026-11-06-pr211-grep-result-context.md)。 |
 | [#210](https://github.com/leookun/cursor-byok/pull/210)（草稿） | 临时过载流式重试 | D | 7；+311/-16 | 未见 | 冲突 4 | 草稿，旧 Go provider/actor 路径；重试可能重复输出或执行。 **下一步：**如需功能，在当前 provider 层验证首字节前后重试语义。 |
 | [#208](https://github.com/leookun/cursor-byok/pull/208) | 逐模型系统提示词 | D | 15；+486/-9 | 未见 | 冲突 13 | 旧 Vue/Go 配置及编译链；与当前提示词和前缀稳定要求需重新对齐。 **下一步：**不直接合并；先定义当前会话内何时允许改变提示词。 |
 | [#198](https://github.com/leookun/cursor-byok/pull/198) | 工程审计加桌宠 | D | 154；+16830/-4072 | 未见 | 冲突 72 | 极高：154 文件、多功能混合；作者明确无法评估副作用；触及旧广告组件。 **下一步：**拒绝整体合入，按独立问题提取。 |
