@@ -16,6 +16,12 @@
 | --- | --- | --- |
 | [#18](https://github.com/haohaomin/cursor-byok/pull/18) / `508d157` | 增加俄语桌面本地化 | 按当前 fork 的 source 词条重新生成并补译 `ru-RU`，接入系统语言解析、设置选择器和 i18n 校验；本地检查与四平台 CI 通过。真实安装包 UI 切换待发布前复核。 |
 
+## 2026-11-06 本 fork PR #23
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#23](https://github.com/haohaomin/cursor-byok/pull/23) / `dfea8ef` | 自动压缩摘要模型永久挂起后无法继续 | 保留现有压缩屏障、重复压缩和回退摘要，只加入 30 秒 deadline 与超时回退；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr378-compaction-timeout.md)。 |
+
 ## 2026-11-06 本 fork PR #17
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
