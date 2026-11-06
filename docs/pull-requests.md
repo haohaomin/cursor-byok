@@ -10,6 +10,12 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
+## 2026-11-06 本 fork PR #21
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#21](https://github.com/haohaomin/cursor-byok/pull/21) / `3b5ce52` | 提示词正文中的结构标签注入防护 | 按当前 Rust `cursor/compile` 路径重实现；库测试、全部目标测试、定向回归、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号未验收；详见[验证记录](history/pull-requests/2026-11-06-pr229-prompt-injection.md)。 |
+
 ## 2026-11-06 本 fork PR #22
 
 | PR / head | 解决目标与范围 | 采用方式与验证边界 |
