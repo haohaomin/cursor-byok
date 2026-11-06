@@ -1,6 +1,6 @@
 //! Decides when to compact provider-visible context and builds a stable fallback summary.
 
-use std::collections::HashSet;
+use std::{collections::HashSet, path::Path};
 
 use crate::{
     model::{
@@ -24,6 +24,14 @@ const FALLBACK_CHARS: usize = 12_000;
 const CONTEXT_RESERVE_DIVISOR: u64 = 10;
 pub(super) const OUTPUT_TOKENS: u64 = 4_096;
 pub(super) const INSTRUCTIONS: &str = "Summarize the conversation for the next model turn. Preserve goals, constraints, decisions, files, commands, errors, results, and unfinished work. Do not call tools. Return only the concise durable summary.";
+
+pub(super) fn instructions() -> crate::Result<String> {
+    instructions_at(&crate::config::compaction_prompt_path()?)
+}
+
+fn instructions_at(path: &Path) -> crate::Result<String> {
+    Ok(crate::config::compaction_prompt_override_at(path)?.unwrap_or_else(|| INSTRUCTIONS.into()))
+}
 
 /// Usable prompt budget: the window minus the proportional reserve.
 pub(super) fn context_budget(context_window: u64) -> u64 {
@@ -232,6 +240,18 @@ mod tests {
             action: RunAction::Start,
             base_checkpoint_id: CheckpointId(1),
         }
+    }
+
+    #[test]
+    fn compaction_instructions_reload_and_fall_back_to_embedded_prompt() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("compaction.md");
+
+        assert_eq!(instructions_at(&path).unwrap(), INSTRUCTIONS);
+        std::fs::write(&path, "custom summary").unwrap();
+        assert_eq!(instructions_at(&path).unwrap(), "custom summary");
+        std::fs::write(&path, "\n  ").unwrap();
+        assert_eq!(instructions_at(&path).unwrap(), INSTRUCTIONS);
     }
 
     #[test]
