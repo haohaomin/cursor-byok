@@ -16,6 +16,18 @@
 | --- | --- | --- |
 | [#17](https://github.com/haohaomin/cursor-byok/pull/17) / `b0a8e50` | 运行时覆盖手动和自动压缩提示词 | 选择性实现当前 Rust 架构的服务端路径；本地 `cursor-server` 全部测试 255✓、14 个忽略，Clippy/格式检查通过；PR CI 的 Frontend、Linux、Windows、macOS 全部通过。未实现上游正文声称的桌面 Config 页面；详细边界见[验证记录](history/pull-requests/2026-11-06-pr343-runtime-compaction.md)。 |
 
+## 2026-11-06 本 fork PR #22
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#22](https://github.com/haohaomin/cursor-byok/pull/22) / `7dda5f1` | 全局 Cursor 规则的本地相关规则协议入口 | 复用现有规则存储、同步和上下文合并，只补 `FetchRelevantKnowledgeForConversation` 路由与代理分流；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
+
+## 2026-11-06 上游 PR #375 的选择性实现
+
+| 上游 PR / 本 fork 分支 | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| 上游 [#375](https://github.com/leookun/cursor-byok/pull/375) / 本 fork [PR #20](https://github.com/haohaomin/cursor-byok/pull/20) / `codex/issue375-resume-progress` | ResumeAction 上下文和无进展恢复 | 不直接采用旧 `request/` 路径；迁移到当前 `compile/` 路径，服务端全量目标测试、Clippy、格式检查通过。PR #20 已创建，真实 Cursor UI 未验收。详见[验证记录](history/pull-requests/2026-11-06-pr375-resume-progress.md)。 |
+
 ## 2026-10-27 新增候选
 
 下表以每项最新记录为准；仅标为初筛的条目不表示已逐行审计或验证作者的测试声明。#514 读取了固定 head 的完整 diff、讨论、reviews 和 checks；后三者均为空，无可用上游 CI 结论。#513、#498 的后续处理分别链接到独立证据。
@@ -76,7 +88,7 @@
 | [#433](https://github.com/leookun/cursor-byok/pull/433) | 所有 Cursor 请求经本地代理 | C | 2；+72/-4 | 未见 | 无文本冲突 | 高且有具体问题：若干云端/FileSync 接口无条件返回 400/404，早于 TAB Direct 分流；还强开 custom-protocol。 **下一步：**撤出硬编码拒绝和构建特性改动；测试账号云功能、TAB 三种模式及代理切换。 |
 | [#378](https://github.com/leookun/cursor-byok/pull/378) | 自动压缩持久化和恢复 | C | 8；+1082/-58 | 未见 | 冲突 3 | 高：checkpoint 发布屏障、重试/恢复和超时共同改变；当前引擎及输出模块冲突。 **下一步：**移植到现有生命周期；验证压缩后立即失败、重启恢复、前缀稳定性。 |
 | [#375](https://github.com/leookun/cursor-byok/pull/375) | ResumeAction 上下文与继续执行 | C | 5；+295/-18 | 未见 | 冲突 3 | 高：actor/请求编译路径已变化，涉及重复执行和无进展重试。 **下一步：**按现有 compile 模块移植；验证取消、重复 Resume、工具完成后的继续执行。 |
-| [#364](https://github.com/leookun/cursor-byok/pull/364) | 工具调用 ID 上限 64→256 | C | 1；+6/-6 | 未见 | 冲突 1 | 高且有明确反对依据：上游作者指出部分 provider 最大只接受 64，不能全局放宽。 **下一步：**不合原补丁；先复现长 ID 问题并验证各 provider 的限制。 |
+| [#364](https://github.com/leookun/cursor-byok/pull/364) | 工具调用 ID 上限 64→256 | C（选择性重实现） | 1 个生产文件；新增 4 项回归 | 本 fork 本地全目标通过；[PR #19](https://github.com/haohaomin/cursor-byok/pull/19) CI 全平台通过 | 冲突 1 | 不采用全局 256；保留 provider 的 64 字节边界，长 ID 用完整 SHA-256 十六进制值稳定映射，避免截断碰撞。实现与测试见[记录](history/pull-requests/2026-11-06-pr364-tool-call-id.md)。 |
 | [#354](https://github.com/leookun/cursor-byok/pull/354) | 重复自动压缩与工具输出截断 | C | 6；+505/-77 | 未见 | 冲突 5 | 高：同时改自动压缩、事件 ID 和 provider 历史投影；与 #378 重叠并有多处冲突。 **下一步：**合并需求后统一设计；验证多轮压缩、完整结果持久化及历史前缀稳定。 |
 | [#353](https://github.com/leookun/cursor-byok/pull/353) | 压缩保留空间可配置 | C | 11；+433/-64 | 未见 | 冲突 10 | 高：旧设置 UI/共享 API/存储与引擎冲突；会影响上下文阈值。 **下一步：**先明确与 #378/#460 的阈值关系，再移植并测试边界。 |
 | [#350](https://github.com/leookun/cursor-byok/pull/350) | ✅ 已选择性实现：自定义上下文窗口优先 | C | 7；+69/-38（上游）；本 fork 9 个文件 | 上游未见；本地 255 单元测试及集成测试✓，桌面检查✓；个人 fork PR #16 CI 全✓ | 已提交个人 fork [PR #16](https://github.com/haohaomin/cursor-byok/pull/16) | 已按当前 `cursor/services/model_catalog` 和 `ModelConfig` 路径重实现；配置上下文排在第一项并成为默认变体，真实上下文选择不会覆盖保存值。未导入旧 protobuf 字段和无关刷新改动。详见[验证记录](history/pull-requests/2026-11-06-pr350-context-priority.md)。 |
