@@ -1,6 +1,6 @@
 //! Executes one Run across model cycles, Tool rounds, and message commits.
-use std::collections::HashSet;
 use std::sync::Arc;
+use std::{collections::HashSet, time::Duration};
 
 use tokio_util::sync::CancellationToken;
 
@@ -30,6 +30,7 @@ pub struct RunEngine {
 /// finished (for example after a cancelled follow-up).
 const CONTINUE_MESSAGE_ID: &str = "runtime:continue";
 const CONTINUE_INSTRUCTION: &str = "Continue from where you left off.";
+const AUTO_COMPACTION_DEADLINE: Duration = Duration::from_secs(30);
 
 impl RunEngine {
     pub fn new(store: Store, provider: Arc<dyn Provider>) -> Self {
@@ -879,6 +880,7 @@ impl RunEngine {
         let drain = tokio::spawn(async move { while discarded_events.recv().await.is_some() {} });
         let mut pending_insertions = Vec::new();
         let mut break_messages = None;
+        let mut timed_out = false;
         let cycle = {
             let cycle = consume_model_cycle(
                 self.provider.stream(invocation, cycle_cancellation.clone()),
@@ -886,6 +888,8 @@ impl RunEngine {
                 &cycle_cancellation,
             );
             tokio::pin!(cycle);
+            let deadline = tokio::time::sleep(AUTO_COMPACTION_DEADLINE);
+            tokio::pin!(deadline);
             loop {
                 tokio::select! {
                     biased;
@@ -917,31 +921,54 @@ impl RunEngine {
                         }
                     },
                     result = &mut cycle => break result,
+                    _ = &mut deadline => {
+                        timed_out = true;
+                        cycle_cancellation.cancel();
+                        break Err(Box::new(super::ModelCycleFailure {
+                            failure: RunFailure::Provider(format!(
+                                "automatic compaction timed out after {} seconds",
+                                AUTO_COMPACTION_DEADLINE.as_secs()
+                            )),
+                            partial_text: String::new(),
+                            partial_reasoning: String::new(),
+                            usage: None,
+                            retryable: false,
+                        }));
+                    }
                 }
             }
         };
         drop(silent_events);
         let _ = drain.await;
-        let (summary, compaction_usage) = match (break_messages.is_some(), cycle) {
-            (true, Ok(cycle)) => (
+        let (summary, compaction_usage) = match (timed_out, break_messages.is_some(), cycle) {
+            (true, _, _) => {
+                tracing::warn!(
+                    deadline_seconds = AUTO_COMPACTION_DEADLINE.as_secs(),
+                    "automatic compaction timed out; using fallback summary"
+                );
+                (super::compaction::fallback_summary(&compactable), None)
+            }
+            (false, true, Ok(cycle)) => (
                 super::compaction::fallback_summary(&compactable),
                 cycle.usage,
             ),
-            (true, Err(failure)) => (
+            (false, true, Err(failure)) => (
                 super::compaction::fallback_summary(&compactable),
                 failure.usage,
             ),
-            (false, Ok(cycle)) if cycle.calls.is_empty() && !cycle.text.trim().is_empty() => {
+            (false, false, Ok(cycle))
+                if cycle.calls.is_empty() && !cycle.text.trim().is_empty() =>
+            {
                 (cycle.text.trim().to_string(), cycle.usage)
             }
-            (false, Ok(cycle)) => {
+            (false, false, Ok(cycle)) => {
                 tracing::warn!("automatic compaction returned no usable summary; using fallback");
                 (
                     super::compaction::fallback_summary(&compactable),
                     cycle.usage,
                 )
             }
-            (false, Err(failure)) => {
+            (false, false, Err(failure)) => {
                 tracing::warn!(error = ?failure.failure, "automatic compaction model failed; using fallback");
                 (
                     super::compaction::fallback_summary(&compactable),
