@@ -4,6 +4,8 @@
 
 **结论：远程 Semble、Grok 与 GPT/Google OAuth 的已提交实现均已合入 main，并随 v1.1.0 发布。Semble 独立终端审批卡片候选仍有 10 个本地文件未提交、未推送。真实 OAuth 账号、Semble 批准/拒绝及 Windows Cursor UI 仍待验收。**
 
+**2026-11-06 进展：Issue #505 的多个 reasoning signature 修复已在 `codex/issue505-multiple-signatures` 完成，`cursor-server --all-targets` 通过（465 通过、14 忽略）；尚未合入 main、发布或完成真实 Cursor/原网关验收。**
+
 ## 1. 已发布的成果
 
 v1.1.0 已发布，涵盖近期主线维护修复，见 [发布与资产核验](history/releases.md#v110)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。

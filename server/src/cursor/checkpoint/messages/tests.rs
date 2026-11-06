@@ -1,6 +1,7 @@
 //! Verifies stable checkpoint Message encoding and recovery behavior.
 use std::collections::HashSet;
 
+use base64::{engine::general_purpose::STANDARD, Engine};
 use serde_json::{json, Value};
 
 use crate::model::{
@@ -268,4 +269,125 @@ fn opaque_cursor_reasoning_signature_round_trips_without_decoding() {
     let projected = project_messages(&[message]).unwrap();
     let encoded = wire_message(&projected[0], "model", None).unwrap();
     assert_eq!(encoded["content"][0]["signature"], signature);
+}
+
+#[test]
+fn multiple_opaque_cursor_reasoning_signatures_round_trip_in_order() {
+    let wire = json!({
+        "role": "assistant",
+        "id": "1",
+        "content": [
+            {"type":"reasoning", "text":"first", "signature":"opaque-1"},
+            {"type":"reasoning", "text":"second", "signature":"opaque-2"},
+            {"type":"text", "text":"answer"}
+        ]
+    });
+    let message = decode(
+        serde_json::to_vec(&wire).unwrap().as_slice(),
+        "cursor-root:opaque-sequence".into(),
+    )
+    .unwrap();
+    let MessageContent::Assistant {
+        thinking,
+        replay_state,
+        ..
+    } = &message.content
+    else {
+        panic!("expected assistant");
+    };
+    assert_eq!(thinking, "firstsecond");
+    assert_eq!(
+        replay_state.as_ref().unwrap().value["signatures"],
+        json!(["opaque-1", "opaque-2"])
+    );
+    assert_eq!(
+        replay_state.as_ref().unwrap().value["texts"],
+        json!(["first", "second"])
+    );
+
+    let projected = project_messages(&[message]).unwrap();
+    let encoded = wire_message(&projected[0], "model", None).unwrap();
+    let content = encoded["content"].as_array().unwrap();
+    assert_eq!(
+        &content[..2],
+        json!([
+            {"type":"reasoning", "text":"first", "signature":"opaque-1", "providerOptions":{"cursor":{"modelName":"model"}}},
+            {"type":"reasoning", "text":"second", "signature":"opaque-2", "providerOptions":{"cursor":{"modelName":"model"}}}
+        ])
+        .as_array()
+        .unwrap()
+    );
+}
+
+#[test]
+fn merged_opaque_signatures_keep_thinking_when_boundaries_are_unknown() {
+    let message = ProjectedMessage {
+        message_id: "assistant".into(),
+        role: Role::Assistant,
+        content: ProjectedContent::Assistant {
+            text: "answer".into(),
+            thinking: "combined".into(),
+            replay_state: Some(ProviderReplayState {
+                provider_kind: "cursor_opaque".into(),
+                value: json!({"signatures":["opaque-1", "opaque-2"]}),
+            }),
+            calls: Vec::new(),
+        },
+    };
+    let encoded = wire_message(&message, "model", None).unwrap();
+    assert_eq!(
+        encoded["content"],
+        json!([
+            {"type":"reasoning", "text":"combined", "signature":"opaque-1", "providerOptions":{"cursor":{"modelName":"model"}}},
+            {"type":"reasoning", "text":"", "signature":"opaque-2", "providerOptions":{"cursor":{"modelName":"model"}}},
+            {"type":"text", "text":"answer"}
+        ])
+    );
+}
+
+#[test]
+fn multiple_enveloped_signatures_merge_provider_blocks_in_order() {
+    let envelope = |signature: &str| {
+        format!(
+            "{}{}",
+            super::REPLAY_ENVELOPE_PREFIX,
+            STANDARD.encode(
+                serde_json::to_vec(&json!({
+                    "provider_kind": "anthropic",
+                    "value": {"blocks": [{"type":"thinking", "signature": signature}]}
+                }))
+                .unwrap()
+            )
+        )
+    };
+    let wire = json!({
+        "role": "assistant",
+        "id": "1",
+        "content": [
+            {"type":"reasoning", "text":"first", "signature": envelope("sig-1")},
+            {"type":"reasoning", "text":"second", "signature": envelope("sig-2")},
+            {"type":"text", "text":"answer"}
+        ]
+    });
+    let message = decode(
+        serde_json::to_vec(&wire).unwrap().as_slice(),
+        "cursor-root:enveloped-sequence".into(),
+    )
+    .unwrap();
+    let MessageContent::Assistant {
+        thinking,
+        replay_state,
+        ..
+    } = message.content
+    else {
+        panic!("expected assistant");
+    };
+    assert_eq!(thinking, "firstsecond");
+    assert_eq!(
+        replay_state.unwrap().value["blocks"],
+        json!([
+            {"type":"thinking", "signature":"sig-1"},
+            {"type":"thinking", "signature":"sig-2"}
+        ])
+    );
 }

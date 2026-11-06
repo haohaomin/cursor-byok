@@ -72,10 +72,12 @@
 - [2026-10-27 · Issue #469 / PR #498：WebFetch 远程分页修复与实机验收](issues/2026-10-27-issue469-webfetch-fix.md)
 - [2026-10-27 · Issue #504：重复用户输入中断正在执行的工具](issues/2026-10-27-issue504-input-redelivery-fix.md)
 - [2026-10-27 · Issue #505：多个思考签名的恢复失败](issues/2026-10-27-issue505-check.md)
+- [2026-11-06 · Issue #505：保留多个 reasoning signature](issues/2026-11-06-issue505-fix.md)
 - [2026-10-27 · Issue #508 / PR #474：代理切换后重建 HTTP 客户端](issues/2026-10-27-issue508-fix.md)
 - [2026-10-27 · Issue #511：清理统计数据后回收 SQLite 文件空间](issues/2026-10-27-issue511-storage-fix.md)
 - [2026-10-27 · Semble：尊重 .cursorignore，并在查询前重新检查排除规则](issues/2026-10-27-semble-cursorignore-fix.md)
 - [2026-10-28 · Issue #469：工作区采集器的 Python 导入隔离](issues/2026-10-28-issue469-python-isolation-fix.md)
+- [2026-11-06 · Issue #458：Windows 终端命令参数修复](issues/2026-11-06-issue458-windows-terminal-fix.md)
 
 该目录中的 JSON、assets 与 reproductions 分别保存结构化证据、截图和复现源码；入口见上方报告。
 
@@ -96,5 +98,6 @@
 - [2026-10-27 · PR #514：会话缓存键与连通性测试](pull-requests/2026-10-27-pr514-fix.md)
 - [2026-10-28 · PR #515：空消息 ID 与父任务关联复核](pull-requests/2026-10-28-pr515-check.md)
 - [2026-11-04 · 本 fork PR #10：选择性采用与隔离测试](pull-requests/2026-11-04-pr10-check.md)
+- [2026-11-06 · 上游 PR #460：缺失 usage 时估算上下文用量](pull-requests/2026-11-06-pr460-context-usage.md)
 
 该目录中的 JSON、assets 与 reproductions 分别保存结构化证据、截图和复现源码；入口见上方报告。
