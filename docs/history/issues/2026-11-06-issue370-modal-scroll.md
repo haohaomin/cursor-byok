@@ -61,3 +61,7 @@ CARGO_TARGET_DIR=/Users/renhao/works/cursor-byok/target \
 [#339 的现版复测](2026-11-06-issue339-light-style-check.md) 发现英文、葡萄牙语的分组模型操作按钮在显示测试结果后换行；基线和当前候选均复现，另行修复。此提交不宣称所有弹窗或所有界面问题均已解决，也未发布桌面版本。
 
 开发服务器还在分组列表展开/语言切换时记录了 `ResizeObserver loop completed with undelivered notifications`；首次出现在未修改基线，恢复基线复查时也出现。本轮没有把开发控制台记为无错误，该既有通知循环需随分组布局问题继续检查。
+
+## 集成检查
+
+PR #28 合入后，已将 main `3a5f51318279874805d99e8a57d4d2973826cbcc` 合入 [PR #29](https://github.com/haohaomin/cursor-byok/pull/29) 分支；冲突仅在 Issue 清单相邻记录，保留各自最新状态。组合代码的滚动失败回归、`npm run check` 与同参数 Tauri debug 构建再次通过。此前 head `0e390e23e9312f163c39f3f315230e9fa9ddefa9` 两套四组 CI 均通过，合并后的新 head 仍须等待其独立 CI；此记录不代表 PR 已合入。

@@ -454,5 +454,23 @@
     "Issue 339 English/Portuguese model result wrapping exists both before and after this change",
     "Existing ResizeObserver loop notifications appeared during grouped list/language changes both before patch and during baseline recheck; not a clean-console acceptance"
   ],
-  "artifacts": "/tmp/cursor-byok-issue370-20261106/"
+  "artifacts": "/tmp/cursor-byok-issue370-20261106/",
+  "integration": {
+    "base": "3a5f51318279874805d99e8a57d4d2973826cbcc",
+    "conflicts": [
+      "docs/issues.md: adjacent status rows only"
+    ],
+    "browser_scroll_regression": "passed",
+    "npm_check": "passed",
+    "tauri_debug_build": "passed",
+    "prior_head_ci": {
+      "head": "0e390e23e9312f163c39f3f315230e9fa9ddefa9",
+      "runs": [
+        42164200220,
+        42164160279
+      ],
+      "conclusion": "success"
+    },
+    "merged_head_ci": "pending new run"
+  }
 }
