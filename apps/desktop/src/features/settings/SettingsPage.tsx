@@ -275,10 +275,11 @@ export function SettingsPage() {
           {themeOptions.map(({ id }) => (
             <button
               className={theme === id ? styles.selected : ""}
+              aria-pressed={theme === id}
               key={id}
               onClick={() => appStore.selectTheme(id)}
             >
-              {id === "default-dark" ? t("默认暗色") : t("默认亮色")}
+              {id === "system" ? t("跟随系统主题") : id === "default-dark" ? t("深色") : t("浅色")}
             </button>
           ))}
         </div>
