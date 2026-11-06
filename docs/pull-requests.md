@@ -14,7 +14,7 @@
 
 | 上游 PR / 本 fork 状态 | 解决目标与范围 | 采用方式与验证边界 |
 | --- | --- | --- |
-| [上游 #378](https://github.com/leookun/cursor-byok/pull/378) / 待提交 | 自动压缩摘要模型挂起后无法继续 | 当前 fork 已有压缩提交屏障、重复压缩和回退摘要；本次只加入 30 秒摘要 deadline，超时后持久化回退摘要并继续模型调用。定向、完整服务端测试、Clippy、格式检查均通过；真实 Cursor UI/账号/远程 SSH 未验收。详见[移植记录](history/pull-requests/2026-11-06-pr378-compaction-timeout.md)。 |
+| [上游 #378](https://github.com/leookun/cursor-byok/pull/378) / [本 fork #23](https://github.com/haohaomin/cursor-byok/pull/23) / `282db59` | 自动压缩摘要模型挂起后无法继续 | 当前 fork 已有压缩提交屏障、重复压缩和回退摘要；本次只加入 30 秒摘要 deadline，超时后持久化回退摘要并继续模型调用。定向、完整服务端测试、Clippy、格式检查均通过；真实 Cursor UI/账号/远程 SSH 未验收。详见[移植记录](history/pull-requests/2026-11-06-pr378-compaction-timeout.md)。 |
 
 ## 2026-10-27 新增候选
 
