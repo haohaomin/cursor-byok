@@ -9,6 +9,7 @@ import { CursorRemoteGuide } from "./CursorRemoteGuide";
 import styles from "./CursorSettings.module.scss";
 import { PageContent } from "../../shell/layout/PageContent";
 import { LegacyModelImport } from "./LegacyModelImport";
+import { OpenCursorButton } from "./OpenCursorButton";
 import { ConfirmDialog } from "../../shared/ui/ConfirmDialog";
 import { FormField, SecretTextInput, TextInput } from "../../shared/ui/FormControls";
 import controls from "../../shared/ui/Controls.module.scss";
@@ -305,7 +306,7 @@ export function CursorSettingsPage() {
   return <>
     <PageActions position="left">
       <div className={styles.takeoverActions}>
-        <span className={styles.takeoverStatus}>{cursorTakenOver ? t("本机已接管") : t("本机未接管")}</span>
+        <span className={styles.takeoverStatus} title={cursorTakenOver ? t("本机已接管") : t("本机未接管")}>{cursorTakenOver ? t("本机已接管") : t("本机未接管")}</span>
         <TooltipTrigger label={takeoverLabel}>
           <Switch
             checked={cursorTakenOver}
@@ -318,14 +319,15 @@ export function CursorSettingsPage() {
           />
         </TooltipTrigger>
         {testTargets.length > 0 && <div className={styles.groupActions} role="group" aria-label={t("操作")}>
-          <button type="button" aria-pressed={grouping === "flat"} onClick={() => setGrouping("flat")}>{t("默认平铺")}</button>
-          {canGroupByProvider && <button type="button" aria-pressed={grouping === "provider"} onClick={() => setGrouping("provider")}>{t("按供应商")}</button>}
-          {canGroupByType && <button type="button" aria-pressed={grouping === "type"} onClick={() => setGrouping("type")}>{t("按类型")}</button>}
-          <button type="button" disabled={cursorBusy || (!batchTesting && testingModelHashes.size > 0)} onClick={() => void (batchTesting ? cancelAllModelTests() : testAllModels())}>{batchTesting ? t("取消全部测试") : t("一键测试")}</button>
+          <button type="button" title={t("默认平铺")} aria-pressed={grouping === "flat"} onClick={() => setGrouping("flat")}>{t("默认平铺")}</button>
+          {canGroupByProvider && <button type="button" title={t("按供应商")} aria-pressed={grouping === "provider"} onClick={() => setGrouping("provider")}>{t("按供应商")}</button>}
+          {canGroupByType && <button type="button" title={t("按类型")} aria-pressed={grouping === "type"} onClick={() => setGrouping("type")}>{t("按类型")}</button>}
+          <button type="button" title={batchTesting ? t("取消全部测试") : t("一键测试")} disabled={cursorBusy || (!batchTesting && testingModelHashes.size > 0)} onClick={() => void (batchTesting ? cancelAllModelTests() : testAllModels())}>{batchTesting ? t("取消全部测试") : t("一键测试")}</button>
         </div>}
       </div>
     </PageActions>
     <PageActions>
+      <OpenCursorButton />
       <TooltipTrigger label={t("Remote SSH 指南")}><button type="button" className={controls.secondary} aria-label={t("Remote SSH 指南")} onClick={() => setRemoteGuideOpen(true)}>SSH</button></TooltipTrigger>
       <TooltipTrigger label={caReady ? t("添加模型") : t("请先初始化 CA")}><button className={controls.iconButton} aria-label={t("添加模型")} disabled={!caReady || cursorBusy} onClick={openNew}><Icon icon={addIcon} size="1.1em" /></button></TooltipTrigger>
     </PageActions>

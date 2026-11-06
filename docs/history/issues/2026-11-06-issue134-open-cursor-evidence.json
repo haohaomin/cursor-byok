@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-06",
+  "issue": "https://github.com/leookun/cursor-byok/issues/134",
+  "baseline": "d7b370b508b030741f4898c925a4fbc7bdbf866d",
+  "native": {
+    "environment": "isolated macOS Tauri WebView, real opener plugin and current capability scope, fixture business data",
+    "launch": "cursor:// dispatched from production button; existing Cursor window readable; no error dialog observed",
+    "missing_permission": "opener.open_url not allowed; visible error toast, button enabled again",
+    "non_root_uri": "cursor://file/issue134-probe-nonexistent rejected by native scope",
+    "minimum_size": "native window reported 1083x558; separate 820x558 application-container measurement and Chromium viewport test used",
+    "limitations": [
+      "No cold launch after quitting Cursor",
+      "No missing-handler OS test",
+      "No Windows/Linux GUI test",
+      "No full-size native screenshot: capture returned a Stage Manager thumbnail"
+    ]
+  },
+  "browser": {
+    "environment": "Chromium; real React source, demo HTTP data; native detection and ancillary IPC mocked only for layout; no OS launch claimed",
+    "baseline_russian_without_launch_button": {
+      "takeover_switch_x": 208.296875,
+      "content_left": 212,
+      "clipped": true
+    },
+    "accepted_locales": [
+      {
+        "locale": "en-US",
+        "scroll": {
+          "documentTop": 0,
+          "rootTop": 0,
+          "scrolled": [
+            450
+          ]
+        },
+        "button": {
+          "x": 697.21875,
+          "y": 40.5,
+          "width": 25,
+          "height": 25
+        },
+        "toolbar": {
+          "min_x": 312.765625,
+          "max_right": 801,
+          "takeover_switch_width": 38,
+          "no_clipped_controls": true
+        },
+        "viewport": [
+          820,
+          558
+        ],
+        "document_width": 820
+      },
+      {
+        "locale": "pt-BR",
+        "scroll": {
+          "documentTop": 0,
+          "rootTop": 0,
+          "scrolled": [
+            450
+          ]
+        },
+        "button": {
+          "x": 697.21875,
+          "y": 40.5,
+          "width": 25,
+          "height": 25
+        },
+        "toolbar": {
+          "min_x": 311.15625,
+          "max_right": 801,
+          "takeover_switch_width": 38,
+          "no_clipped_controls": true
+        },
+        "viewport": [
+          820,
+          558
+        ],
+        "document_width": 820
+      },
+      {
+        "locale": "ru-RU",
+        "scroll": {
+          "documentTop": 0,
+          "rootTop": 0,
+          "scrolled": [
+            450
+          ]
+        },
+        "button": {
+          "x": 697.21875,
+          "y": 40.5,
+          "width": 25,
+          "height": 25
+        },
+        "toolbar": {
+          "min_x": 384.640625,
+          "max_right": 801,
+          "takeover_switch_width": 38,
+          "no_clipped_controls": true
+        },
+        "viewport": [
+          820,
+          558
+        ],
+        "document_width": 820
+      },
+      {
+        "locale": "zh-CN",
+        "scroll": {
+          "documentTop": 0,
+          "rootTop": 0,
+          "scrolled": [
+            450
+          ]
+        },
+        "button": {
+          "x": 697.21875,
+          "y": 40.5,
+          "width": 25,
+          "height": 25
+        },
+        "toolbar": {
+          "min_x": 359.21875,
+          "max_right": 801,
+          "takeover_switch_width": 38,
+          "no_clipped_controls": true
+        },
+        "viewport": [
+          820,
+          558
+        ],
+        "document_width": 820
+      }
+    ],
+    "light_theme": "selected through settings and visually inspected",
+    "browser_only": {
+      "main_loaded": true,
+      "native": false,
+      "open_button_count": 0
+    }
+  },
+  "cleanup": {
+    "native_probe": "quit",
+    "browser_session": "closed",
+    "fixture_files": "moved outside repository",
+    "production_accounts_or_proxy_settings": "unchanged"
+  }
+}

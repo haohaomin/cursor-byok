@@ -150,7 +150,7 @@
 | ☐ | [#283](https://github.com/leookun/cursor-byok/issues/283) 与原账号切换问题 | B | 待现版复测 | 旧版账号/设置损坏报告；仅用数据副本测试接管与恢复，禁止用删除数据库作为修复。 |
 | ☐ | [#256](https://github.com/leookun/cursor-byok/issues/256) windows有一定概率闪退 | B | 待现版复测 | 旧版 Windows 闪退日志；需现版崩溃堆栈和 Windows 环境。 |
 | ☐ | [#371](https://github.com/leookun/cursor-byok/issues/371) follow the system theme and set it as default. | C | 需求待评估 | 先核对现版跟随系统主题是否已支持，再决定是否仍有需求。 |
-| ☐ | [#134](https://github.com/leookun/cursor-byok/issues/134) 添加一个打开cursor 的快捷键按钮 | C | 需求待评估 | 先确认现版是否已有启动 Cursor 的入口，再评估额外快捷操作。 |
+| ☐（实现与局部实测完成） | [#134](https://github.com/leookun/cursor-byok/issues/134) 添加一个打开cursor 的快捷键按钮 | C | 手动打开按钮已实现；macOS 原生分发和四语言布局通过 | 复用 opener，仅允许 `cursor://`；普通浏览器隐藏。820×558 复测修复俄语工具栏挤出，原生权限失败及其他 URI 拒绝已验。冷启动、缺少 handler、Windows/Linux GUI 未验，见 [实现与验收](history/issues/2026-11-06-issue134-open-cursor.md)。 |
 | ☐ | [#119](https://github.com/leookun/cursor-byok/issues/119) 有个小建议，更新提示关闭之后就不要弹出来了，可以用户手动点击 版本更新 | C | 需求待评估 | 核对当前更新提示关闭后的记忆策略，区分本次关闭和跳过某版本。 |
 | ☐ | [#370](https://github.com/leookun/cursor-byok/issues/370) Import modal scrollbar is not working | D | 待补信息 | 正文为空；补导入弹窗截图、平台和滚动复现步骤。 |
 
