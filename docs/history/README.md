@@ -77,6 +77,7 @@
 - [2026-10-27 · Issue #511：清理统计数据后回收 SQLite 文件空间](issues/2026-10-27-issue511-storage-fix.md)
 - [2026-10-27 · Semble：尊重 .cursorignore，并在查询前重新检查排除规则](issues/2026-10-27-semble-cursorignore-fix.md)
 - [2026-10-28 · Issue #469：工作区采集器的 Python 导入隔离](issues/2026-10-28-issue469-python-isolation-fix.md)
+- [2026-11-06 · Issue #458：Windows 终端命令参数修复](issues/2026-11-06-issue458-windows-terminal-fix.md)
 
 该目录中的 JSON、assets 与 reproductions 分别保存结构化证据、截图和复现源码；入口见上方报告。
 
