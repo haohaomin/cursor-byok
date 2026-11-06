@@ -308,6 +308,7 @@
   "ac69f68b7010ec79": "Download and install",
   "ad6a60ee93d3ba3e": "Loading call details…",
   "ae2d0b7f79cea4a3": "Model output: {tokens} × ${price}/1M = {cost}",
+  "ae48333d3301c608": "Configured custom context takes priority; leave empty to use the default.",
   "aecb952b1e6cce36": "Hide the Dock icon when disabled. You can still open the app from the menu bar icon.",
   "aee88743413144a2": "Refresh",
   "affb73206cfa035d": "Expires: {time}",

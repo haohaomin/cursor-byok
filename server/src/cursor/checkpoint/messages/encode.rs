@@ -6,8 +6,8 @@ use serde_json::{json, Map, Value};
 
 use crate::{
     model::{
-        project_messages, CanonicalMessage, ContentPart, ProjectedContent, ProjectedMessage, Role,
-        ToolCall, ToolCallContent, ToolRoundAssistant,
+        project_messages, CanonicalMessage, ContentPart, ProjectedContent, ProjectedMessage,
+        ProviderReplayState, Role, ToolCall, ToolCallContent, ToolRoundAssistant,
     },
     Error, Result,
 };
@@ -214,18 +214,7 @@ fn wire_content(content: &ProjectedContent, model: &str) -> Result<Value> {
             replay_state,
             calls,
         } => {
-            let mut parts = Vec::new();
-            if !thinking.is_empty() || replay_state.is_some() {
-                let mut reasoning = json!({
-                    "type": "reasoning",
-                    "text": thinking,
-                    "providerOptions": {"cursor": {"modelName": model}},
-                });
-                if let Some(replay_state) = replay_state {
-                    reasoning["signature"] = Value::String(encode_replay_state(replay_state)?);
-                }
-                parts.push(reasoning);
-            }
+            let mut parts = replay_reasoning_parts(thinking, replay_state.as_ref(), model)?;
             if !text.is_empty() {
                 parts.push(json!({"type":"text", "text":text}));
             }
@@ -250,7 +239,63 @@ fn wire_content(content: &ProjectedContent, model: &str) -> Result<Value> {
     })
 }
 
-fn encode_replay_state(replay_state: &crate::model::ProviderReplayState) -> Result<String> {
+fn replay_reasoning_parts(
+    thinking: &str,
+    replay_state: Option<&ProviderReplayState>,
+    model: &str,
+) -> Result<Vec<Value>> {
+    let Some(replay_state) = replay_state else {
+        return Ok((!thinking.is_empty())
+            .then(|| {
+                json!({
+                    "type": "reasoning",
+                    "text": thinking,
+                    "providerOptions": {"cursor": {"modelName": model}},
+                })
+            })
+            .into_iter()
+            .collect());
+    };
+
+    if replay_state.provider_kind == "cursor_opaque" {
+        if let Some(signatures) = replay_state
+            .value
+            .get("signatures")
+            .and_then(Value::as_array)
+        {
+            let texts = replay_state.value.get("texts").and_then(Value::as_array);
+            return signatures
+                .iter()
+                .enumerate()
+                .map(|(index, signature)| {
+                    let signature = signature.as_str().ok_or_else(|| {
+                        Error::Protocol("Cursor opaque replay signature is not a string".into())
+                    })?;
+                    let text = texts
+                        .and_then(|texts| texts.get(index))
+                        .and_then(Value::as_str)
+                        .unwrap_or(if index == 0 { thinking } else { "" });
+                    Ok(json!({
+                        "type": "reasoning",
+                        "text": text,
+                        "providerOptions": {"cursor": {"modelName": model}},
+                        "signature": signature,
+                    }))
+                })
+                .collect();
+        }
+    }
+
+    let mut reasoning = json!({
+        "type": "reasoning",
+        "text": thinking,
+        "providerOptions": {"cursor": {"modelName": model}},
+    });
+    reasoning["signature"] = Value::String(encode_replay_state(replay_state)?);
+    Ok(vec![reasoning])
+}
+
+fn encode_replay_state(replay_state: &ProviderReplayState) -> Result<String> {
     if replay_state.provider_kind == "cursor_opaque" {
         return replay_state
             .value

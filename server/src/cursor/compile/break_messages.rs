@@ -258,6 +258,34 @@ pub(super) fn compile_request_context(
     Ok(should_project_request_context(history, &message).then_some(message))
 }
 
+const RESUME_PROMPT: &str = "<resume>\nContinue the unfinished task from the current conversation state. Use the latest workspace context, make concrete progress toward the user's request, and do not repeat work that is already complete.\n</resume>";
+
+pub(super) fn compile_resume_messages(
+    event_id: &str,
+    subagent_models: &str,
+    request_context: &pb::RequestContext,
+    history: &[CanonicalMessage],
+    has_pending_tool_round: bool,
+) -> Result<Vec<CanonicalMessage>> {
+    let mut messages = compile_request_context(
+        &format!("resume:{event_id}"),
+        subagent_models,
+        request_context,
+        history,
+    )?
+    .into_iter()
+    .collect::<Vec<_>>();
+    if !has_pending_tool_round {
+        messages.push(CanonicalMessage::text(
+            format!("resume-prompt:{event_id}"),
+            Role::User,
+            Origin::Prompt,
+            RESUME_PROMPT,
+        ));
+    }
+    Ok(messages)
+}
+
 fn should_project_request_context(
     history: &[CanonicalMessage],
     current: &CanonicalMessage,
