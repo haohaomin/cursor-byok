@@ -6,7 +6,9 @@
 
 ## 参考与实现
 
-当前基线没有启动入口。检索上游打开 Cursor 的相关 PR 后，没有发现可直接复用的对应实现；已有终止 Cursor 的接管流程不适合这个操作。复用项目已安装的 Tauri opener 插件和系统 URI 关联，参考 [Tauri opener 文档](https://v2.tauri.app/plugin/opener/) 与 [Cursor deep links 文档](https://cursor.com/docs/reference/deeplinks)，没有新增依赖。
+当前基线没有启动入口。最初按打开 Cursor 检索未找到独立补丁；随后检查更新提示相关 PR 时，发现已关闭且未合入的 [上游 PR #502](https://github.com/leookun/cursor-byok/pull/502) 也包含启动功能。已核对其 head `73f5b957b5049ca651d2528e3362e92c41143c5f` 的完整 `internal/cursor/launch.go`：140 行 Go 实现枚举安装路径、查 PATH 并创建进程，属于旧 Go/Wails 架构，不能直接应用到当前 Rust/Tauri fork。
+
+当前实现复用项目已安装的 Tauri opener 插件和系统 URI 关联，参考 [Tauri opener 文档](https://v2.tauri.app/plugin/opener/) 与 [Cursor deep links 文档](https://cursor.com/docs/reference/deeplinks)。没有复制旧架构的路径探测和进程启动模块，也没有新增依赖。已有终止 Cursor 的接管流程不适合这个操作。
 
 ```text
 apps/desktop/
