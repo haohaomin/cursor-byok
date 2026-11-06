@@ -10,6 +10,12 @@
 | --- | --- | --- |
 | [#10](https://github.com/haohaomin/cursor-byok/pull/10) / `042bd8c2cc51` | Statsig 禁用不支持的本地 Agent 循环；解码失败诊断 | 选择性采用门控与测试；日志只保留元数据。未采用 README 和原始 payload 日志。原 PR 已关闭、未合并；本地整合及隔离验证见[记录](history/pull-requests/2026-11-04-pr10-check.md)，真实 Cursor 待验。 |
 
+## 2026-11-06 本 fork PR #22
+
+| PR / head | 解决目标与范围 | 采用方式与验证边界 |
+| --- | --- | --- |
+| [#22](https://github.com/haohaomin/cursor-byok/pull/22) / `7dda5f1` | 全局 Cursor 规则的本地相关规则协议入口 | 复用现有规则存储、同步和上下文合并，只补 `FetchRelevantKnowledgeForConversation` 路由与代理分流；定向、完整服务端测试、Clippy、格式检查和四平台 CI 通过。真实 Cursor UI/账号/远程 SSH 未验收；详见[移植记录](history/pull-requests/2026-11-06-pr345-global-rules-relevance.md)。 |
+
 ## 2026-11-06 上游 PR #375 的选择性实现
 
 | 上游 PR / 本 fork 分支 | 解决目标与范围 | 采用方式与验证边界 |

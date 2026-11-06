@@ -183,6 +183,7 @@ fn is_local_path(path: &str) -> bool {
             | "/aiserver.v1.AiService/KnowledgeBaseList"
             | "/aiserver.v1.AiService/KnowledgeBaseUpdate"
             | "/aiserver.v1.AiService/KnowledgeBaseRemove"
+            | "/aiserver.v1.AiService/FetchRelevantKnowledgeForConversation"
             | "/aiserver.v1.AiService/WriteGitCommitMessage"
             | "/aiserver.v1.NetworkService/IsConnected"
             | "/aiserver.v1.AnalyticsService/BootstrapStatsig"
@@ -209,6 +210,7 @@ mod tests {
             "/aiserver.v1.AiService/GetDefaultModel",
             "/aiserver.v1.AiService/GetDefaultModelNudgeData",
             "/aiserver.v1.AiService/AvailableDocs",
+            "/aiserver.v1.AiService/FetchRelevantKnowledgeForConversation",
             "/aiserver.v1.DashboardService/GetEffectiveUserPlugins",
             "/aiserver.v1.DashboardService/GetUserPrivacyMode",
             "/aiserver.v1.AuthService/GetUserMeta",
