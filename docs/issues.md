@@ -48,7 +48,7 @@
 | ☐ | [#184](https://github.com/leookun/cursor-byok/issues/184) gemini模型不支持吗？ | B | 待现版复测 | 核对 Gemini 协议和 URL，405 先检查路由，不直接判模型不支持。 |
 | ☐ | [#88](https://github.com/leookun/cursor-byok/issues/88) 配置的OpenAi模型出现Instructions are required | B | 本地连通性测试缺口已修复；原中转站待实测 | 测试请求补充非空系统指令，严格/宽松 Responses HTTP 回归通过；见 [修复记录](history/issues/2026-10-05-issue88-fix.md)。 |
 | ☐ | [#86](https://github.com/leookun/cursor-byok/issues/86) 响应出现&lt;think&gt;标签时出现异常中断 | B | 当前正文标签路径验证通过；原官方 API 待实测 | 新增 6 项回归确认完整/跨分片/未闭合标签与后续正文保留，断流明确报错；无生产代码改动，见 [复核记录](history/issues/2026-10-05-issue86-check.md)。 |
-| ☐ | [#463](https://github.com/leookun/cursor-byok/issues/463) Gemini Provider Support | C | 需求待评估 | 核对 Gemini 所用协议及 x-goog-api-key 鉴权入口；勿与 Anthropic 模型混判。 |
+| ☐（预设已实现，待合入） | [#463](https://github.com/leookun/cursor-byok/issues/463) Gemini Provider Support | C | 已增加 Gemini OpenAI 兼容预设；原生 `generateContent` 协议仍未实现，见 [验证记录](history/issues/2026-11-13-issue463-gemini-openai-compat.md) | 使用 `generativelanguage.googleapis.com/v1beta/openai/chat/completions` 和 Bearer API Key；真实 Gemini Key 待验收。 |
 | ☐ | [#470](https://github.com/leookun/cursor-byok/issues/470) 谷歌模型的gemini 3.1pro模型也不能用 | D | 待补信息 | 主要证据为图片；补协议、请求地址类型和服务端错误。 |
 | ☐ | [#440](https://github.com/leookun/cursor-byok/issues/440) 谷歌里面的claude模型用不了 | D | 待补信息 | 补 Google 插件下具体 Claude 入口、授权状态和错误正文。 |
 | ☐ | [#379](https://github.com/leookun/cursor-byok/issues/379) Grok Responses API 的后台工具任务完成回调时，BYOK 代理组装回包缺少必填的 `tool_call_id` 字段，xAI 服务端直接参数校验失败 | D | 待补信息 | 正文为空；补缺失 tool_call_id 的请求和后台完成通知，勿只凭标题改协议。 |
