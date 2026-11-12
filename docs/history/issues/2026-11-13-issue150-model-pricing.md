@@ -52,6 +52,6 @@ model_hash → 覆盖价格，否则使用全局价格
 | React + Chromium Demo | 设置页 16 个模型可编辑；修改 GPT-5.2 输入价并保存后，主页总价和模型明细立即按覆盖价计算；无运行时错误 |
 | `git diff --check` | 通过 |
 
-浏览器验证使用仓库 Demo 的受控数据和真实 React 组件，没有访问真实供应商，也没有证明插件模型已经支持独立价格。该实现尚未合入主线或发布版本，需在独立 PR 的最终提交上重新执行远端 CI 后再合并。
+浏览器验证使用仓库 Demo 的受控数据和真实 React 组件，没有访问真实供应商，也没有证明插件模型已经支持独立价格。实现已通过 [PR #39](https://github.com/haohaomin/cursor-byok/pull/39) 合入当前 `main`，尚未随新版本发布；GitHub Actions 在仓库侧不可用，本地联合回归、Clippy 和桌面检查已在合并前完成。
 
 结构化证据见 [JSON](2026-11-13-issue150-model-pricing-evidence.json)。
