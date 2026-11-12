@@ -142,7 +142,7 @@
 
 | 完成 | Issue / 原标题 | 分级 | 本地状态 | 下一步 / 证据线索 |
 | --- | --- | --- | --- | --- |
-| ☐ | [#486](https://github.com/leookun/cursor-byok/issues/486) Linux RPM 无法在 Rocky Linux 9.5 安装：缺少 libwebkit2gtk-4.1.so.0 | B | 待现版复测 | Rocky 9.5 缺 WebKitGTK 4.1；核对发行版依赖与可支持的打包方式，需 Linux 环境。 |
+| ◐ | [#486](https://github.com/leookun/cursor-byok/issues/486) Linux RPM 无法在 Rocky Linux 9.5 安装：缺少 libwebkit2gtk-4.1.so.0 | B | 已补充 [Linux 安装与依赖说明](linux.md)；RPM 仍要求宿主机提供 WebKitGTK 4.1 | Rocky/RHEL/Fedora 尚未现场安装、启动和托盘回归；未通过删除 RPM 依赖来制造假修复。 |
 | ☐ | [#436](https://github.com/leookun/cursor-byok/issues/436) Linux(fedora) 托盘右键菜单没有显示出来 | B | 待现版复测 | 需 Fedora 桌面环境实测托盘菜单，记录桌面协议及依赖。 |
 | ☐（局部已修） | [#339](https://github.com/leookun/cursor-byok/issues/339) 亮色模式样式问题 | B | 分组布局 PR #30 与截断按钮 PR #31 均已合入，最终 CI 通过 | 分组布局的 12 组 60 次状态检查通过，见 [布局修复](history/issues/2026-11-06-issue339-model-test-layout.md)；截断按钮首次点击/键盘激活已先复现再修复，8 组页面回归及提示边界通过，见 [交互修复](history/issues/2026-11-06-truncated-button-interaction.md)。表格悬停穿透/数字箭头此前 Chromium 未复现，原生 GUI 待验。 |
 | ☐ | [#323](https://github.com/leookun/cursor-byok/issues/323) beta版更新所有模型配置全部丢失 | B | 待现版复测 | 旧 beta 升级后配置丢失的报告；先识别数据目录/版本，仅用数据副本验证。 |

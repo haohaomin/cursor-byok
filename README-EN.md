@@ -57,7 +57,7 @@ The application is free and open source; your model provider may charge for API 
 | macOS · Apple Silicon | `*_aarch64.app.tar.gz` | Extract and move the application to Applications. |
 | macOS · Intel | `*_x64.app.tar.gz` | Extract and move the application to Applications. |
 | Windows · x64 | `*_x64-setup.exe` | Run the installer; use `*-windows-amd64.zip` for the portable build. |
-| Linux · x64 | `*_amd64.AppImage` / `*_amd64.deb` / `*.x86_64.rpm` | Choose for your distribution; AppImage needs execute permission. |
+| Linux · x64 | `*_amd64.AppImage` / `*_amd64.deb` / `*.x86_64.rpm` | Choose for your distribution; AppImage needs execute permission. See the [Linux installation guide](docs/linux.md) for dependencies and compatibility boundaries. |
 
 For a first installation, choose a desktop package from the table. `.sig` files are updater signatures. `latest.json`, `portable-latest.json`, and `update.json` are update manifests, not installers.
 

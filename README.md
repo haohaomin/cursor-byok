@@ -57,7 +57,7 @@ Cursor BYOK 在本机运行模型网关，将 Cursor 的 Agent 请求接入你�
 | macOS · Apple Silicon（M 系列） | `*_aarch64.app.tar.gz` | 解压，将应用放入“应用程序”。 |
 | macOS · Intel | `*_x64.app.tar.gz` | 解压，将应用放入“应用程序”。 |
 | Windows · x64 | `*_x64-setup.exe` | 运行安装程序；便携版选择 `*-windows-amd64.zip`。 |
-| Linux · x64 | `*_amd64.AppImage` / `*_amd64.deb` / `*.x86_64.rpm` | 按发行版选择；AppImage 需具有执行权限。 |
+| Linux · x64 | `*_amd64.AppImage` / `*_amd64.deb` / `*.x86_64.rpm` | 按发行版选择；AppImage 需具有执行权限。Linux 依赖与兼容边界见 [安装指南](docs/linux.md)。 |
 
 首次安装优先选择上表中的桌面包。`.sig` 是更新签名，`latest.json`、`portable-latest.json`、`update.json` 是更新清单，无需手动安装。
 
