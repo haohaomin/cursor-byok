@@ -13,6 +13,7 @@ import { formatTimeInput, parseTimeInput } from "../../shared/utils/parseTimeInp
 import { modelProviderName } from "../../shared/utils/modelProvider";
 import { claudeIcon, flatColorOrganizationIcon, openAiIcon } from "../../shared/ui/icons";
 import { useI18n } from "../../i18n/store";
+import { aggregateUsageCosts, costsForMetrics } from "../../shared/utils/tokenPricing";
 
 type TimeRange = { startMs: number; endMs: number };
 
@@ -54,7 +55,7 @@ function presetRange(preset: Exclude<OverviewRangePreset, "custom">, now = new D
 }
 
 export function HomePage() {
-  const { overview, busy, models, plugins, pricing } = useAppStore();
+  const { overview, busy, models, plugins, pricing, modelPricing } = useAppStore();
   const { locale } = useI18n();
   const [usageMetric, setUsageMetric] = useState<UsageMetric | null>(null);
   const [preset, setPreset] = useState<OverviewRangePreset>("month");
@@ -89,6 +90,9 @@ export function HomePage() {
 
   const filteredOverview = rangeOverview ?? overview;
   const modelUsage = filteredOverview.model_usage ?? [];
+  const costs = modelUsage.length > 0
+    ? aggregateUsageCosts(modelUsage, pricing, modelPricing)
+    : costsForMetrics(filteredOverview.metrics, pricing);
   const dailyTokenUsage = filteredOverview.token_usage_series.map((bucket) => ({
     bucketStartMs: bucket.bucket_start_ms,
     inputTokens: bucket.input_tokens,
@@ -105,6 +109,7 @@ export function HomePage() {
     promptTokens: filteredOverview.metrics.prompt_tokens,
     cacheReadTokens: filteredOverview.metrics.cache_read_tokens,
     cacheWriteTokens: filteredOverview.metrics.cache_write_tokens,
+    costs,
   };
   const openCustom = (open: boolean) => {
     if (open && !customStart && !customEnd) {
@@ -212,6 +217,7 @@ export function HomePage() {
       metric={rangeOverview && !rangeBusy ? usageMetric : null}
       rows={modelUsage}
       pricing={pricing}
+      modelPricing={modelPricing}
       onClose={() => setUsageMetric(null)}
     />
   </>;
