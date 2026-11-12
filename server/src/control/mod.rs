@@ -9,7 +9,7 @@ mod settings;
 
 use axum::{
     body::{to_bytes, Body},
-    extract::State,
+    extract::{DefaultBodyLimit, State},
     http::{header, header::CONTENT_TYPE, HeaderValue, Method, Request, Response, StatusCode},
     routing::{any, get, post, put},
     Router,
@@ -116,7 +116,7 @@ pub fn api_router(service: ControlService) -> Router {
         )
         .route(
             "/__byok-api__/api/models/backup/import",
-            post(models::import_backup),
+            post(models::import_backup).layer(DefaultBodyLimit::max(16 * 1024 * 1024)),
         )
         .route("/__byok-api__/api/models/discover", post(models::discover))
         .route(

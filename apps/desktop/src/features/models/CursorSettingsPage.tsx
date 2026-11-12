@@ -278,7 +278,7 @@ export function CursorSettingsPage() {
     document.body.append(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
     message(t("模型配置已导出"));
   };
 
@@ -308,7 +308,7 @@ export function CursorSettingsPage() {
     models={models}
     pluginModels={pluginModels}
     grouping={grouping}
-    disabled={cursorBusy}
+    disabled={cursorBusy || backupBusy}
     testingModelHashes={testingModelHashes}
     testResults={modelTestResults}
     onTest={(model) => void testModel(model)}
@@ -330,10 +330,10 @@ export function CursorSettingsPage() {
     setCaCommand(null);
     setWaitingForCaRefresh(true);
   };
-  const content = <CursorCaProvider><CursorCaGate busy={cursorBusy} waitingForRefresh={waitingForCaRefresh} onInitialize={() => void initializeCa()} onRefresh={() => void refreshCa()}>
+  const content = <CursorCaProvider><CursorCaGate busy={cursorBusy || backupBusy} waitingForRefresh={waitingForCaRefresh} onInitialize={() => void initializeCa()} onRefresh={() => void refreshCa()}>
     <div className={styles.page}>
       <LegacyModelImport afterImportFocusRef={addModelButton}>{({ busy: importingLegacyModels, previewing, open }) =>
-        <CursorModelProvider><CursorModelGate busy={cursorBusy || importingLegacyModels} previewingImport={previewing} onAdd={openNew} onImport={open}>{list}</CursorModelGate></CursorModelProvider>
+        <CursorModelProvider><CursorModelGate busy={cursorBusy || backupBusy || importingLegacyModels} previewingImport={previewing} onAdd={openNew} onImport={open}>{list}</CursorModelGate></CursorModelProvider>
       }</LegacyModelImport>
     </div>
   </CursorCaGate></CursorCaProvider>;
@@ -353,7 +353,7 @@ export function CursorSettingsPage() {
         <TooltipTrigger label={takeoverLabel}>
           <Switch
             checked={cursorTakenOver}
-            disabled={cursorBusy || (!cursorTakenOver && !caReady)}
+            disabled={cursorBusy || backupBusy || (!cursorTakenOver && !caReady)}
             label={takeoverLabel}
             onChange={(enabled) => {
               if (enabled) void appStore.setCursorEnabled(true);
@@ -362,10 +362,10 @@ export function CursorSettingsPage() {
           />
         </TooltipTrigger>
         {testTargets.length > 0 && <div className={styles.groupActions} role="group" aria-label={t("操作")}>
-          <button type="button" title={t("默认平铺")} aria-pressed={grouping === "flat"} onClick={() => setGrouping("flat")}>{t("默认平铺")}</button>
-          {canGroupByProvider && <button type="button" title={t("按供应商")} aria-pressed={grouping === "provider"} onClick={() => setGrouping("provider")}>{t("按供应商")}</button>}
-          {canGroupByType && <button type="button" title={t("按类型")} aria-pressed={grouping === "type"} onClick={() => setGrouping("type")}>{t("按类型")}</button>}
-          <button type="button" title={batchTesting ? t("取消全部测试") : t("一键测试")} disabled={cursorBusy || (!batchTesting && testingModelHashes.size > 0)} onClick={() => void (batchTesting ? cancelAllModelTests() : testAllModels())}>{batchTesting ? t("取消全部测试") : t("一键测试")}</button>
+          <button type="button" title={t("默认平铺")} aria-pressed={grouping === "flat"} disabled={cursorBusy || backupBusy} onClick={() => setGrouping("flat")}>{t("默认平铺")}</button>
+          {canGroupByProvider && <button type="button" title={t("按供应商")} aria-pressed={grouping === "provider"} disabled={cursorBusy || backupBusy} onClick={() => setGrouping("provider")}>{t("按供应商")}</button>}
+          {canGroupByType && <button type="button" title={t("按类型")} aria-pressed={grouping === "type"} disabled={cursorBusy || backupBusy} onClick={() => setGrouping("type")}>{t("按类型")}</button>}
+          <button type="button" title={batchTesting ? t("取消全部测试") : t("一键测试")} disabled={cursorBusy || backupBusy || (!batchTesting && testingModelHashes.size > 0)} onClick={() => void (batchTesting ? cancelAllModelTests() : testAllModels())}>{batchTesting ? t("取消全部测试") : t("一键测试")}</button>
         </div>}
       </div>
     </PageActions>
@@ -382,7 +382,7 @@ export function CursorSettingsPage() {
         }}
       />
       <div className={styles.groupActions} role="group" aria-label={t("模型配置备份")}>
-        <TooltipTrigger label={t("导出文件包含 API Key，请妥善保管")}>
+        <TooltipTrigger label={t("仅备份内置模型配置；导出文件包含 API Key，请妥善保管")}>
           <button type="button" className={controls.secondary} disabled={backupBusy || cursorBusy || models.length === 0} onClick={exportBackup}>{t("导出配置")}</button>
         </TooltipTrigger>
         <TooltipTrigger label={t("仅支持本项目导出的 JSON 文件")}>
@@ -391,7 +391,7 @@ export function CursorSettingsPage() {
       </div>
       <OpenCursorButton />
       <TooltipTrigger label={t("Remote SSH 指南")}><button type="button" className={controls.secondary} aria-label={t("Remote SSH 指南")} onClick={() => setRemoteGuideOpen(true)}>SSH</button></TooltipTrigger>
-      <TooltipTrigger label={caReady ? t("添加模型") : t("请先初始化 CA")}><button ref={addModelButton} className={controls.iconButton} aria-label={t("添加模型")} disabled={!caReady || cursorBusy} onClick={openNew}><Icon icon={addIcon} size="1.1em" /></button></TooltipTrigger>
+      <TooltipTrigger label={caReady ? t("添加模型") : t("请先初始化 CA")}><button ref={addModelButton} className={controls.iconButton} aria-label={t("添加模型")} disabled={!caReady || cursorBusy || backupBusy} onClick={openNew}><Icon icon={addIcon} size="1.1em" /></button></TooltipTrigger>
     </PageActions>
     <PageContent title="Cursor" sections={[{ key: "cursor-settings", estimatedHeight: estimatedModelHeight, content }]} />
     <CursorRemoteGuide open={remoteGuideOpen} onClose={() => setRemoteGuideOpen(false)} />
@@ -408,7 +408,7 @@ export function CursorSettingsPage() {
     >
       <p>{t("关闭后将移除 Cursor 本地代理配置。如果你需要登陆官方账号，通常不需要关闭操作，推荐直接登陆你的账号即可(byok模型与官方账号的模型已支持无缝衔接)，是否继续关闭并清理代理？")}</p>
     </ConfirmDialog>
-    <Modal fullHeight open={draft !== null} title={editing ? t("编辑模型") : t("添加模型")} banner={draft && (editorTesting || editorTestState) ? <CursorModelTestResult state={editorTestState} testing={editorTesting} /> : undefined} busy={cursorBusy || savingAndTesting} onClose={() => { if (editing && editorTesting) void cancelModelTest(editing.model_hash); setDraft(null); setEditing(null); }} onSubmit={() => void save()} submitLabel={t("保存")} secondaryAction={<button type="button" className={controls.secondary} disabled={cursorBusy || savingAndTesting} onClick={() => void (editorTesting && editing ? cancelModelTest(editing.model_hash) : saveAndTest())}>{savingAndTesting ? t("处理中…") : editorTesting ? t("取消测试") : t("保存并测试")}</button>}>
+    <Modal fullHeight open={draft !== null} title={editing ? t("编辑模型") : t("添加模型")} banner={draft && (editorTesting || editorTestState) ? <CursorModelTestResult state={editorTestState} testing={editorTesting} /> : undefined} busy={cursorBusy || backupBusy || savingAndTesting} onClose={() => { if (editing && editorTesting) void cancelModelTest(editing.model_hash); setDraft(null); setEditing(null); }} onSubmit={() => void save()} submitLabel={t("保存")} secondaryAction={<button type="button" className={controls.secondary} disabled={cursorBusy || backupBusy || savingAndTesting} onClick={() => void (editorTesting && editing ? cancelModelTest(editing.model_hash) : saveAndTest())}>{savingAndTesting ? t("处理中…") : editorTesting ? t("取消测试") : t("保存并测试")}</button>}>
       {draft && <>
         <CursorModelEditor draft={draft} modelOptions={modelOptions} discovering={discovering} onChange={setDraft} onDiscover={discover} />
       </>}

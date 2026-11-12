@@ -188,6 +188,69 @@ async fn model_backup_import_rejects_unknown_format_and_empty_backups() {
 }
 
 #[tokio::test]
+async fn model_backup_import_appends_models_in_backup_order() {
+    let (router, _provider, store, _directory) = setup().await;
+    let mut first = model_input();
+    first.display_name = "First imported".into();
+    first.model_id = "imported-first".into();
+    first.sort_order = 99;
+    let mut second = first.clone();
+    second.display_name = "Second imported".into();
+    second.model_id = "imported-second".into();
+    second.sort_order = 1;
+
+    let (status, _) = send(
+        router,
+        "POST",
+        "/__byok-api__/api/models/backup/import",
+        None,
+        json!({"format": "cursor-byok-models", "version": 1, "models": [first, second]}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    let model_ids = store
+        .models()
+        .await
+        .unwrap()
+        .into_iter()
+        .map(|model| model.model_id)
+        .collect::<Vec<_>>();
+    assert_eq!(
+        model_ids,
+        ["qwen/model", "imported-first", "imported-second"]
+    );
+}
+
+#[tokio::test]
+async fn model_backup_import_accepts_payloads_larger_than_the_default_json_limit() {
+    let (router, _provider, store, _directory) = setup().await;
+    let mut imported = model_input();
+    imported.display_name = "Large backup".into();
+    imported.model_id = "large-backup".into();
+    let payload = json!({
+        "format": "cursor-byok-models",
+        "version": 1,
+        "models": [imported],
+        "padding": "x".repeat(2 * 1024 * 1024),
+    });
+
+    let (status, body) = send(
+        router,
+        "POST",
+        "/__byok-api__/api/models/backup/import",
+        None,
+        payload,
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(
+        serde_json::from_str::<Value>(&body).unwrap(),
+        json!({"imported": 1, "skipped": 0, "total": 1})
+    );
+    assert_eq!(store.models().await.unwrap().len(), 2);
+}
+
+#[tokio::test]
 async fn model_pricing_settings_round_trip_through_control_api() {
     let (router, _provider, _store, _directory) = setup().await;
     let (status, body) = send(

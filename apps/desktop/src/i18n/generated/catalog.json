@@ -566,7 +566,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 368,
-          "column": 260
+          "column": 274
         }
       ]
     },
@@ -1112,7 +1112,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 366,
-          "column": 154
+          "column": 190
         }
       ]
     },
@@ -1910,7 +1910,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 368,
-          "column": 246
+          "column": 260
         }
       ]
     },
@@ -2257,7 +2257,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 411,
-          "column": 703
+          "column": 731
         }
       ]
     },
@@ -2642,6 +2642,18 @@
         }
       ]
     },
+    "5a0d54253c44a9d2": {
+      "source": "仅备份内置模型配置；导出文件包含 API Key，请妥善保管",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/models/CursorSettingsPage.tsx",
+          "line": 385,
+          "column": 32
+        }
+      ]
+    },
     "5a284a1a2be8da0e": {
       "source": "从本机旧版配置读取模型；确认前会显示新增和已存在的模型。",
       "kind": "text",
@@ -2722,7 +2734,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 367,
-          "column": 141
+          "column": 177
         }
       ]
     },
@@ -3293,7 +3305,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 365,
-          "column": 123
+          "column": 159
         }
       ]
     },
@@ -3304,12 +3316,12 @@
       "refs": [
         {
           "file": "shared/store/appStore.ts",
-          "line": 254,
+          "line": 258,
           "column": 23
         },
         {
           "file": "shared/store/appStore.ts",
-          "line": 261,
+          "line": 265,
           "column": 25
         }
       ]
@@ -4426,7 +4438,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 411,
-          "column": 432
+          "column": 446
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
@@ -4595,7 +4607,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 411,
-          "column": 715
+          "column": 743
         }
       ]
     },
@@ -4907,18 +4919,6 @@
           "file": "features/plugins/PluginManagementPage.tsx",
           "line": 90,
           "column": 14
-        }
-      ]
-    },
-    "b12b754052b791c0": {
-      "source": "导出文件包含 API Key，请妥善保管",
-      "kind": "text",
-      "placeholders": [],
-      "refs": [
-        {
-          "file": "features/models/CursorSettingsPage.tsx",
-          "line": 385,
-          "column": 32
         }
       ]
     },
@@ -5741,7 +5741,7 @@
         {
           "file": "features/models/CursorSettingsPage.tsx",
           "line": 411,
-          "column": 675
+          "column": 703
         },
         {
           "file": "shared/ui/Modal.tsx",
