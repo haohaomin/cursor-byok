@@ -2,7 +2,7 @@
   "date": "2026-11-13",
   "issues": [150, 417],
   "scope": "per-model token pricing for local BYOK usage",
-  "status": "implemented_locally_not_merged",
+  "status": "merged_main_not_released",
   "identity": "model_hash",
   "fallback": "global pricing",
   "plugin_pricing": "not_supported_separately",
@@ -54,6 +54,6 @@
   "limitations": [
     "No real provider requests were sent.",
     "Plugin models still use global pricing.",
-    "The dependent usage-breakdown PR remains open and this pricing work is not merged or released."
+    "The usage-breakdown PR #34 and pricing integration PR #39 are merged into main; this change is not yet included in a new release."
   ]
 }

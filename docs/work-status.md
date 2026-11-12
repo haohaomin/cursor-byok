@@ -2,7 +2,7 @@
 
 更新：2026-11-04；本轮合并与 v1.1.0 发布状态已通过 GitHub API 和产物下载核对。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
-**2026-11-13 进展：**#150/#417 的逐模型 Token 定价已在依赖 #107 的分支完成并通过本地验证，已提交 [PR #35](https://github.com/haohaomin/cursor-byok/pull/35)，尚未合入或发布；依赖的按模型用量统计为 [PR #34](https://github.com/haohaomin/cursor-byok/pull/34)。设置页按 `model_hash` 保存输入、输出、缓存读取和缓存写入单价；首页总计与按模型明细按覆盖价计算，未配置覆盖时使用全局价格。工作区全量 Rust 测试为 578 通过、0 失败、14 忽略；桌面检查、Tauri debug/no-bundle 构建和 React + Chromium Demo 均通过。插件模型暂使用全局价格，见 [定价验证记录](history/issues/2026-11-13-issue150-model-pricing.md)。
+**2026-11-13 进展：**#150/#417 的逐模型 Token 定价已通过 [PR #39](https://github.com/haohaomin/cursor-byok/pull/39) 合入 `main`（合并提交 `e53e97e`）；原 #35 是合入已先落地的 #34 分支，未直接进入主线，已由 #39 在当前主线基线上重新集成。设置页按 `model_hash` 保存输入、输出、缓存读取和缓存写入单价；首页总计与按模型明细按覆盖价计算，未配置覆盖时使用全局价格。当前主线联合回归为 293 个服务端单测通过、0 失败、14 忽略，桌面检查、Clippy 和生产构建通过。插件模型暂使用全局价格，真实供应商和发布版本仍待验收，见 [定价验证记录](history/issues/2026-11-13-issue150-model-pricing.md)。
 
 **结论：远程 Semble、Grok 与 GPT/Google OAuth 的已提交实现均已合入 main，并随 v1.1.0 发布。Semble 独立终端审批卡片候选仍有 10 个本地文件未提交、未推送。真实 OAuth 账号、Semble 批准/拒绝及 Windows Cursor UI 仍待验收。**
 
@@ -10,7 +10,7 @@
 
 **2026-11-06 进展：Issue #505 的多个 reasoning signature 修复已在 `codex/issue505-multiple-signatures` 完成，`cursor-server --all-targets` 通过（465 通过、14 忽略）；尚未合入 main、发布或完成真实 Cursor/原网关验收。**
 
-**2026-11-13 进展：Issue #463/#184 已增加 Google Gemini OpenAI 兼容预设，使用完整 `v1beta/openai/chat/completions` 地址和现有 Bearer 鉴权；前端类型检查、构建与浏览器配置验证通过，已提交 [PR #36](https://github.com/haohaomin/cursor-byok/pull/36)。原生 `generateContent` 协议和真实 Gemini Key 尚未验收，见 [验证记录](history/issues/2026-11-13-issue463-gemini-openai-compat.md)。**
+**2026-11-13 进展：Issue #463/#184 已增加 Google Gemini OpenAI 兼容预设，使用完整 `v1beta/openai/chat/completions` 地址和现有 Bearer 鉴权；前端类型检查、构建与浏览器配置验证通过，已通过 [PR #36](https://github.com/haohaomin/cursor-byok/pull/36) 合入 `main`。原生 `generateContent` 协议和真实 Gemini Key 尚未验收，见 [验证记录](history/issues/2026-11-13-issue463-gemini-openai-compat.md)。**
 
 ## 1. 已发布的成果
 
