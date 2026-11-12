@@ -4,6 +4,8 @@
 
 **结论：远程 Semble、Grok 与 GPT/Google OAuth 的已提交实现均已合入 main，并随 v1.1.0 发布。Semble 独立终端审批卡片候选仍有 10 个本地文件未提交、未推送。真实 OAuth 账号、Semble 批准/拒绝及 Windows Cursor UI 仍待验收。**
 
+**2026-11-13 进展：**上游 PR #433 已按当前 Rust/Tauri 架构选择性重实现：非 Tab 的 Cursor host 请求进入本地路由，CONNECT 隧道保持原始 authority；硬编码云端 400/404 短路和 `custom-protocol` feature 未采用。定向代理测试、Clippy、桌面检查和工作区回归通过，真实代理网络与 Cursor UI 待验，见[验证记录](history/pull-requests/2026-11-13-pr433-proxy-routing.md)。**
+
 **2026-11-06 进展：Issue #505 的多个 reasoning signature 修复已在 `codex/issue505-multiple-signatures` 完成，`cursor-server --all-targets` 通过（465 通过、14 忽略）；尚未合入 main、发布或完成真实 Cursor/原网关验收。**
 
 ## 1. 已发布的成果
