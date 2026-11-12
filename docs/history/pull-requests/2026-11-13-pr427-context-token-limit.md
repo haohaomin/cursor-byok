@@ -21,6 +21,7 @@
 | `cargo fmt --all -- --check` | 通过 | 在 macOS 工作副本执行 |
 | `git diff --check` | 通过 | 无空白错误 |
 | `cargo test --locked -p cursor-server --lib cursor::services::model_catalog::tests` | 通过 | Oracle Linux 9.8 ARM64；完整编译后 7 passed、299 filtered out |
+| `cargo clippy --locked -p cursor-server --lib -- -D warnings` | 通过 | Oracle Linux 9.8 ARM64；远程 clippy 组件安装后检查通过 |
 | 真实 Cursor 客户端 / provider | 未执行 | 需要运行中的 Cursor 与可用 provider 账号；代码级协议测试不等价于 UI 验收 |
 
 ## 与相邻候选的关系
