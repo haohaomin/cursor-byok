@@ -22,7 +22,7 @@ use cursor_server::{
     network::NetworkClients,
     plugin::{PluginRegistry, PluginRuntime},
     provider::{FinishReason, ModelEvent, ProviderRouter},
-    store::ExternalApiSettings,
+    store::{ExternalApiSettings, TokenPricingSettings},
 };
 use serde_json::{json, Value};
 use tower::ServiceExt;
@@ -116,6 +116,88 @@ async fn management_settings_enable_the_external_route_without_restart() {
         .await
         .0,
         StatusCode::OK
+    );
+}
+
+#[tokio::test]
+async fn model_pricing_settings_round_trip_through_control_api() {
+    let (router, _provider, _store, _directory) = setup().await;
+    let (status, body) = send(
+        router.clone(),
+        "GET",
+        "/__byok-api__/api/settings/model-pricing",
+        None,
+        json!({}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(serde_json::from_str::<Value>(&body).unwrap(), json!([]));
+
+    let payload = json!([
+        {
+            "model_hash": "z-model",
+            "input_per_million": 3.0,
+            "output_per_million": 15.0,
+            "cache_read_per_million": 0.3,
+            "cache_write_per_million": 3.75
+        },
+        {
+            "model_hash": "a-model",
+            "input_per_million": 5.0,
+            "output_per_million": 25.0,
+            "cache_read_per_million": 0.5,
+            "cache_write_per_million": 6.25
+        }
+    ]);
+    let (status, body) = send(
+        router.clone(),
+        "PUT",
+        "/__byok-api__/api/settings/model-pricing",
+        None,
+        payload,
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    let saved =
+        serde_json::from_str::<Vec<cursor_server::store::ModelTokenPricing>>(&body).unwrap();
+    assert_eq!(saved[0].model_hash, "a-model");
+    assert_eq!(saved[1].model_hash, "z-model");
+    assert_eq!(
+        saved[1].pricing,
+        TokenPricingSettings {
+            input_per_million: 3.0,
+            output_per_million: 15.0,
+            cache_read_per_million: 0.3,
+            cache_write_per_million: 3.75,
+        }
+    );
+
+    let (status, body) = send(
+        router.clone(),
+        "PUT",
+        "/__byok-api__/api/settings/model-pricing",
+        None,
+        json!([
+            {"model_hash":"same","input_per_million":1,"output_per_million":1,"cache_read_per_million":1,"cache_write_per_million":1},
+            {"model_hash":"same","input_per_million":1,"output_per_million":1,"cache_read_per_million":1,"cache_write_per_million":1}
+        ]),
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("duplicate model pricing"));
+
+    let (status, body) = send(
+        router,
+        "GET",
+        "/__byok-api__/api/settings/model-pricing",
+        None,
+        json!({}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(
+        serde_json::from_str::<Value>(&body).unwrap()[0]["model_hash"],
+        "a-model"
     );
 }
 

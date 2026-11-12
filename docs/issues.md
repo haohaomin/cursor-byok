@@ -160,9 +160,9 @@
 | --- | --- | --- | --- | --- |
 | ☐ | [#324](https://github.com/leookun/cursor-byok/issues/324) 使用上的一些小痛点。 | B | 待现版复测 | 拆分配置复制、密钥显示和模型哈希冲突；先复现冲突，避免混合改动。 |
 | ☐ | [#471](https://github.com/leookun/cursor-byok/issues/471) 需求：增加一个配置备份功能 | C | 需求待评估 | 定义导出/导入字段、密钥处理和覆盖策略；先确认当前版本已有能力。 |
-| ☐ | [#417](https://github.com/leookun/cursor-byok/issues/417) 增加自定义定价 | C | 需求待评估 | 与 #150 的自定义价格需求归组，确认币种、计价单位和历史统计规则。 |
+| ☐（PR #35 待合入） | [#417](https://github.com/leookun/cursor-byok/issues/417) 增加自定义定价 | C | 已实现全局及逐模型 Token 价格；[PR #35](https://github.com/haohaomin/cursor-byok/pull/35) 已通过本地验证并开放 | 以 `model_hash` 保存输入/输出/缓存读写单价；未设置覆盖时使用全局价格。插件模型暂沿用全局价格，见 [实现与验证](history/issues/2026-11-13-issue150-model-pricing.md)。 |
 | ☐（现版已支持） | [#254](https://github.com/leookun/cursor-byok/issues/254) 支持配置tab-server的baseurl，而不是内置一个 | C | 既有功能无需重写；路由、持久化及设置页受控验证通过 | 16 个 TAB RPC 的前缀/query/二进制转发、SQLite 重连、地址切换、流式交付与非法配置保护共 4 项测试通过；设置页接线已测。未修改生产代码；真实 Cursor TAB、HTTPS 服务及控制面账号未验，见 [核查与边界](history/issues/2026-11-06-issue254-tab-baseurl-check.md)。 |
-| ☐（按模型统计已实现） | [#150](https://github.com/leookun/cursor-byok/issues/150) 提几个意见看看需求能否实现。 | C | 按模型分项统计已实现，逐模型价格仍待实现 | 统一价格沿用现有设置；逐模型输入/输出/缓存价格另行实现，见 [#107 统计记录](history/issues/2026-11-12-issue107-model-usage-breakdown.md)。 |
+| ☐（PR #34/#35 待合入） | [#150](https://github.com/leookun/cursor-byok/issues/150) 提几个意见看看需求能否实现。 | C | #107 按模型分项统计见 [PR #34](https://github.com/haohaomin/cursor-byok/pull/34)，逐模型 Token 定价见 [PR #35](https://github.com/haohaomin/cursor-byok/pull/35)；两者本地验证通过 | 首页总价和模型明细按 `model_hash` 选择覆盖价，其他模型使用全局价格；插件模型暂不单独定价。见 [统计记录](history/issues/2026-11-12-issue107-model-usage-breakdown.md) 与 [定价验证](history/issues/2026-11-13-issue150-model-pricing.md)。 |
 | ☐ | [#146](https://github.com/leookun/cursor-byok/issues/146) Docker支持 | C | 需求待评估 | 明确桌面/纯服务部署目标后评估容器支持。 |
 | ☐（实现待合入） | [#107](https://github.com/leookun/cursor-byok/issues/107) 请问能不能在用量统计时候加个模型的分类 | C | 概览四项统计可按模型展开；Store、工作区和浏览器回归通过 | 合入后再更新主线状态；Git 自动提交的本地模型/直连路径已核对，真实 Cursor Git UI 未验。 |
 | ☐ | [#99](https://github.com/leookun/cursor-byok/issues/99) 关于批量添加模型和token用量统计的一点建议 | C | 需求待评估 | 先检查现版批量模型导入和统计；统计清零单独作为数据问题验证。 |
