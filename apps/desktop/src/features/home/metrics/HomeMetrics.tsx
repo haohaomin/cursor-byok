@@ -4,6 +4,7 @@ import { Icon } from "../../../shared/ui/Icon";
 import { useTooltip, type TooltipAnchor } from "../../../shared/ui/Tooltip";
 import { informationOutlineIcon } from "../../../shared/ui/icons";
 import { CacheHitRateChart } from "./CacheHitRateChart";
+import type { UsageMetric } from "./ModelUsageDialog";
 import styles from "./HomeMetrics.module.scss";
 
 export type HomeMetricsData = {
@@ -59,7 +60,7 @@ function InfoTooltip({ content }: { content: string }) {
   ><Icon icon={informationOutlineIcon} size="1.1em" /></button>;
 }
 
-export function HomeMetrics({ data, refreshVersion = 0 }: { data: HomeMetricsData; refreshVersion?: number }) {
+export function HomeMetrics({ data, onOpen, refreshVersion = 0 }: { data: HomeMetricsData; onOpen?: (metric: UsageMetric) => void; refreshVersion?: number }) {
   const { pricing } = useAppStore();
   const inputTokens = Math.max(0, data.promptTokens - data.cacheReadTokens - data.cacheWriteTokens);
   const outputTokens = Math.max(0, data.tokenUsage - data.promptTokens);
@@ -137,31 +138,33 @@ export function HomeMetrics({ data, refreshVersion = 0 }: { data: HomeMetricsDat
     <section className={styles.root} aria-label={t("调用统计")}>
       <article className={styles.metric}>
         <div className={styles.label}>{t("缓存命中率")}<InfoTooltip content={cacheTooltip} /></div>
-        <CacheHitRateChart rate={defaultCacheHitRate ?? 0} animationKey={refreshVersion} />
+        <button type="button" className={styles.details} aria-label={t("按模型查看：{metric}", { metric: t("缓存命中率") })} onClick={() => onOpen?.("cache")} disabled={!onOpen}>
+          <CacheHitRateChart rate={defaultCacheHitRate ?? 0} animationKey={refreshVersion} />
+        </button>
       </article>
       <article className={styles.metric}>
         <div className={styles.label}>{t("LLM 调用")}<InfoTooltip content={callsTooltip} /></div>
-        <div className={styles.body}>
+        <button type="button" className={styles.details} aria-label={t("按模型查看：{metric}", { metric: t("LLM 调用") })} onClick={() => onOpen?.("calls")} disabled={!onOpen}>
           <div className={styles.value} title={formatInteger(data.llmCalls)}>{formatCompactInteger(data.llmCalls)}</div>
           <div className={styles.secondary}>{t("成功 {successful} / 异常 {failed}", {
             successful: formatCompactInteger(data.successfulCalls),
             failed: formatCompactInteger(data.failedCalls),
           })}</div>
-        </div>
+        </button>
       </article>
       <article className={styles.metric}>
         <div className={styles.label}>{t("Token 消耗")}<InfoTooltip content={tokensTooltip} /></div>
-        <div className={styles.body}>
+        <button type="button" className={styles.details} aria-label={t("按模型查看：{metric}", { metric: t("Token 消耗") })} onClick={() => onOpen?.("tokens")} disabled={!onOpen}>
           <div className={styles.value} title={formatInteger(data.tokenUsage)}>{formatCompactInteger(data.tokenUsage)}</div>
           <div className={styles.secondary}>{t("提示词 {tokens}", { tokens: formatCompactInteger(data.promptTokens) })}</div>
-        </div>
+        </button>
       </article>
       <article className={styles.metric}>
         <div className={styles.label}>{t("价值估算")}<InfoTooltip content={costTooltip} /></div>
-        <div className={styles.body}>
+        <button type="button" className={styles.details} aria-label={t("按模型查看：{metric}", { metric: t("价值估算") })} onClick={() => onOpen?.("cost")} disabled={!onOpen}>
           <div className={styles.value} title={formatUSD(totalCost)}>{formatUSD(totalCost)}</div>
           <div className={styles.secondary}>{t("缓存读写 {cost}", { cost: formatUSD(cacheCost) })}</div>
-        </div>
+        </button>
       </article>
     </section>
   </div>;
