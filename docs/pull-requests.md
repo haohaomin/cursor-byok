@@ -8,7 +8,7 @@
 
 | PR / head | 解决目标与范围 | 验证边界 |
 | --- | --- | --- |
-| [#44](https://github.com/haohaomin/cursor-byok/pull/44) / `f77fe1f` + review fixes | 为模型设置增加内置模型 JSON 配置备份导出/导入；导入按模型哈希跳过重复项，并补齐排序、并发刷新、导出 URL 和大请求体边界 | 原始提交工作区 Rust 293 项通过、14 项忽略；修复后新增排序/大请求体回归，前端检查与四语言扫描通过。真实安装包文件选择器和跨电脑导入尚待人工验收；需等待修复提交后的 PR CI。详见 [Issue #471 记录](history/issues/2026-11-13-issue471-model-backup.md)。 |
+| [#44](https://github.com/haohaomin/cursor-byok/pull/44) / `f77fe1f` + review fixes | 为模型设置增加内置模型 JSON 配置备份导出/导入；导入按模型哈希跳过重复项，并补齐排序、并发刷新、导出 URL 和大请求体边界 | 原始提交工作区 Rust 293 项通过、14 项忽略；修复后新增排序/大请求体回归，前端检查、四语言扫描、Clippy 和 Tauri debug 构建通过；Sourcery 复审通过，但该分支没有 GitHub Actions 运行记录。真实安装包文件选择器和跨电脑导入尚待人工验收。详见 [Issue #471 记录](history/issues/2026-11-13-issue471-model-backup.md)。 |
 
 ## 2026-11-06 已合并 PR 的测试状态
 
