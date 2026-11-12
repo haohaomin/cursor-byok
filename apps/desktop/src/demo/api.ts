@@ -234,28 +234,45 @@ function createOverview(params: URLSearchParams): Overview {
   const step = granularity === "minute" ? 60_000 : granularity === "hour" ? 3_600_000 : 86_400_000;
   const count = granularity === "minute" ? Math.min(60, Math.max(10, Math.ceil(duration / step))) : granularity === "hour" ? Math.min(24, Math.max(8, Math.ceil(duration / step))) : Math.min(365, Math.max(7, Math.ceil(duration / step)));
   const series = createSeries(count, step, Number.isFinite(end) && end > 0 ? end : FIXED_NOW);
-  const totals = series.reduce((sum, bucket) => ({
-    input: sum.input + bucket.input_tokens,
-    cacheRead: sum.cacheRead + bucket.cache_read_tokens,
-    cacheWrite: sum.cacheWrite + bucket.cache_write_tokens,
-    output: sum.output + bucket.output_tokens,
-  }), { input: 0, cacheRead: 0, cacheWrite: 0, output: 0 });
   const llmCalls = Math.max(12, Math.round(count * 5.4));
 
+  const split = (value: number, index: number) => Math.floor(value / models.length) + (index < value % models.length ? 1 : 0);
+  const selected = params.get("model_hashes");
+  const hashes: string[] | null = selected ? JSON.parse(selected) : null;
+  const selectedIndexes = models.map((model, index) => ({ model, index })).filter(({ model }) => !hashes || hashes.includes(model.model_hash));
+  const modelUsage = selectedIndexes.map(({ model, index }) => {
+    const total = series.reduce((sum, bucket) => ({
+      input: sum.input + split(bucket.input_tokens, index),
+      output: sum.output + split(bucket.output_tokens, index),
+      read: sum.read + split(bucket.cache_read_tokens, index),
+      write: sum.write + split(bucket.cache_write_tokens, index),
+    }), { input: 0, output: 0, read: 0, write: 0 });
+    const failed = split(Math.max(1, Math.floor(llmCalls * 0.008)), index);
+    const successful = split(llmCalls - Math.max(1, Math.floor(llmCalls * 0.008)), index);
+    return {
+      model_hash: model.model_hash, model_id: model.model_id, display_name: model.display_name,
+      provider_type: model.type, provider_url: model.base_url,
+      metrics: {
+        llm_calls: successful + failed, successful_calls: successful, failed_calls: failed,
+        input_tokens: total.input, output_tokens: total.output, cache_read_tokens: total.read, cache_write_tokens: total.write,
+        prompt_tokens: total.input + total.read + total.write,
+        token_usage: total.input + total.read + total.write + total.output,
+      },
+    };
+  });
+  const metrics = { llm_calls: 0, successful_calls: 0, failed_calls: 0, input_tokens: 0, output_tokens: 0, cache_read_tokens: 0, cache_write_tokens: 0, prompt_tokens: 0, token_usage: 0 };
+  for (const row of modelUsage) for (const key of Object.keys(metrics) as (keyof typeof metrics)[]) metrics[key] += row.metrics[key];
   return {
-    metrics: {
-      llm_calls: llmCalls,
-      successful_calls: llmCalls - Math.max(1, Math.floor(llmCalls * 0.008)),
-      failed_calls: Math.max(1, Math.floor(llmCalls * 0.008)),
-      token_usage: totals.input + totals.cacheRead + totals.cacheWrite + totals.output,
-      prompt_tokens: totals.input + totals.cacheRead + totals.cacheWrite,
-      input_tokens: totals.input,
-      cache_read_tokens: totals.cacheRead,
-      cache_write_tokens: totals.cacheWrite,
-      output_tokens: totals.output,
-    },
+    metrics,
+    model_usage: modelUsage.sort((a, b) => b.metrics.token_usage - a.metrics.token_usage),
     token_usage_granularity: granularity,
-    token_usage_series: series,
+    token_usage_series: series.map((bucket) => ({
+      bucket_start_ms: bucket.bucket_start_ms,
+      input_tokens: selectedIndexes.reduce((sum, { index }) => sum + split(bucket.input_tokens, index), 0),
+      output_tokens: selectedIndexes.reduce((sum, { index }) => sum + split(bucket.output_tokens, index), 0),
+      cache_read_tokens: selectedIndexes.reduce((sum, { index }) => sum + split(bucket.cache_read_tokens, index), 0),
+      cache_write_tokens: selectedIndexes.reduce((sum, { index }) => sum + split(bucket.cache_write_tokens, index), 0),
+    })),
   };
 }
 

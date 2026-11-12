@@ -7,7 +7,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 80,
+          "line": 92,
           "column": 47
         }
       ]
@@ -21,7 +21,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 92,
+          "line": 93,
           "column": 5
         }
       ]
@@ -63,7 +63,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 112,
+          "line": 113,
           "column": 5
         }
       ]
@@ -94,7 +94,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 127,
+          "line": 128,
           "column": 5
         }
       ]
@@ -153,6 +153,18 @@
         }
       ]
     },
+    "053461ce86d26572": {
+      "source": "成功",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 23,
+          "column": 8
+        }
+      ]
+    },
     "05468af47054d488": {
       "source": "模型 {model} 连通性测试成功（{duration} ms）",
       "kind": "template",
@@ -163,7 +175,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 156,
+          "line": 157,
           "column": 27
         }
       ]
@@ -201,7 +213,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 104,
+          "line": 105,
           "column": 5
         }
       ]
@@ -215,7 +227,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 101,
+          "line": 102,
           "column": 5
         }
       ]
@@ -232,7 +244,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 396,
+          "line": 397,
           "column": 73
         }
       ]
@@ -271,7 +283,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 407,
+          "line": 408,
           "column": 89
         }
       ]
@@ -283,8 +295,23 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 160,
+          "line": 163,
           "column": 40
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 164,
+          "column": 100
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 16,
+          "column": 88
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 46,
+          "column": 46
         }
       ]
     },
@@ -299,7 +326,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 122,
+          "line": 123,
           "column": 5
         }
       ]
@@ -328,12 +355,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 309,
+          "line": 310,
           "column": 87
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 309,
+          "line": 310,
           "column": 131
         }
       ]
@@ -433,7 +460,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 42,
+          "line": 53,
           "column": 11
         }
       ]
@@ -520,7 +547,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 109,
+          "line": 110,
           "column": 5
         }
       ]
@@ -532,8 +559,23 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 153,
+          "line": 156,
           "column": 40
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 157,
+          "column": 100
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 16,
+          "column": 48
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 45,
+          "column": 48
         }
       ]
     },
@@ -549,7 +591,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 406,
+          "line": 407,
           "column": 36
         }
       ]
@@ -561,12 +603,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 325,
+          "line": 326,
           "column": 69
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 325,
+          "line": 326,
           "column": 260
         }
       ]
@@ -607,8 +649,23 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 139,
+          "line": 140,
           "column": 40
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 141,
+          "column": 100
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 16,
+          "column": 70
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 27,
+          "column": 8
         }
       ]
     },
@@ -653,17 +710,17 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 332,
+          "line": 333,
           "column": 40
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 332,
-          "column": 119
+          "line": 333,
+          "column": 140
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 349,
+          "line": 350,
           "column": 74
         }
       ]
@@ -677,7 +734,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 91,
+          "line": 92,
           "column": 5
         }
       ]
@@ -827,7 +884,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 370,
+          "line": 371,
           "column": 52
         }
       ]
@@ -865,7 +922,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 99,
+          "line": 100,
           "column": 5
         }
       ]
@@ -899,7 +956,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 82,
+          "line": 83,
           "column": 5
         }
       ]
@@ -923,8 +980,66 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 65,
+          "line": 77,
           "column": 20
+        }
+      ]
+    },
+    "1ded6559f626109d": {
+      "source": "缓存读取",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 29,
+          "column": 8
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 34,
+          "column": 34
+        }
+      ]
+    },
+    "1dfed13bce897358": {
+      "source": "按模型查看：{metric}",
+      "kind": "template",
+      "placeholders": [
+        "metric"
+      ],
+      "refs": [
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 141,
+          "column": 70
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 147,
+          "column": 70
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 157,
+          "column": 70
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 164,
+          "column": 70
+        }
+      ]
+    },
+    "1f7cbe80b2352b1d": {
+      "source": "与首页当前时间和模型筛选一致。",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 39,
+          "column": 91
         }
       ]
     },
@@ -940,6 +1055,18 @@
           "file": "shared/ui/ModelSelect.tsx",
           "line": 156,
           "column": 21
+        }
+      ]
+    },
+    "1fa8fbb9f80b5e04": {
+      "source": "按当前统一单价估算，与首页筛选条件一致。",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 39,
+          "column": 63
         }
       ]
     },
@@ -969,7 +1096,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 400,
+          "line": 401,
           "column": 89
         }
       ]
@@ -1017,12 +1144,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 323,
+          "line": 324,
           "column": 63
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 323,
+          "line": 324,
           "column": 154
         }
       ]
@@ -1074,7 +1201,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 80,
+          "line": 92,
           "column": 33
         }
       ]
@@ -1112,7 +1239,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 51,
+          "line": 52,
           "column": 43
         }
       ]
@@ -1124,7 +1251,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 89,
+          "line": 90,
           "column": 5
         }
       ]
@@ -1141,7 +1268,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 399,
+          "line": 400,
           "column": 186
         }
       ]
@@ -1170,17 +1297,17 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 339,
+          "line": 340,
           "column": 20
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 370,
+          "line": 371,
           "column": 76
         },
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 58,
+          "line": 70,
           "column": 20
         },
         {
@@ -1226,12 +1353,12 @@
         {
           "file": "shared/ui/ConfirmDialog.tsx",
           "line": 4,
-          "column": 86
+          "column": 99
         },
         {
           "file": "shared/ui/Modal.tsx",
-          "line": 42,
-          "column": 200
+          "line": 44,
+          "column": 232
         },
         {
           "file": "shell/AppLayout.tsx",
@@ -1247,7 +1374,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 338,
+          "line": 339,
           "column": 14
         }
       ]
@@ -1261,7 +1388,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 81,
+          "line": 82,
           "column": 5
         }
       ]
@@ -1304,7 +1431,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 413,
+          "line": 414,
           "column": 70
         }
       ]
@@ -1374,7 +1501,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 370,
+          "line": 371,
           "column": 99
         },
         {
@@ -1444,12 +1571,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 363,
+          "line": 364,
           "column": 35
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 366,
+          "line": 367,
           "column": 41
         }
       ]
@@ -1503,7 +1630,7 @@
         {
           "file": "shared/ui/ConfirmDialog.tsx",
           "line": 4,
-          "column": 110
+          "column": 123
         }
       ]
     },
@@ -1514,7 +1641,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 398,
+          "line": 399,
           "column": 123
         }
       ]
@@ -1546,7 +1673,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 146,
+          "line": 149,
           "column": 46
         }
       ]
@@ -1760,12 +1887,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 325,
+          "line": 326,
           "column": 55
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 325,
+          "line": 326,
           "column": 246
         }
       ]
@@ -1776,13 +1903,18 @@
       "placeholders": [],
       "refs": [
         {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 38,
+          "column": 96
+        },
+        {
           "file": "features/models/CursorRemoteGuide.tsx",
           "line": 24,
           "column": 70
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 354,
+          "line": 355,
           "column": 80
         },
         {
@@ -1838,6 +1970,18 @@
         }
       ]
     },
+    "428fb8bfeecf7f91": {
+      "source": "异常",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 24,
+          "column": 8
+        }
+      ]
+    },
     "42a1d9e5b037c210": {
       "source": "字节数",
       "kind": "text",
@@ -1888,7 +2032,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 165,
+          "line": 166,
           "column": 27
         }
       ]
@@ -1902,7 +2046,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 94,
+          "line": 95,
           "column": 5
         }
       ]
@@ -2024,8 +2168,18 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 26,
+          "line": 27,
           "column": 27
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 27,
+          "column": 151
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 41,
+          "column": 108
         },
         {
           "file": "shared/ui/DataTable.tsx",
@@ -2046,7 +2200,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 399,
+          "line": 400,
           "column": 34
         }
       ]
@@ -2073,7 +2227,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 349,
+          "line": 350,
           "column": 703
         }
       ]
@@ -2114,7 +2268,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 59,
+          "line": 71,
           "column": 21
         }
       ]
@@ -2249,7 +2403,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 202,
+          "line": 203,
           "column": 13
         }
       ]
@@ -2350,7 +2504,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 260,
+          "line": 261,
           "column": 47
         }
       ]
@@ -2374,7 +2528,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 332,
+          "line": 333,
           "column": 52
         }
       ]
@@ -2408,7 +2562,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 399,
+          "line": 400,
           "column": 83
         }
       ]
@@ -2521,12 +2675,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 324,
+          "line": 325,
           "column": 59
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 324,
+          "line": 325,
           "column": 141
         }
       ]
@@ -2614,7 +2768,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 133,
+          "line": 134,
           "column": 5
         }
       ]
@@ -2645,6 +2799,16 @@
           "file": "features/home/charts/DailyTokenUsageChart.tsx",
           "line": 164,
           "column": 15
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 30,
+          "column": 8
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 34,
+          "column": 45
         }
       ]
     },
@@ -2681,7 +2845,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 93,
+          "line": 94,
           "column": 5
         }
       ]
@@ -2707,7 +2871,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 103,
+          "line": 104,
           "column": 5
         }
       ]
@@ -2784,7 +2948,7 @@
       "refs": [
         {
           "file": "shared/api.ts",
-          "line": 524,
+          "line": 533,
           "column": 43
         }
       ]
@@ -2870,7 +3034,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 156,
+          "line": 159,
           "column": 46
         }
       ]
@@ -2937,6 +3101,23 @@
           "file": "shell/AppLayout.tsx",
           "line": 52,
           "column": 47
+        }
+      ]
+    },
+    "68f33bec99c89f36": {
+      "source": "非缓存输入",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 28,
+          "column": 8
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 34,
+          "column": 13
         }
       ]
     },
@@ -3034,7 +3215,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 163,
+          "line": 166,
           "column": 46
         }
       ]
@@ -3046,12 +3227,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 322,
+          "line": 323,
           "column": 40
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 322,
+          "line": 323,
           "column": 123
         }
       ]
@@ -3063,12 +3244,12 @@
       "refs": [
         {
           "file": "shared/store/appStore.ts",
-          "line": 250,
+          "line": 251,
           "column": 23
         },
         {
           "file": "shared/store/appStore.ts",
-          "line": 257,
+          "line": 258,
           "column": 25
         }
       ]
@@ -3128,7 +3309,7 @@
       "refs": [
         {
           "file": "shared/api.ts",
-          "line": 519,
+          "line": 528,
           "column": 43
         }
       ]
@@ -3140,7 +3321,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 137,
+          "line": 138,
           "column": 50
         }
       ]
@@ -3193,7 +3374,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 394,
+          "line": 395,
           "column": 67
         }
       ]
@@ -3231,7 +3412,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 84,
+          "line": 96,
           "column": 41
         }
       ]
@@ -3306,7 +3487,7 @@
       "refs": [
         {
           "file": "shared/api.ts",
-          "line": 462,
+          "line": 471,
           "column": 21
         }
       ]
@@ -3345,7 +3526,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 200,
+          "line": 201,
           "column": 11
         }
       ]
@@ -3401,7 +3582,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 55,
+          "line": 66,
           "column": 14
         }
       ]
@@ -3493,7 +3674,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 54,
+          "line": 55,
           "column": 17
         }
       ]
@@ -3642,7 +3823,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 414,
+          "line": 415,
           "column": 87
         }
       ]
@@ -3752,7 +3933,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 370,
+          "line": 371,
           "column": 250
         }
       ]
@@ -3798,7 +3979,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 51,
+          "line": 52,
           "column": 61
         }
       ]
@@ -4107,7 +4288,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 211,
+          "line": 212,
           "column": 22
         }
       ]
@@ -4160,12 +4341,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 349,
+          "line": 350,
           "column": 432
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 357,
+          "line": 358,
           "column": 193
         },
         {
@@ -4205,8 +4386,8 @@
         },
         {
           "file": "shared/ui/Modal.tsx",
-          "line": 42,
-          "column": 223
+          "line": 44,
+          "column": 255
         }
       ]
     },
@@ -4219,7 +4400,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 43,
+          "line": 54,
           "column": 11
         }
       ]
@@ -4269,7 +4450,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 139,
+          "line": 140,
           "column": 15
         }
       ]
@@ -4324,7 +4505,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 349,
+          "line": 350,
           "column": 715
         }
       ]
@@ -4372,6 +4553,20 @@
           "file": "features/models/CursorModelEditor.tsx",
           "line": 164,
           "column": 61
+        }
+      ]
+    },
+    "a7855aee85d59bbc": {
+      "source": "{metric} · 按模型统计",
+      "kind": "template",
+      "placeholders": [
+        "metric"
+      ],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 17,
+          "column": 26
         }
       ]
     },
@@ -4516,7 +4711,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 117,
+          "line": 118,
           "column": 5
         }
       ]
@@ -4683,7 +4878,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 357,
+          "line": 358,
           "column": 49
         }
       ]
@@ -4721,7 +4916,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 100,
+          "line": 101,
           "column": 5
         }
       ]
@@ -4798,7 +4993,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 102,
+          "line": 103,
           "column": 5
         }
       ]
@@ -4834,7 +5029,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 354,
+          "line": 355,
           "column": 103
         }
       ]
@@ -4938,7 +5133,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 203,
+          "line": 204,
           "column": 13
         }
       ]
@@ -5006,12 +5201,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 362,
+          "line": 363,
           "column": 45
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 365,
+          "line": 366,
           "column": 42
         }
       ]
@@ -5116,7 +5311,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 349,
+          "line": 350,
           "column": 62
         }
       ]
@@ -5193,7 +5388,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 110,
+          "line": 111,
           "column": 5
         }
       ]
@@ -5297,12 +5492,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 331,
+          "line": 332,
           "column": 30
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 331,
+          "line": 332,
           "column": 115
         }
       ]
@@ -5396,7 +5591,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 362,
+          "line": 363,
           "column": 27
         }
       ]
@@ -5408,12 +5603,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 349,
+          "line": 350,
           "column": 675
         },
         {
           "file": "shared/ui/Modal.tsx",
-          "line": 100,
+          "line": 114,
           "column": 153
         }
       ]
@@ -5495,7 +5690,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 347,
+          "line": 348,
           "column": 11
         }
       ]
@@ -5521,7 +5716,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 359,
+          "line": 360,
           "column": 27
         }
       ]
@@ -5571,7 +5766,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 355,
+          "line": 356,
           "column": 47
         }
       ]
@@ -5629,7 +5824,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 69,
+          "line": 81,
           "column": 56
         }
       ]
@@ -5677,7 +5872,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 97,
+          "line": 98,
           "column": 5
         }
       ]
@@ -5701,7 +5896,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 70,
+          "line": 82,
           "column": 61
         }
       ]
@@ -5826,7 +6021,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 223,
+          "line": 224,
           "column": 26
         }
       ]
@@ -5929,8 +6124,23 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 143,
+          "line": 146,
           "column": 40
+        },
+        {
+          "file": "features/home/metrics/HomeMetrics.tsx",
+          "line": 147,
+          "column": 100
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 16,
+          "column": 27
+        },
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 22,
+          "column": 8
         }
       ]
     },
@@ -6064,7 +6274,7 @@
       "refs": [
         {
           "file": "features/models/LegacyModelImport.tsx",
-          "line": 71,
+          "line": 83,
           "column": 66
         }
       ]
@@ -6124,7 +6334,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 359,
+          "line": 360,
           "column": 44
         }
       ]
@@ -6136,7 +6346,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 355,
+          "line": 356,
           "column": 77
         }
       ]
@@ -6160,12 +6370,12 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 309,
+          "line": 310,
           "column": 74
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 309,
+          "line": 310,
           "column": 118
         }
       ]
@@ -6196,7 +6406,7 @@
         },
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 321,
+          "line": 322,
           "column": 98
         }
       ]
@@ -6208,7 +6418,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 354,
+          "line": 355,
           "column": 53
         }
       ]
@@ -6513,6 +6723,18 @@
         }
       ]
     },
+    "fb04addb4c2654f5": {
+      "source": "输出",
+      "kind": "text",
+      "placeholders": [],
+      "refs": [
+        {
+          "file": "features/home/metrics/ModelUsageDialog.tsx",
+          "line": 34,
+          "column": 25
+        }
+      ]
+    },
     "fb11aa6f29827095": {
       "source": "检查中…",
       "kind": "text",
@@ -6569,7 +6791,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 83,
+          "line": 84,
           "column": 5
         }
       ]
@@ -6581,7 +6803,7 @@
       "refs": [
         {
           "file": "features/models/CursorSettingsPage.tsx",
-          "line": 340,
+          "line": 341,
           "column": 21
         }
       ]
@@ -6617,7 +6839,7 @@
       "refs": [
         {
           "file": "features/home/metrics/HomeMetrics.tsx",
-          "line": 106,
+          "line": 107,
           "column": 5
         }
       ]
@@ -6665,7 +6887,7 @@
       "refs": [
         {
           "file": "features/home/HomePage.tsx",
-          "line": 201,
+          "line": 203,
           "column": 25
         }
       ]
