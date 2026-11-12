@@ -31,9 +31,24 @@ impl Store {
         model_hashes: Option<&str>,
         bucket_ms: Option<i64>,
     ) -> Result<Overview> {
+        // Keep the breakdown and series on one read snapshot so a call that finishes during this
+        // request cannot make the two views disagree.
+        let mut tx = self.pool.begin().await?;
         // One grouped query supplies both the total and its breakdown, even while calls finish.
         let rows = sqlx::query(&format!(
-            "SELECT model_hash, model_id, MAX(display_name) AS display_name, provider_type, provider_url,
+            "WITH filtered AS (
+                SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY model_hash, model_id, provider_type, provider_url
+                    ORDER BY created_at_ms DESC, call_id DESC
+                ) AS latest_rank
+                FROM llm_calls
+                WHERE (? IS NULL OR created_at_ms >= ?)
+                  AND (? IS NULL OR created_at_ms < ?)
+                  AND (? IS NULL OR model_hash IN (SELECT value FROM json_each(?)))
+            )
+            SELECT model_hash, model_id,
+                MAX(CASE WHEN latest_rank = 1 THEN display_name END) AS display_name,
+                provider_type, provider_url,
                 SUM(status != 'running') AS llm_calls,
                 SUM(status = 'completed') AS successful_calls,
                 SUM(status NOT IN ('running', 'completed')) AS failed_calls,
@@ -41,10 +56,7 @@ impl Store {
                 COALESCE(SUM(cache_read_tokens), 0) AS cache_read_tokens,
                 COALESCE(SUM(cache_write_tokens), 0) AS cache_write_tokens,
                 COALESCE(SUM(output_tokens), 0) AS output_tokens
-             FROM llm_calls
-             WHERE (? IS NULL OR created_at_ms >= ?)
-               AND (? IS NULL OR created_at_ms < ?)
-               AND (? IS NULL OR model_hash IN (SELECT value FROM json_each(?)))
+             FROM filtered
              GROUP BY model_hash, model_id, provider_type, provider_url
              ORDER BY model_id, provider_url, provider_type, model_hash",
             fresh_input = fresh_input_sql(),
@@ -55,7 +67,7 @@ impl Store {
         .bind(end_ms)
         .bind(model_hashes)
         .bind(model_hashes)
-        .fetch_all(&self.pool)
+        .fetch_all(&mut *tx)
         .await?;
         let mut model_usage = Vec::with_capacity(rows.len());
         let mut metrics = OverviewMetrics::default();
@@ -125,7 +137,7 @@ impl Store {
         .bind(end_ms)
         .bind(model_hashes)
         .bind(model_hashes)
-        .fetch_all(&self.pool)
+        .fetch_all(&mut *tx)
         .await?;
         let mut recorded = rows
             .into_iter()
@@ -154,6 +166,8 @@ impl Store {
                     })
             })
             .collect();
+
+        tx.commit().await?;
 
         Ok(Overview {
             metrics,

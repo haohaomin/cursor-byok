@@ -118,7 +118,11 @@ async fn historical_models_keep_distinct_provider_and_model_identities() {
         1100,
     )
     .await;
-    sqlx::query("UPDATE llm_calls SET display_name = 'Renamed' WHERE call_id = 'renamed'")
+    sqlx::query("UPDATE llm_calls SET display_name = 'Zeta old' WHERE call_id = 'original'")
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    sqlx::query("UPDATE llm_calls SET display_name = 'Alpha latest' WHERE call_id = 'renamed'")
         .execute(&store.pool)
         .await
         .unwrap();
@@ -164,7 +168,7 @@ async fn historical_models_keep_distinct_provider_and_model_identities() {
     assert_eq!(rows(&value).len(), 5);
     assert_eq!(rows(&value)[0]["metrics"]["llm_calls"], 2);
     assert_eq!(rows(&value)[0]["provider_url"], "https://one.example/v1");
-    assert_eq!(rows(&value)[0]["display_name"], "Renamed");
+    assert_eq!(rows(&value)[0]["display_name"], "Alpha latest");
     assert!(rows(&value).iter().any(|r| r["model_hash"].is_null()));
     assert!(rows(&value)
         .iter()

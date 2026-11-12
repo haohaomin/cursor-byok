@@ -73,6 +73,8 @@ export function HomePage() {
   useEffect(() => {
     if (!selectedRange) return;
     let active = true;
+    setRangeOverview(null);
+    setUsageMetric(null);
     setRangeBusy(true);
     void api.overview({
       ...selectedRange,
@@ -86,6 +88,7 @@ export function HomePage() {
   }, [preset, customRange, overview, refreshVersion, appliedModels]);
 
   const filteredOverview = rangeOverview ?? overview;
+  const modelUsage = filteredOverview.model_usage ?? [];
   const dailyTokenUsage = filteredOverview.token_usage_series.map((bucket) => ({
     bucketStartMs: bucket.bucket_start_ms,
     inputTokens: bucket.input_tokens,
@@ -171,7 +174,11 @@ export function HomePage() {
     {
       key: "metrics",
       estimatedHeight: 130,
-      content: <HomeMetrics data={metrics} refreshVersion={refreshVersion} onOpen={setUsageMetric} />,
+      content: <HomeMetrics
+        data={metrics}
+        refreshVersion={refreshVersion}
+        onOpen={rangeOverview && !rangeBusy ? setUsageMetric : undefined}
+      />,
     },
 
     {
@@ -201,6 +208,11 @@ export function HomePage() {
       onRefresh={() => void refresh()}
     /></PageActions>
     <PageContent title={t("概览")} sections={sections} />
-    <ModelUsageDialog metric={usageMetric} rows={filteredOverview.model_usage} pricing={pricing} onClose={() => setUsageMetric(null)} />
+    <ModelUsageDialog
+      metric={rangeOverview && !rangeBusy ? usageMetric : null}
+      rows={modelUsage}
+      pricing={pricing}
+      onClose={() => setUsageMetric(null)}
+    />
   </>;
 }
