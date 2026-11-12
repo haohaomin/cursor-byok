@@ -6,7 +6,7 @@
 
 **2026-11-06 进展：Issue #505 的多个 reasoning signature 修复已在 `codex/issue505-multiple-signatures` 完成，`cursor-server --all-targets` 通过（465 通过、14 忽略）；尚未合入 main、发布或完成真实 Cursor/原网关验收。**
 
-**2026-11-13 进展：Issue #463 已增加 Google Gemini OpenAI 兼容预设，使用完整 `v1beta/openai/chat/completions` 地址和现有 Bearer 鉴权；前端类型检查、构建与浏览器配置验证通过。原生 `generateContent` 协议和真实 Gemini Key 尚未验收，见 [验证记录](history/issues/2026-11-13-issue463-gemini-openai-compat.md)。**
+**2026-11-13 进展：Issue #463/#184 已增加 Google Gemini OpenAI 兼容预设，使用完整 `v1beta/openai/chat/completions` 地址和现有 Bearer 鉴权；前端类型检查、构建与浏览器配置验证通过。原生 `generateContent` 协议和真实 Gemini Key 尚未验收，见 [验证记录](history/issues/2026-11-13-issue463-gemini-openai-compat.md)。**
 
 ## 1. 已发布的成果
 

@@ -1,6 +1,6 @@
-# Issue #463：Gemini OpenAI 兼容预设
+# Issue #463 / #184：Gemini OpenAI 兼容预设
 
-上游 Issue [#463](https://github.com/leookun/cursor-byok/issues/463) 只提供了一个鉴权提示：Gemini 原生 API 使用 `x-goog-api-key`。这不足以支持直接把 Cursor 的 OpenAI 请求体发送到 Gemini 原生 `generateContent` 端点，因为两者的 URL、请求体和流式响应格式不同。
+上游 Issue [#463](https://github.com/leookun/cursor-byok/issues/463) 只提供了一个鉴权提示：Gemini 原生 API 使用 `x-goog-api-key`；[#184](https://github.com/leookun/cursor-byok/issues/184) 的现场错误则是把 Gemini 配置到现有 OpenAI/Anthropic 适配器后得到 405。这不足以支持直接把 Cursor 的 OpenAI 请求体发送到 Gemini 原生 `generateContent` 端点，因为两者的 URL、请求体和流式响应格式不同。
 
 Google 同时提供 OpenAI 兼容入口：
 
