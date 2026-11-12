@@ -4,6 +4,12 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-13 本 fork PR #44
+
+| PR / head | 解决目标与范围 | 验证边界 |
+| --- | --- | --- |
+| [#44](https://github.com/haohaomin/cursor-byok/pull/44) / `f77fe1f` | 为模型设置增加 JSON 配置备份导出/导入；导入按模型哈希跳过重复项 | 工作区 Rust 293 项通过、14 项忽略，Clippy/格式检查、桌面类型检查、Vite 与 Tauri debug 构建通过；真实安装包文件选择器和跨电脑导入尚待人工验收，PR CI 尚在运行。详见 [Issue #471 记录](history/issues/2026-11-13-issue471-model-backup.md)。 |
+
 ## 2026-11-06 已合并 PR 的测试状态
 
 本 fork 最近合并的 #12、#14、#15、#16、#17、#18、#19、#20、#21、#22、#23，最终 PR 提交的 Frontend、Rust Linux、Desktop Rust Windows/macOS 检查均通过。合并后 main `b6936e885db61` 的 [CI](https://github.com/haohaomin/cursor-byok/actions/runs/42147293009) 也全部通过。
