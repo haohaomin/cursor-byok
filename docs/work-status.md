@@ -2,6 +2,8 @@
 
 更新：2026-11-04；本轮合并与 v1.1.0 发布状态已通过 GitHub API 和产物下载核对。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
+**2026-11-13 进展：**#150/#417 的逐模型 Token 定价已在依赖 #107 的分支完成并通过本地验证，已提交 [PR #35](https://github.com/haohaomin/cursor-byok/pull/35)，尚未合入或发布；依赖的按模型用量统计为 [PR #34](https://github.com/haohaomin/cursor-byok/pull/34)。设置页按 `model_hash` 保存输入、输出、缓存读取和缓存写入单价；首页总计与按模型明细按覆盖价计算，未配置覆盖时使用全局价格。工作区全量 Rust 测试为 578 通过、0 失败、14 忽略；桌面检查、Tauri debug/no-bundle 构建和 React + Chromium Demo 均通过。插件模型暂使用全局价格，见 [定价验证记录](history/issues/2026-11-13-issue150-model-pricing.md)。
+
 **结论：远程 Semble、Grok 与 GPT/Google OAuth 的已提交实现均已合入 main，并随 v1.1.0 发布。Semble 独立终端审批卡片候选仍有 10 个本地文件未提交、未推送。真实 OAuth 账号、Semble 批准/拒绝及 Windows Cursor UI 仍待验收。**
 
 **2026-11-13 进展：**上游 PR #433 已按当前 Rust/Tauri 架构选择性重实现：非 Tab 的 Cursor host 请求进入本地路由，CONNECT 隧道保持原始 authority；硬编码云端 400/404 短路和 `custom-protocol` feature 未采用。定向代理测试、Clippy、桌面检查和工作区回归通过，真实代理网络与 Cursor UI 待验，见[验证记录](history/pull-requests/2026-11-13-pr433-proxy-routing.md)。**

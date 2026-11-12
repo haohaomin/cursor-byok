@@ -173,6 +173,10 @@ export interface TokenPricingSettings {
   cache_write_per_million: number;
 }
 
+export interface ModelTokenPricing extends TokenPricingSettings {
+  model_hash: string;
+}
+
 export type PluginRuntimeState = "uninitialized" | "initializing" | "ready" | "failed" | "unsupported";
 export type PluginRuntimePhase = "checking" | "downloading" | "verifying" | "installing" | "validating";
 
@@ -562,4 +566,6 @@ export const api = {
   setCommitSettings: (settings: CommitSettings) => request<CommitSettingsView>("/settings/commit", { method: "PUT", body: JSON.stringify(settings) }),
   pricingSettings: () => request<TokenPricingSettings>("/settings/pricing"),
   setPricingSettings: (settings: TokenPricingSettings) => request<TokenPricingSettings>("/settings/pricing", { method: "PUT", body: JSON.stringify(settings) }),
+  modelPricingSettings: () => request<ModelTokenPricing[]>("/settings/model-pricing"),
+  setModelPricingSettings: (settings: ModelTokenPricing[]) => request<ModelTokenPricing[]>("/settings/model-pricing", { method: "PUT", body: JSON.stringify(settings) }),
 };

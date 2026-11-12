@@ -4,11 +4,13 @@ import type {
   ExternalApiSettings,
   LlmCall,
   Model,
+  ModelTokenPricing,
   Overview,
   OverviewTokenUsageBucket,
   ProxySettings,
   StatisticsStorage,
   TabSettings,
+  TokenPricingSettings,
 } from "../shared/api";
 
 const API_ROOT = "/__byok-api__/api";
@@ -87,6 +89,12 @@ let harnessStatus: CursorHarnessStatus = {
 
 let detailed = true;
 let portSettings = { proxy_port: 0, service_port: 0 };
+let pricing: TokenPricingSettings = {
+  input_per_million: 5,
+  output_per_million: 25,
+  cache_read_per_million: 0.5,
+  cache_write_per_million: 6.25,
+};
 let externalApiSettings: ExternalApiSettings = { enabled: false, api_key: "" };
 let proxySettings: ProxySettings = {
   mode: "default",
@@ -96,6 +104,13 @@ let proxySettings: ProxySettings = {
   has_password: false,
 };
 let tabSettings: TabSettings = { mode: "public", address: "" };
+let modelPricing: ModelTokenPricing[] = [{
+  model_hash: "mock-gpt",
+  input_per_million: 1.5,
+  output_per_million: 8,
+  cache_read_per_million: 0.15,
+  cache_write_per_million: 1.5,
+}];
 let storage: StatisticsStorage = { call_count: calls.length, trace_count: calls.length };
 
 export function installDemoApi() {
@@ -149,6 +164,11 @@ export function installDemoApi() {
       portSettings = body as typeof portSettings;
       return json(portSettings);
     }
+    if (path === "/settings/pricing" && method === "GET") return json(pricing);
+    if (path === "/settings/pricing") {
+      pricing = body as TokenPricingSettings;
+      return json(pricing);
+    }
     if (path === "/settings/external-api" && method === "GET") return json(externalApiSettings);
     if (path === "/settings/external-api") {
       externalApiSettings = body as ExternalApiSettings;
@@ -171,6 +191,23 @@ export function installDemoApi() {
       tabSettings = body as TabSettings;
       return json(tabSettings);
     }
+    if (path === "/settings/model-pricing" && method === "GET") return json(modelPricing);
+    if (path === "/settings/model-pricing") {
+      modelPricing = [...(body as ModelTokenPricing[])].sort((left, right) => left.model_hash.localeCompare(right.model_hash));
+      return json(modelPricing);
+    }
+    if (path === "/settings/commit" && method === "GET") {
+      return json({ model_id: "", prompt: "", prompt_locale: "en-US", default_prompt: "Write a concise commit message." });
+    }
+    if (path === "/settings/commit") {
+      const next = body as { model_id?: string; prompt?: string; prompt_locale?: string };
+      return json({
+        model_id: next.model_id ?? "",
+        prompt: next.prompt ?? "",
+        prompt_locale: next.prompt_locale ?? "en-US",
+        default_prompt: "Write a concise commit message.",
+      });
+    }
     if (path === "/settings/desktop" && method === "GET") return json({ silent_start: false, show_dock_icon: true });
     if (path === "/settings/desktop") return json(body);
     if (path === "/desktop/open-external-url") {
@@ -182,6 +219,10 @@ export function installDemoApi() {
       return empty();
     }
     if (path.endsWith("/dismissals")) return empty();
+    if (path === "/plugins" && method === "GET") return json([]);
+    if (path === "/plugins/runtime" && method === "GET") {
+      return json({ state: "unsupported", version: "demo", target: null, phase: null, downloaded_bytes: 0, total_bytes: null, error: null });
+    }
 
     return json({ message: `Unhandled demo endpoint: ${method} ${path}` }, 404);
   };
