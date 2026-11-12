@@ -8,6 +8,7 @@
 | 安装包已经包含哪些修复 | [维护状态](maintenance-status.md) |
 | 所有 Issue 的进度与下一步 | [Issue 清单](issues.md) |
 | 上游 PR 能否采用、风险是什么 | [PR 审查清单](pull-requests.md) |
+| Linux 安装包依赖和发行版边界 | [Linux 安装指南](linux.md) |
 | Remote SSH 如何配置 | [远程连接指南](remote-ssh.md) |
 | 复现、失败基线、验收、截图与旧发布 | [历史资料](history/README.md) |
 | 安装、功能和使用说明 | [中文 README](../README.md) / [English README](../README-EN.md) |
@@ -20,6 +21,7 @@ docs/
 ├── maintenance-status.md  # 用户可用范围
 ├── issues.md              # Issue 清单
 ├── pull-requests.md       # PR 审查清单
+├── linux.md               # Linux 安装依赖与兼容边界
 ├── remote-ssh.md          # 当前使用指南
 └── history/               # 按日期保留的证据
 ```
