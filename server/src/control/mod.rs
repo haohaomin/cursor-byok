@@ -114,6 +114,10 @@ pub fn api_router(service: ControlService) -> Router {
             "/__byok-api__/api/models",
             get(models::list).post(models::create),
         )
+        .route(
+            "/__byok-api__/api/models/backup/import",
+            post(models::import_backup),
+        )
         .route("/__byok-api__/api/models/discover", post(models::discover))
         .route(
             "/__byok-api__/api/models/import-v0049",

@@ -76,7 +76,7 @@ impl Store {
         Ok(saved)
     }
 
-    pub(super) async fn create_models_if_missing(
+    pub(crate) async fn create_models_if_missing(
         &self,
         inputs: &[ModelConfigInput],
     ) -> Result<usize> {
