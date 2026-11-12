@@ -114,7 +114,7 @@
 | [#420](https://github.com/leookun/cursor-byok/pull/420) | MCP schema 整数约束规范化 | B（本地已合入） | 原 PR：1；+182/-31 | 本轮服务端 387 测试及 Clippy 通过 | 已合入并推送 main（`e2f17e0`） | 已补齐原补丁的大整数精度缺陷；合并保留空 schema、properties 和 required 修复，新增组合回归。v1.1.0 已包含该合入，未新增真实 UI 验证；上游仍 OPEN、仓库已归档。见 [合并记录](history/pull-requests/2026-10-19-branch-integration.md)。 |
 | [#483](https://github.com/leookun/cursor-byok/pull/483) | CodeBuddy CN 与后台自动签到 | C | 38；+4888/-211 | 未见 | 冲突 1 | 高：38 文件，新增宿主调度、锁、状态持久化、凭据刷新及导出策略；作者未测真实流式聊天。 **下一步：**单独验证调度取消/重启/跨日、账号并发与 token 日志保护，再测真实聊天。 |
 | [#474](https://github.com/leookun/cursor-byok/pull/474) | 代理缓存刷新，夹带规则黑名单 | C | 6；+242/-1 | 4✓ | 无文本冲突 | 高且有具体问题：与标题无关的规则正文日志、匹配规则删除、返回成功但未保存。 **2026-10-27：**网络部分已独立实现并补验证；规则删除/正文日志仍不采用。见[#508 修复](history/issues/2026-10-27-issue508-fix.md)。 |
-| [#458](https://github.com/leookun/cursor-byok/pull/458) | Windows cmd 转义及 CA 信任范围 | C | 3；+7/-8 | 未见 | 无文本冲突 | 高且有具体问题：同时把证书安装/检测由 LocalMachine 改为 CurrentUser，已有安装可能误报未信任。 **下一步：**拆出 cmd 修复，保留当前证书存储约定；Windows 实机验证终端与转义。 |
+| [#458](https://github.com/leookun/cursor-byok/pull/458) | Windows cmd 转义及 CA 信任范围 | C | 3；+7/-8 | 未见 | 无文本冲突 | cmd 参数修复已由 fork PR #14 合入 main；证书改为 CurrentUser 的部分暂不采用，会让既有 LocalMachine 证书被误报为未信任。上游补丁已完成交叉编译和工作区回归，但没有 Windows 实机证书验收；除非先定义迁移策略，否则不再重复发布。 |
 | [#447](https://github.com/leookun/cursor-byok/pull/447) | Agent 路由、模型别名与 CLI 启动器 | C | 19；+1120/-2 | 未见 | 冲突 1 | 高：19 文件多功能；与 fork 的控制路由冲突；上游作者不愿维护新 launcher 栈。 **下一步：**拆出 bidi/MCP/路由修复；逐项验证。CLI 优先评估官方 agent -e 入口。 |
 | [#437](https://github.com/leookun/cursor-byok/pull/437) | Antigravity 模型和额度管理大改 | C | 60；+2847/-1037 | 未见 | 冲突 1 | 高：60 文件，包含数据库 0010、账号/模型管理及非必要 release workflow 改写。 **下一步：**拆出功能和发版流程；用数据库副本测升级，保护 fork 的更新源与签名。 |
 | [#433](https://github.com/leookun/cursor-byok/pull/433) | 所有 Cursor 请求经本地代理 | C | 2；+72/-4（上游） | 上游无可用 checks | 选择性重实现 | 本 fork 只采用非 Tab Cursor 请求进入本地路由、CONNECT 不重写两项；明确舍弃硬编码 400/404 短路和 `custom-protocol` feature。4 项代理单元测试、Clippy、桌面检查和全工作区回归通过；真实代理网络与 Cursor UI 待验，见[验证记录](history/pull-requests/2026-11-13-pr433-proxy-routing.md)。 |
@@ -152,9 +152,9 @@
 
 [本地代理](https://github.com/leookun/cursor-byok/blob/a5b1ce085d6a48e9fa83866f49dbb198ae753c70/server/src/local_app/proxy.rs#L134) 在检查 Cursor host、TAB Direct 分流之前匹配 `local_stub_status`，对 FileSync、BackgroundComposer 等接口直接返回 400/404；未检查账号是否真的没有这些功能。对依赖这些接口的用户会改变行为，不能视为纯粹的出站代理修复。Cargo 同时强制开启 `custom-protocol`，需要独立验证开发运行模式。
 
-### #458：小 diff 也有安装行为变化
+### #458：cmd 修复已采用，证书范围改动暂缓
 
-[证书安装](https://github.com/leookun/cursor-byok/blob/5b63b8586a22975114e955933022b1f3c64a9de4/server/src/local_app/ca/mod.rs#L91) 与 Windows 检测一起转到 CurrentUser，而既有 LocalMachine 证书不再被这段检测识别。应拆开终端参数修复和证书范围调整。上游行内 review 也指出此问题；本次未做 Windows 实机测试。
+[证书安装](https://github.com/leookun/cursor-byok/blob/5b63b8586a22975114e955933022b1f3c64a9de4/server/src/local_app/ca/mod.rs#L91) 与 Windows 检测一起转到 CurrentUser，而既有 LocalMachine 证书不再被这段检测识别。cmd 参数部分已经由 fork PR #14 合入 main；证书范围部分即使交叉编译和工作区回归通过，也不能替代 Windows 实机证书验收，因此暂不采用，避免把现有安装标记为未信任。
 
 ### #437 / #483：插件标题下还有共享基础设施改动
 
