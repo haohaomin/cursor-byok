@@ -966,4 +966,35 @@ mod tests {
         assert_eq!(available.context_token_limit, Some(272_000));
         assert_eq!(available.context_token_limit_for_max_mode, Some(272_000));
     }
+
+    #[test]
+    fn oversized_builtin_context_limit_is_omitted_instead_of_truncated() {
+        let mut model = model();
+        model.context_window_tokens = Some(i32::MAX as u64 + 1);
+        let available = available_model(&model);
+
+        assert_eq!(available.context_token_limit, None);
+        assert_eq!(available.context_token_limit_for_max_mode, None);
+    }
+
+    #[test]
+    fn plugin_model_does_not_advertise_a_builtin_context_limit() {
+        let available = available_plugin_model(&PluginModelDescriptor {
+            id: "plugin:test/provider/model".into(),
+            plugin_id: "plugin:test".into(),
+            plugin_name: "Test Plugin".into(),
+            provider_id: "provider".into(),
+            model_id: "model".into(),
+            display_name: "Plugin Model".into(),
+            description: None,
+            icon: String::new(),
+            provider_type: "test".into(),
+            max_output_tokens: None,
+            images: false,
+            enabled: true,
+        });
+
+        assert_eq!(available.context_token_limit, None);
+        assert_eq!(available.context_token_limit_for_max_mode, None);
+    }
 }
