@@ -60,5 +60,8 @@ SQLite model_configs → 刷新模型列表
 | `npm run tauri:build -- --debug --no-bundle` | 通过（隔离 target） | macOS Tauri debug/no-bundle 产物可生成 |
 | 工作区 Rust 全量测试 | 293 通过、14 忽略、0 失败 | 现有全量回归；忽略项按项目配置需要 Deno 或缓存模型 |
 | 工作区 Clippy | 通过 | `-D warnings` |
+| Oracle Linux 9.8 ARM64：`cargo fmt --all -- --check` | 通过 | 使用排除 macOS AppleDouble 元数据的干净归档交叉验证 |
+| Oracle Linux 9.8 ARM64：4 项 `model_backup_import` 回归 | 4 通过、0 失败、13 过滤 | 覆盖重复导入、备份顺序、大请求体和非法备份 |
+| Oracle Linux 9.8 ARM64：`cargo clippy --locked -p cursor-server --test external_api -- -D warnings` | 通过 | 针对导入接口测试目标 |
 
-当前证据证明服务端导入逻辑、并发顺序保护、前端类型/构建和 Tauri debug 产物可用；PR #44 的 Sourcery 复审已通过，但该分支没有 GitHub Actions 运行记录。尚未证明已安装的 Cursor 桌面包在真实文件选择器中完成一次导出再导入，也未验证跨操作系统文件选择器行为。该项保持部分完成，直到桌面人工验收补齐。
+当前证据证明服务端导入逻辑、并发顺序保护、前端类型/构建、Tauri debug 产物，以及 macOS 与 Oracle Linux ARM64 上的定向回归可用；PR #44 的 Sourcery 复审已通过，但该分支没有 GitHub Actions 运行记录。尚未证明已安装的 Cursor 桌面包在真实文件选择器中完成一次导出再导入，也未验证跨操作系统文件选择器行为。该项保持部分完成，直到桌面人工验收补齐。
