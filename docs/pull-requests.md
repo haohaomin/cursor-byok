@@ -8,7 +8,7 @@
 
 | PR / head | 解决目标与范围 | 验证状态与边界 |
 | --- | --- | --- |
-| [#45](https://github.com/haohaomin/cursor-byok/pull/45) / `53131d2` | Issue #99：发现供应商模型列表后多选并批量添加；Token 用量统计沿用已合入的 #107/#150 | 本地 Rust 全量 293✓、14 项忽略，Clippy、格式、四语言扫描、桌面检查和 Tauri debug/no-bundle 构建通过；PR 刚创建，CI 尚未返回。真实供应商 `/models` 返回及已安装应用 UI 待手工验收。 |
+| [#45](https://github.com/haohaomin/cursor-byok/pull/45) / `0b67fff` | Issue #99：发现供应商模型列表后多选并批量添加；Token 用量统计沿用已合入的 #107/#150 | macOS 与 Oracle Linux 9.8 ARM64 的格式检查和控制 API 批量回归均通过；Oracle Linux Clippy 通过。桌面检查、四语言扫描和 Tauri debug/no-bundle 构建也已通过；当前没有 GitHub Actions 检查。真实供应商 `/models` 返回及已安装应用 UI 待手工验收。 |
 
 ## 2026-11-06 已合并 PR 的测试状态
 

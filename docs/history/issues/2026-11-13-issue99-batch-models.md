@@ -43,10 +43,11 @@ SQLite 事务一次写入全部模型并刷新列表
 
 | 检查 | 结果 |
 | --- | --- |
-| `cargo fmt --all -- --check` | 通过 |
-| 控制 API 批量创建回归 | 通过；`model_create_accepts_a_batch_of_discovered_models` 1 项，0 失败 |
+| `cargo fmt --all -- --check` | 通过；macOS 与 Oracle Linux 9.8 ARM64 均通过 |
+| 控制 API 批量创建回归 | 通过；macOS 与 Oracle Linux 9.8 ARM64 均为 `model_create_accepts_a_batch_of_discovered_models` 1 项通过、0 失败 |
+| `cargo clippy --locked -p cursor-server --test external_api -- -D warnings` | 通过；Oracle Linux 9.8 ARM64 通过 |
 | `npm run i18n:scan` | 通过；新增文案已填充 en-US、pt-BR、ru-RU、zh-CN |
 | `npm run check` | 通过；TypeScript、Node 类型检查和生产构建通过，保留既有动态导入/大 chunk 警告 |
 | `git diff --check` | 通过 |
 
-本次没有真实供应商账号，因此没有验证不同服务商的实际 `/models` 返回、重复模型的操作提示或已安装 Tauri 应用中的鼠标流程。PR CI 仍需针对最终提交独立执行；这些边界不计为手工验收通过。
+本次没有真实供应商账号，因此没有验证不同服务商的实际 `/models` 返回、重复模型的操作提示或已安装 Tauri 应用中的鼠标流程。当前 PR 没有 GitHub Actions 检查，以上 macOS 与 Oracle Linux 证据来自本地和隔离远程运行；这些边界不计为手工验收通过。
