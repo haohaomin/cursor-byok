@@ -32,6 +32,10 @@ use crate::{
 #[path = "title_tests.rs"]
 mod title_tests;
 
+#[cfg(test)]
+#[path = "team_tests.rs"]
+mod team_tests;
+
 pub fn router(
     registry: TransportRegistry,
     clients: crate::network::NetworkClients,
@@ -62,6 +66,14 @@ fn router_with_proxy(
         .route(
             "/aiserver.v1.DashboardService/GetUserPrivacyMode",
             post(compatibility::user_privacy_mode),
+        )
+        .route(
+            "/aiserver.v1.DashboardService/GetTeamReposOrEmptyIfNotInTeam",
+            post(compatibility::team_configuration),
+        )
+        .route(
+            "/aiserver.v1.DashboardService/GetTeamAdminSettingsOrEmptyIfNotInTeam",
+            post(compatibility::team_configuration),
         )
         .route(
             "/agent.v1.AgentService/UpdateConversationMetadata",

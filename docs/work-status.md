@@ -20,6 +20,8 @@
 
 **2026-11-24 PR #493：**选择性修复经 fork PR #50 合入，跨平台 CI 与 v1.2.3 发布核验通过。修复 Cursor 代理 HTTP/2 协商和响应取消后上传未释放；其他网关保持 HTTP/1.1。[测试与范围](history/pull-requests/2026-11-24-pr493-http2-relay.md)。
 
+**2026-11-24 PR #485 Todo：**完成回包只保留 patch、压缩后无客户端检查点丢失 Todo 已修复；[PR #52](https://github.com/haohaomin/cursor-byok/pull/52) 已合入 main，548 项服务端回归和最终跨平台 CI 通过。自动发布待核验，原生 Cursor 卡片 UI 未验收，见 [记录](history/pull-requests/2026-11-24-pr485-todo-state.md)。
+
 ## 1. 已发布的成果
 
 v1.2.4 已发布，新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
