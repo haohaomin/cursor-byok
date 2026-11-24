@@ -848,6 +848,15 @@ fn spawn_run_request(
             };
             prepared
         };
+        // Recover before spawning the checkpoint worker: even a turn without
+        // TodoWrite must not overwrite persisted compacted todos with an empty list.
+        let prepared = match prepared {
+            Ok(prepared) if request.conversation_state.is_none() => checkpoint
+                .restore_todos(prepared.0.base_checkpoint_id)
+                .await
+                .map(|()| prepared),
+            result => result,
+        };
         let (mut prepared, context) = match prepared {
             Ok(prepared) => prepared,
             Err(error) => {

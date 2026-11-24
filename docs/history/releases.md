@@ -443,3 +443,16 @@
 - 先前 v1.2.2 由 #102 回放测试与证据修订自动发布；未改生产代码。该版本仅核对发布状态和资产目录，没有另做完整下载签名验收。
 
 完整摘要见 [结构化证据](2026-11-24-v1.2.3-release-evidence.json)。本次没有安装到用户机器；真实 Cursor Agent/语音与上游新增 Run listener 未验收。#444 压缩历史修复尚未包含在 v1.2.3。
+
+<a id="v124"></a>
+
+## v1.2.4 发布验证记录
+
+来源日期：2026-11-24。包含 fork PR #51：自动压缩按时间分批覆盖早期目标和已完成任务；遇到窗口拒绝会缩小批次重试，失败/超时/取消不提交替代摘要。排除私有 thinking/replay 内容，避免预算检查重复复制图片，支持纯文本模型预先剥离图片。
+
+- 源码合并：`70c3cd3df7d7b81719e713db41a8d456d5e03296`；[main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45363121769) 全部成功。发布提交：`b4a7de97a30bbf0e4bcc87d46b79eb7d0df312ad`。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45364165486) 四平台及最终发布成功；[v1.2.4](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.4) 为 Latest，draft=false，prerelease=false。
+- 实际下载全部 20 项资产，大小与 GitHub SHA-256 全部匹配；现有 updater 公钥验证 7 份 Minisign 签名，全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、URL、签名和旧版包校验和均匹配；新旧仓库用户名的 Latest 更新入口一致。
+
+[结构化证据](2026-11-24-v1.2.4-release-evidence.json)。未安装到用户机器；未使用真实 Grok/grok2api 或原作者的 Cursor 会话，模型摘要质量不能由模拟测试保证。本版不包含正在评估的 PR #485 Todo 显示修复。

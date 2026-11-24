@@ -8,7 +8,7 @@ use crate::{
         prompting::{fold_derived_state, fold_derived_state_from, DerivedState},
         protocol::proto::agent::v1 as pb,
     },
-    model::{CanonicalMessage, MessageContent},
+    model::{CanonicalMessage, CheckpointId, MessageContent},
     store::BlobId,
     Error, Result,
 };
@@ -16,6 +16,15 @@ use crate::{
 use super::CheckpointBuilder;
 
 impl CheckpointBuilder {
+    /// Restore Todo presentation from the selected canonical history when the
+    /// client omitted its checkpoint. Compaction removes the original tool calls.
+    pub(crate) async fn restore_todos(&mut self, checkpoint_id: CheckpointId) -> Result<()> {
+        if let Some(bytes) = self.store.cursor_checkpoint(checkpoint_id).await? {
+            self.base.todos = pb::ConversationStateStructure::decode(bytes.as_slice())?.todos;
+        }
+        Ok(())
+    }
+
     pub(super) async fn build_derived_state(
         &self,
         messages: &[CanonicalMessage],
@@ -118,6 +127,23 @@ impl CheckpointBuilder {
             None
         };
         Ok((todo_ids, plan_id))
+    }
+
+    /// Rebuild the state before a tool result using the same source as checkpoints.
+    /// Cursor may omit its checkpoint while the server still has canonical history.
+    pub(crate) async fn todo_state(
+        &self,
+        messages: &[CanonicalMessage],
+    ) -> Result<serde_json::Value> {
+        Ok(fold_derived_state_from(
+            messages,
+            DerivedState {
+                todos: Some(self.base_todo_state().await?),
+                plan: None,
+            },
+        )
+        .todos
+        .expect("Todo state was seeded"))
     }
 
     async fn base_todo_state(&self) -> Result<serde_json::Value> {

@@ -2,7 +2,9 @@
 use serde_json::Value;
 
 use crate::{
-    cursor::{protocol::proto::agent::v1 as pb, tools::codec as interaction},
+    cursor::{
+        prompting::apply_todo_write, protocol::proto::agent::v1 as pb, tools::codec as interaction,
+    },
     model::{ToolCall, ToolResult},
     Error, Result,
 };
@@ -82,6 +84,33 @@ fn todo_write(call: &ToolCall) -> Result<ToolCompletion> {
         },
         tool,
     ))
+}
+
+/// Cursor compares the previous list in args with the full list in the result.
+/// Only the native card changes; canonical arguments/results remain untouched.
+pub(crate) fn project_todo_completion(
+    call: &ToolCall,
+    completion: &mut ToolCompletion,
+    state: &mut Value,
+) {
+    let Some(pb::tool_call::Tool::UpdateTodosToolCall(tool)) = completion.tool_call.tool.as_mut()
+    else {
+        return;
+    };
+    let Some(pb::update_todos_result::Result::Success(success)) = tool
+        .result
+        .as_mut()
+        .and_then(|result| result.result.as_mut())
+    else {
+        return;
+    };
+    let next = apply_todo_write(Some(state.clone()), call.arguments.clone());
+    if let Some(args) = tool.args.as_mut() {
+        args.todos = todo_items(state);
+    }
+    success.todos = todo_items(&next);
+    success.total_count = success.todos.len() as i32;
+    *state = next;
 }
 
 fn update_current_step(call: &ToolCall, message_index: usize) -> Result<ToolCompletion> {
