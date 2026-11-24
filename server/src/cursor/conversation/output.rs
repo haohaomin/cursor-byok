@@ -27,7 +27,7 @@ use crate::{
             codec, compat,
             runtime::CursorToolRuntime,
             stream::ToolCallStream,
-            tool_call_result::{ToolCompletion, ToolResultReceiver},
+            tool_call_result::{project_todo_completion, ToolCompletion, ToolResultReceiver},
             ToolBatchState, ToolDispatcher,
         },
     },
@@ -150,6 +150,8 @@ impl ConversationOutput {
     }
 
     async fn run_inner(&mut self) -> Result<RunFinish> {
+        // Read checkpoint todo blobs only when this Run actually completes a TodoWrite.
+        let mut todo_state = None;
         if self.context.compacting {
             self.handle.emit(&events::summary_started())?;
         }
@@ -572,11 +574,36 @@ impl ConversationOutput {
                                     ))
                                 })?;
                             if !synthetic {
-                                let completion = completions.remove(call_id).ok_or_else(|| {
+                                let mut completion = completions.remove(call_id).ok_or_else(|| {
                                     Error::Protocol(format!(
                                         "core committed a tool result without typed Cursor state: {call_id}"
                                     ))
                                 })?;
+                                if matches!(
+                                    completion.tool_call().tool,
+                                    Some(pb::tool_call::Tool::UpdateTodosToolCall(_))
+                                ) {
+                                    if todo_state.is_none() {
+                                        let parent = self
+                                            .store
+                                            .checkpoint_parent(state.checkpoint_id)
+                                            .await?
+                                            .ok_or_else(|| {
+                                                Error::Protocol(
+                                                    "tool result checkpoint has no parent".into(),
+                                                )
+                                            })?;
+                                        let messages =
+                                            self.store.load_checkpoint_messages(parent).await?;
+                                        todo_state =
+                                            Some(self.checkpoint.todo_state(&messages).await?);
+                                    }
+                                    project_todo_completion(
+                                        call,
+                                        &mut completion,
+                                        todo_state.as_mut().expect("todo state loaded"),
+                                    );
+                                }
                                 self.handle
                                     .emit(&codec::tool_completed(call, &completion))?;
                                 presentation.tool_completed(&completion);

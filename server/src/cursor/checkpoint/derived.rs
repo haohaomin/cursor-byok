@@ -120,6 +120,23 @@ impl CheckpointBuilder {
         Ok((todo_ids, plan_id))
     }
 
+    /// Rebuild the state before a tool result using the same source as checkpoints.
+    /// Cursor may omit its checkpoint while the server still has canonical history.
+    pub(crate) async fn todo_state(
+        &self,
+        messages: &[CanonicalMessage],
+    ) -> Result<serde_json::Value> {
+        Ok(fold_derived_state_from(
+            messages,
+            DerivedState {
+                todos: Some(self.base_todo_state().await?),
+                plan: None,
+            },
+        )
+        .todos
+        .expect("Todo state was seeded"))
+    }
+
     async fn base_todo_state(&self) -> Result<serde_json::Value> {
         let mut todos = Vec::with_capacity(self.base.todos.len());
         for raw_id in &self.base.todos {
