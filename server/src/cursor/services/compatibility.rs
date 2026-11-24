@@ -35,6 +35,14 @@ pub async fn user_privacy_mode(
     route(&proxy, request, EmptyResponse {}).await
 }
 
+/// The local BYOK identity has no team. Official accounts retain their policies.
+pub async fn team_configuration(
+    Extension(proxy): Extension<CursorProxy>,
+    request: Request<Body>,
+) -> Result<Response<Body>> {
+    route(&proxy, request, EmptyResponse {}).await
+}
+
 async fn route<M: Message>(
     proxy: &CursorProxy,
     request: Request<Body>,

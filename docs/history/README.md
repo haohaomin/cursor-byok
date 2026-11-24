@@ -6,6 +6,7 @@
 - [历史发布与资产核验](releases.md)
 - [2026-09-30 上游同步](upstream-sync/2026-09-30.md)
 
+- [2026-11-24 · PR #485：本地身份团队配置路由](pull-requests/2026-11-24-pr485-team-metadata.md)
 - [2026-11-24 · PR #485：Todo 完成回包保留完整列表](pull-requests/2026-11-24-pr485-todo-state.md)
 
 ## Issue 调查与验收
