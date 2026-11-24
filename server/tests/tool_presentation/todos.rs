@@ -49,15 +49,26 @@ fn registry(
 
 #[tokio::test]
 async fn todo_completion_keeps_full_state_across_checkpoint_resume_and_clear() {
-    exercise_todos(true).await;
+    exercise_todos(Resume::Checkpoint).await;
 }
 
 #[tokio::test]
 async fn todo_completion_uses_server_history_when_cursor_checkpoint_is_omitted() {
-    exercise_todos(false).await;
+    exercise_todos(Resume::StoredHistory).await;
 }
 
-async fn exercise_todos(with_checkpoint: bool) {
+#[tokio::test]
+async fn todo_completion_recovers_compacted_state_without_client_checkpoint() {
+    exercise_todos(Resume::CompactedHistory).await;
+}
+
+enum Resume {
+    Checkpoint,
+    StoredHistory,
+    CompactedHistory,
+}
+
+async fn exercise_todos(resume: Resume) {
     let (_directory, store) = fixtures::temp_store().await;
     let provider = fake_provider::FakeProvider::default();
     let create = json!({"merge": false, "todos": [
@@ -68,16 +79,59 @@ async fn exercise_todos(with_checkpoint: bool) {
     let clear = json!({"merge": false, "todos": []});
     provider.push(todo_call("create", &create));
     provider.push(finished());
+    if matches!(resume, Resume::CompactedHistory) {
+        provider.push(finished()); // Manual summary deliberately contains no Todo JSON.
+        provider.push(finished()); // A turn without TodoWrite must also retain the list.
+    }
     provider.push(todo_call("patch", &patch));
     provider.push(todo_call("clear", &clear));
     provider.push(finished());
-    let (created, checkpoint) =
-        run_todos(&registry(store.clone(), &provider), "create-run", None).await;
+    let (created, checkpoint) = run_todos(
+        &registry(store.clone(), &provider),
+        "create-run",
+        None,
+        "continue",
+    )
+    .await;
     assert_eq!(checkpoint.todos.len(), 2);
+    if matches!(resume, Resume::CompactedHistory) {
+        let (_, compacted) = run_todos(
+            &registry(store.clone(), &provider),
+            "summary-run",
+            Some(checkpoint.clone()),
+            "/summarize",
+        )
+        .await;
+        assert_eq!(compacted.self_summary_count, 1);
+        assert_eq!(compacted.todos.len(), 2);
+        let messages = store
+            .load_current_messages(&ConversationId::new("todos-conversation"))
+            .await
+            .unwrap();
+        assert!(
+            messages
+                .iter()
+                .all(|message| !matches!(&message.content, MessageContent::ToolResult(_))),
+            "compacted history must no longer contain the old TodoWrite result"
+        );
+        let (_, retained) = run_todos(
+            &registry(store.clone(), &provider),
+            "no-todo-run",
+            None,
+            "continue",
+        )
+        .await;
+        assert_eq!(
+            retained.todos.len(),
+            2,
+            "a plain turn must not erase compacted todos"
+        );
+    }
     let (updated, final_checkpoint) = run_todos(
         &registry(store.clone(), &provider),
         "update-run",
-        with_checkpoint.then_some(checkpoint),
+        matches!(resume, Resume::Checkpoint).then_some(checkpoint),
+        "continue",
     )
     .await;
     let merged = success(&updated[0]);
@@ -116,6 +170,9 @@ async fn exercise_todos(with_checkpoint: bool) {
         .await
         .unwrap();
     for (id, expected) in [("create", &create), ("patch", &patch), ("clear", &clear)] {
+        if id == "create" && matches!(resume, Resume::CompactedHistory) {
+            continue;
+        }
         let result = messages
             .iter()
             .find_map(|message| match &message.content {
@@ -138,7 +195,14 @@ async fn exercise_todos(with_checkpoint: bool) {
             .unwrap();
         assert_eq!(&call.arguments, expected);
     }
-    assert_eq!(provider.requests().len(), 5);
+    let requests = provider.requests();
+    if matches!(resume, Resume::CompactedHistory) {
+        assert_eq!(requests.len(), 7);
+        assert!(requests[4].history.starts_with(&requests[3].history));
+        assert_eq!(requests[4].prompt, requests[3].prompt);
+    } else {
+        assert_eq!(requests.len(), 5);
+    }
 }
 
 fn success(tool: &pb::UpdateTodosToolCall) -> &pb::UpdateTodosSuccess {
@@ -156,6 +220,7 @@ async fn run_todos(
     registry: &TransportRegistry,
     id: &str,
     checkpoint: Option<pb::ConversationStateStructure>,
+    text: &str,
 ) -> (Vec<pb::UpdateTodosToolCall>, pb::ConversationStateStructure) {
     let mut request = client_run();
     let Some(pb::agent_client_message::Message::RunRequest(run)) = &mut request.message else {
@@ -170,6 +235,7 @@ async fn run_todos(
         unreachable!()
     };
     action.user_message.as_mut().unwrap().message_id = format!("user-{id}");
+    action.user_message.as_mut().unwrap().text = text.into();
     let handle = registry.get_or_create(id).await.unwrap();
     let mut output = handle.subscribe();
     handle
