@@ -34,5 +34,9 @@ server/src/
 - 失败基线：本地团队接口 400 而非 200；非本地身份的转发边界测试通过。
 - 两项生产 Router 回归覆盖两个 RPC、本地请求体消费、无 Connect 帧的空 protobuf、精确本地 token、被改动的 token、普通账号、无认证、GET 及未选择的团队接口。
 - 使用不可转发的上游地址识别代理分支；没有联系官方服务、使用真实账号或修改桌面数据。
-- 服务端单元测试 **309 通过、0 失败、14 忽略**，服务端全目标 Clippy（`-D warnings`）、格式与差异检查通过。跨平台 CI、合入与发布待确认。
+- 服务端单元测试 **309 通过、0 失败、14 忽略**，服务端全目标 Clippy（`-D warnings`）、格式与差异检查通过。最终 head `13769d997f50` 的 push/PR 两组跨平台 CI 全通过，已由 [PR #53](https://github.com/haohaomin/cursor-byok/pull/53) 合入 main（`02d17bd7a58b`）；已随 v1.2.6 发布，20 项资产、7 份签名和三套更新清单通过核验，见 [发布记录](../releases.md#v126)。
 - 原生 Cursor 启动、真实团队账号策略和完整 Windows Agent 会话尚未验收，不能由此把此前 Windows Agent 问题标记为已解决。
+
+## CI 环境记录
+
+PR CI `45407491773` 首次因 GitHub macOS arm64 运行机容量不足而失败；该任务没有分配 runner，steps 为空，注释为 “The job was not acquired by Runner of type hosted even after multiple attempts”。仅重跑这个任务后全绿，没有更改代码或放宽检查。对应 push CI `45407479238` 首次已全绿。

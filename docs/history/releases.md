@@ -456,3 +456,32 @@
 - `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、URL、签名和旧版包校验和均匹配；新旧仓库用户名的 Latest 更新入口一致。
 
 [结构化证据](2026-11-24-v1.2.4-release-evidence.json)。未安装到用户机器；未使用真实 Grok/grok2api 或原作者的 Cursor 会话，模型摘要质量不能由模拟测试保证。本版不包含正在评估的 PR #485 Todo 显示修复。
+
+
+<a id="v125"></a>
+
+## v1.2.5 发布验证记录
+
+来源日期：2026-11-24。包含 fork PR #52：Todo 完成卡片保留前后完整列表；压缩后客户端省略检查点时恢复持久化 Todo，普通轮次不再清空待办。
+
+- 源码合并：`900294e329b67c654bdec09f08eb16a2e3a1dfe0`；[main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45406943034) 全部成功。发布提交：`9a70f31738b62ca50e79594c798618d086b3caba`。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45408806274) 四平台及最终发布成功；[v1.2.5](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.5) 核验时为 Latest，draft=false，prerelease=false，已补充中文发布说明。
+- 下载全部 20 项资产，大小和 GitHub SHA-256 全部匹配；现有 updater 公钥验证 7 份 Minisign 签名，全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、URL、签名和旧版校验和匹配；新旧仓库用户名的 Latest 入口一致。
+
+[结构化证据](2026-11-24-v1.2.5-release-evidence.json)。没有安装到用户机器；原生 Cursor Todo 卡片与真实客户端省略检查点的场景未手动验收。本版不包含后续 #53 团队配置路由。
+
+
+<a id="v126"></a>
+
+## v1.2.6 发布验证记录
+
+来源日期：2026-11-24。包含 fork PR #53：内置本地 BYOK 身份的两个无团队配置 RPC 返回空 protobuf，普通账号继续读取官方团队策略；也包含 v1.2.5 的 Todo 修复。
+
+- 源码合并：`02d17bd7a58bf40d1cdc627f8af66b21030acfe3`；[main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45412371917) 全部成功。发布提交：`cd59ec38abb8fd90585f5fc4f1430cf77af49337`。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45413918343) 四平台及最终发布成功；[v1.2.6](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.6) 核验时为 Latest，draft=false，prerelease=false，已补充中文发布说明。
+- 首次 Apple Silicon 构建因 GitHub macOS arm64 容量不足被取消，未分配 runner、未执行步骤。仅重跑该任务及下游发布后成功（attempt 2），沿用原有标签与另外三个已完成的构建。
+- 下载全部 20 项资产，大小和 GitHub SHA-256 全部匹配；现有 updater 公钥验证 7 份 Minisign 签名，全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、URL、签名和旧版校验和匹配；新旧仓库用户名的 Latest 更新入口一致。
+
+[结构化证据](2026-11-24-v1.2.6-release-evidence.json)。没有安装到用户机器；原生 Cursor Todo 卡片、真实团队账号策略和完整 Windows Agent 会话仍待验收。DeepSeek 跨协议续写仅做初审，未包含新的实现。

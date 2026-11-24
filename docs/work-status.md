@@ -1,10 +1,10 @@
 # 工作状态
 
-更新：2026-11-24；v1.2.4 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
+更新：2026-11-24；v1.2.6 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
 **2026-11-13 进展：**#150/#417 的逐模型 Token 定价已通过 [PR #39](https://github.com/haohaomin/cursor-byok/pull/39) 合入 `main`（合并提交 `e53e97e`）；原 #35 是合入已先落地的 #34 分支，未直接进入主线，已由 #39 在当前主线基线上重新集成。设置页按 `model_hash` 保存输入、输出、缓存读取和缓存写入单价；首页总计与按模型明细按覆盖价计算，未配置覆盖时使用全局价格。当前主线联合回归为 293 个服务端单测通过、0 失败、14 忽略，桌面检查、Clippy 和生产构建通过。插件模型暂使用全局价格，真实供应商和发布版本仍待验收，见 [定价验证记录](history/issues/2026-11-13-issue150-model-pricing.md)。
 
-**当前结论：2026-11-19 已将 PR #13、#43–#49 合入 main。Semble 独立终端审批卡片修复已提交、推送并合入 #13；批量模型导入与配置备份的冲突已解决。最新公开版本为 v1.2.4，包含此前合并、PR #50 的 HTTP/2 代理修复及 PR #51 的自动压缩修复。真实 OAuth 账号、Semble 批准/拒绝仍待验收；Windows Cursor UI 的 CA 初始化与接管已通过，Agent 验收尚未完成，根因未确定。**
+**当前结论：2026-11-19 已将 PR #13、#43–#49 合入 main。Semble 独立终端审批卡片修复已提交、推送并合入 #13；批量模型导入与配置备份的冲突已解决。最新公开版本为 v1.2.6，包含此前合并、PR #50 的 HTTP/2、PR #51 的自动压缩、PR #52 的 Todo 及 PR #53 的团队配置修复。真实 OAuth 账号、Semble 批准/拒绝仍待验收；Windows Cursor UI 的 CA 初始化与接管已通过，Agent 验收尚未完成，根因未确定。**
 
 **2026-11-13 进展：**上游 PR #433 已按当前 Rust/Tauri 架构选择性重实现：非 Tab 的 Cursor host 请求进入本地路由，CONNECT 隧道保持原始 authority；硬编码云端 400/404 短路和 `custom-protocol` feature 未采用。定向代理测试、Clippy、桌面检查和工作区回归通过，真实代理网络与 Cursor UI 待验，见[验证记录](history/pull-requests/2026-11-13-pr433-proxy-routing.md)。**
 
@@ -20,11 +20,13 @@
 
 **2026-11-24 PR #493：**选择性修复经 fork PR #50 合入，跨平台 CI 与 v1.2.3 发布核验通过。修复 Cursor 代理 HTTP/2 协商和响应取消后上传未释放；其他网关保持 HTTP/1.1。[测试与范围](history/pull-requests/2026-11-24-pr493-http2-relay.md)。
 
-**2026-11-24 PR #485 Todo：**完成回包只保留 patch、压缩后无客户端检查点丢失 Todo 已修复；[PR #52](https://github.com/haohaomin/cursor-byok/pull/52) 已合入 main，548 项服务端回归和最终跨平台 CI 通过。自动发布待核验，原生 Cursor 卡片 UI 未验收，见 [记录](history/pull-requests/2026-11-24-pr485-todo-state.md)。
+**2026-11-24 PR #485 Todo：**完成回包只保留 patch、压缩后无客户端检查点丢失 Todo 已修复；[PR #52](https://github.com/haohaomin/cursor-byok/pull/52) 已合入 main，548 项服务端回归和最终跨平台 CI 通过。已随 v1.2.5 发布核验，原生 Cursor 卡片 UI 未验收，见 [记录](history/pull-requests/2026-11-24-pr485-todo-state.md)。
+
+**2026-11-24 PR #485 团队配置：**两个无团队配置接口的本地路由已复现并修复，[PR #53](https://github.com/haohaomin/cursor-byok/pull/53) 合入 main。309 项单元测试、Clippy 和最终跨平台 CI 通过，已随 v1.2.6 发布核验；未扩大 Windows Agent 与真实团队账号验收结论，见 [记录](history/pull-requests/2026-11-24-pr485-team-metadata.md)。
 
 ## 1. 已发布的成果
 
-v1.2.4 已发布，新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
+v1.2.6 新增本地身份团队配置路由（[发布核验](history/releases.md#v126)）；v1.2.5 新增 Todo 完整列表与压缩恢复（[发布核验](history/releases.md#v125)）；v1.2.4 新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
 
 | 工作 | 已完成部分 | 保留的边界 |
 | --- | --- | --- |
