@@ -160,10 +160,25 @@ pub fn decode(request: &ai::BidiAppendRequest) -> Result<DecodedAppend> {
         .map(|id| id.request_id.as_str())
         .filter(|id| !id.is_empty())
         .ok_or_else(|| Error::Protocol("BidiAppend request_id is required".into()))?;
-    if !request.data_binary.is_empty() {
-        return Err(Error::Protocol(
-            "BidiAppend data_binary is not part of the captured protocol".into(),
-        ));
+    if !request.data_binary.is_empty() && request.data.is_empty() {
+        // Some Cursor clients serialize the AgentClientMessage into the
+        // binary payload field instead of the hex-encoded data field.
+        let payload = request.data_binary.clone();
+        let message =
+            agent::AgentClientMessage::decode(payload.as_slice()).inspect_err(|error| {
+                tracing::warn!(
+                    request_id,
+                    seqno = request.append_seqno,
+                    payload_len = payload.len(),
+                    %error,
+                    "cannot decode BidiAppend AgentClientMessage"
+                );
+            })?;
+        return Ok(DecodedAppend {
+            request_id: request_id.into(),
+            seqno: request.append_seqno,
+            message,
+        });
     }
     if request.data.is_empty() {
         return Err(Error::Protocol(
@@ -258,5 +273,53 @@ mod tests {
         assert!(!output.contains("private-conversation-content"));
         assert!(!output.contains(&hex::encode(&payload)));
         assert!(!output.contains("payload_prefix"));
+    }
+
+    #[test]
+    fn decode_accepts_binary_payload_field() {
+        let mut message = agent::AgentClientMessage::default();
+        message.message = Some(agent::agent_client_message::Message::ClientHeartbeat(
+            Default::default(),
+        ));
+        let payload = message.encode_to_vec();
+        assert!(!payload.is_empty());
+        let request = ai::BidiAppendRequest {
+            request_id: Some(ai::BidiRequestId {
+                request_id: "binary-payload-test".into(),
+            }),
+            append_seqno: 3,
+            data_binary: payload,
+            data: String::new(),
+            ..Default::default()
+        };
+
+        let decoded = match decode(&request) {
+            Ok(decoded) => decoded,
+            Err(error) => panic!("binary payload should decode: {error}"),
+        };
+        assert_eq!(decoded.request_id, "binary-payload-test");
+        assert_eq!(decoded.seqno, 3);
+        assert!(matches!(
+            decoded.message.message.as_ref(),
+            Some(agent::agent_client_message::Message::ClientHeartbeat(_))
+        ));
+    }
+
+    #[test]
+    fn decode_rejects_invalid_binary_payload() {
+        // Field 1 must be length-delimited, not a 32-bit value.
+        let mut payload = vec![0x0d];
+        payload.extend_from_slice(b"not-a-valid-agent-client-message");
+        let request = ai::BidiAppendRequest {
+            request_id: Some(ai::BidiRequestId {
+                request_id: "binary-garbage-test".into(),
+            }),
+            append_seqno: 1,
+            data_binary: payload,
+            data: String::new(),
+            ..Default::default()
+        };
+
+        assert!(decode(&request).is_err());
     }
 }
