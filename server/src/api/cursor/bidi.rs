@@ -163,13 +163,12 @@ pub fn decode(request: &ai::BidiAppendRequest) -> Result<DecodedAppend> {
     if !request.data_binary.is_empty() && request.data.is_empty() {
         // Some Cursor clients serialize the AgentClientMessage into the
         // binary payload field instead of the hex-encoded data field.
-        let payload = request.data_binary.clone();
-        let message =
-            agent::AgentClientMessage::decode(payload.as_slice()).inspect_err(|error| {
+        let message = agent::AgentClientMessage::decode(request.data_binary.as_slice())
+            .inspect_err(|error| {
                 tracing::warn!(
                     request_id,
                     seqno = request.append_seqno,
-                    payload_len = payload.len(),
+                    payload_len = request.data_binary.len(),
                     %error,
                     "cannot decode BidiAppend AgentClientMessage"
                 );
