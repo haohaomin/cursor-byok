@@ -5,7 +5,8 @@ use super::*;
 use crate::run::compaction;
 
 /// Bound each provider call; cancellation remains active between batches.
-const AUTO_COMPACTION_DEADLINE: Duration = Duration::from_secs(30);
+/// Generous because BYOK providers may stream large summaries slowly.
+const AUTO_COMPACTION_DEADLINE: Duration = Duration::from_secs(180);
 
 impl RunEngine {
     pub(super) async fn auto_compact(
