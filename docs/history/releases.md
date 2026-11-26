@@ -485,3 +485,16 @@
 - `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、URL、签名和旧版校验和匹配；新旧仓库用户名的 Latest 更新入口一致。
 
 [结构化证据](2026-11-24-v1.2.6-release-evidence.json)。没有安装到用户机器；原生 Cursor Todo 卡片、真实团队账号策略和完整 Windows Agent 会话仍待验收。DeepSeek 跨协议续写仅做初审，未包含新的实现。
+
+<a id="v127"></a>
+
+## v1.2.7 发布验证记录
+
+来源日期：2026-11-26。包含 fork PR #57：保留 Responses 原生明文 reasoning，支持 DeepSeek 跨 Responses/Chat 的工具续写；最终响应快照中的 reasoning 不再丢失；Chat 明确返回的空 reasoning 可以经过检查点和重启回放。
+
+- 源码合并：`0338e3eb3286b594b6b6a0bc8b3994bfb9a7675b`；[main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45801000047) 全部成功。发布提交：`f11ea59c4d8f3cf557029d46c05626ea0d0b3522`。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45802312742) 四个平台、签名和最终发布全部成功；[v1.2.7](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.7) 为 Latest，draft=false，prerelease=false。
+- 下载全部 20 项资产，大小与 GitHub SHA-256 全部匹配；使用未变更的 updater 公钥和仓库锁定的 `minisign-verify 0.2.5` 验证 7 个签名，全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 均为 1.2.7；平台覆盖、下载 URL、签名、旧版包校验和与大小全部匹配。
+
+[结构化证据](2026-11-26-v1.2.7-release-evidence.json)。没有安装到用户机器；真实 DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收。本版发布核验只证明包、签名和更新清单正确。

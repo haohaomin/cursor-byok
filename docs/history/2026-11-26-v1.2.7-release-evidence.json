@@ -1,0 +1,182 @@
+{
+  "version": "1.2.7",
+  "repository": "haohaomin/cursor-byok",
+  "release_url": "https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.7",
+  "release_commit": "f11ea59c4d8f3cf557029d46c05626ea0d0b3522",
+  "source_commit": "0338e3eb3286b594b6b6a0bc8b3994bfb9a7675b",
+  "release_run": "https://github.com/haohaomin/cursor-byok/actions/runs/45802312742",
+  "ci_run": "https://github.com/haohaomin/cursor-byok/actions/runs/45801000047",
+  "published_at": "2026-11-26T10:44:16Z",
+  "verified_at": "2026-11-26T10:55:00Z",
+  "draft": false,
+  "prerelease": false,
+  "latest": true,
+  "updater_public_key_sha256": "a4e4479f2f264e2aa24e384b67e9adb0b57efa5225f1f76cad0be0249a28ce15",
+  "signature_verifier": "minisign-verify 0.2.5 (Rust crate locked in Cargo.lock)",
+  "assets": [
+    {
+      "name": "cursor-byok-1.2.7-linux-amd64.tar.gz",
+      "size": 31348503,
+      "sha256": "589e3166c1eb73017e2471831afe74af0d4fb84774bf53407e88195d0db1858d",
+      "github_digest_verified": true
+    },
+    {
+      "name": "cursor-byok-1.2.7-macos-amd64.tar.gz",
+      "size": 30126731,
+      "sha256": "82e398d982235c1b662710b4810e0c1a1a078c31c878814c73a2ba4745d4a652",
+      "github_digest_verified": true
+    },
+    {
+      "name": "cursor-byok-1.2.7-macos-arm64.tar.gz",
+      "size": 29063096,
+      "sha256": "5152361653308b49777d2f1802473f1ce7ad35fdb001603fc822f2c9c01b0c78",
+      "github_digest_verified": true
+    },
+    {
+      "name": "cursor-byok-1.2.7-windows-amd64.zip",
+      "size": 28112026,
+      "sha256": "c368fe3b53ce5816b6732427dd4a2459418ada21fb91b55d6a2a55ef3ed702ac",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "cursor-byok-1.2.7-windows-amd64.zip.sig",
+      "size": 428,
+      "sha256": "08ec4abc033697bc8d8772050efb3d28498882f254cac51b5f6dac9b6218896e",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK-1.2.7-1.x86_64.rpm",
+      "size": 31899118,
+      "sha256": "86420fd3a5a7c375d5e2d1ca4f8c5a0fd7ff65db3c72d2ec9bb558ab822852c4",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK-1.2.7-1.x86_64.rpm.sig",
+      "size": 420,
+      "sha256": "c27fca0dff6673be414453bf1dbe27144d9dfb3318269e3477f3f3ca8545c662",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_aarch64.app.tar.gz",
+      "size": 29063096,
+      "sha256": "5152361653308b49777d2f1802473f1ce7ad35fdb001603fc822f2c9c01b0c78",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_aarch64.app.tar.gz.sig",
+      "size": 412,
+      "sha256": "2b773898487df01cd32bb5d2cb2cf41b2a77bc6a755f14a5861e8d0a89aa899b",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_amd64.AppImage",
+      "size": 109591032,
+      "sha256": "33bb7723e5dcd139c06ff3a3c23622bdeb00ba6ca8e143161ad93cc7474e7c6b",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_amd64.AppImage.sig",
+      "size": 424,
+      "sha256": "ce855fffc6fe2bc60658f8fb46c59d18a92b0bde6ad693082c03f6e92ecb796b",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_amd64.deb",
+      "size": 31893256,
+      "sha256": "cc579ccdbb69e078bbae977b8520f96803cb2676fb1158786a9fdb30cf299f11",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_amd64.deb.sig",
+      "size": 416,
+      "sha256": "4c718d17037e83721ce86e495745ae1383eae502b8795134db0ff46a5cf37ed7",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_x64-setup.exe",
+      "size": 21247497,
+      "sha256": "7535bd7df81178c13ec48a606d521bf9eb0e158409fa0e49289e06c99fc4fe71",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_x64-setup.exe.sig",
+      "size": 424,
+      "sha256": "2fe429a2129a9ff9082be820ae67b60eca24552ae3f20fcfe7a7ea7ed18e10cb",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_x64.app.tar.gz",
+      "size": 30126731,
+      "sha256": "82e398d982235c1b662710b4810e0c1a1a078c31c878814c73a2ba4745d4a652",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.7_x64.app.tar.gz.sig",
+      "size": 412,
+      "sha256": "e4e2da078fe19f328a2581c4aaebba650acd974228895ff2e0f0e619c5c68ccb",
+      "github_digest_verified": true
+    },
+    {
+      "name": "latest.json",
+      "size": 6045,
+      "sha256": "b0e6a8eee324ab75d7af4d71649a6b242f899e8e96c20c881821038ee712c84c",
+      "github_digest_verified": true
+    },
+    {
+      "name": "portable-latest.json",
+      "size": 720,
+      "sha256": "f29550dabf5c614adf4ca14925591d17df21b96c849d61c52ddaaf5cbb0654a6",
+      "github_digest_verified": true
+    },
+    {
+      "name": "update.json",
+      "size": 1208,
+      "sha256": "a555ce547bdf00e92290ef9e42b44768e95a394a8258e4db2efc92d0daaefb30",
+      "github_digest_verified": true
+    }
+  ],
+  "manifests": {
+    "latest.json": {
+      "version": "1.2.7",
+      "platforms": [
+        "darwin-aarch64",
+        "darwin-aarch64-app",
+        "darwin-x86_64",
+        "darwin-x86_64-app",
+        "linux-x86_64",
+        "linux-x86_64-appimage",
+        "linux-x86_64-deb",
+        "linux-x86_64-rpm",
+        "windows-x86_64",
+        "windows-x86_64-nsis"
+      ],
+      "all_urls_point_to_tag": true
+    },
+    "portable-latest.json": {
+      "version": "1.2.7",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "all_urls_point_to_tag": true
+    },
+    "update.json": {
+      "version": "1.2.7",
+      "platforms": [
+        "linux-amd64",
+        "macos-amd64",
+        "macos-arm64",
+        "windows-amd64"
+      ],
+      "all_urls_point_to_tag": true,
+      "checksums_and_sizes_match": true
+    }
+  },
+  "verification": "Downloaded all 20 release assets; compared local size and SHA-256 with GitHub digests; verified seven Tauri Minisign signatures after decoding their outer base64 with the unchanged updater public key; checked manifest versions, platform coverage, tag URLs, signatures, and legacy update checksums/sizes. No package was installed locally."
+}
