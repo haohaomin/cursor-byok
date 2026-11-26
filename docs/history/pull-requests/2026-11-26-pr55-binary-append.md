@@ -31,3 +31,16 @@ server/
 本机首次编译遇到既有 SQLx 宏 dylib 的 `mis-aligned LINKEDIT string pool`，使用既有命令行覆盖 `--config 'profile.dev.package.sqlx-macros.strip="none"'` 后解除，未修改仓库构建配置。
 
 本轮使用隔离 SQLite 与模拟 provider；作者声称已在 Cursor 3.29.9/3.32.4 实测，属于作者证据。本轮未重复真实 Cursor UI/供应商验收，不能据此认定历史 Windows Agent、远程 SSH 或 #155 后台审批问题全部解决。
+
+## 审查与合入
+
+整合提交 `d062c320e1de049b2c1378e59d1e5f7e4f29bf26` 经 [PR #59](https://github.com/haohaomin/cursor-byok/pull/59) 合入 main，合并提交 `438ec8ffee1ff4e43827e08486006748eb7d6333`。该 head 的 [PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45812933105) 与 [push CI](https://github.com/haohaomin/cursor-byok/actions/runs/45812876791) 的 Linux、Windows、macOS、前端检查全部通过。GitHub 已将原 PR #55 标记为 merged，并自动关闭其关联 Issue #54；这不扩大上述实机验收范围。
+
+Sourcery 检查通过，但提出了两项意见，逐项判断如下：
+
+- 删除十六进制字段：未采纳。现有捕获协议及子代理 HTTP 测试仍使用该字段，没有证明它已经过时。本次不存在失败后尝试另一格式的回退。
+- 限制超大请求：记录为共用入口的独立待办。既有 `handlers.rs` 已使用 `DefaultBodyLimit::disable()` 和 `to_bytes(body, usize::MAX)`，解压与外层 protobuf 读取先于本次载荷选择，十六进制路径也具有同一风险。本次不以任意内部载荷阈值冒充完整防护；后续需统一限定读取/解压边界，并验证合法大图和长历史请求。
+
+## 发布
+
+修复已随 [v1.2.8](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.8) 发布。主线 CI、四平台发布、20 项资产哈希/大小、7 个签名和三个更新清单均通过，[发布核验](../releases.md#v128)。本轮未安装新包到用户机器。

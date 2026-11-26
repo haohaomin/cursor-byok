@@ -498,3 +498,18 @@
 - `latest.json`、`portable-latest.json`、`update.json` 均为 1.2.7；平台覆盖、下载 URL、签名、旧版包校验和与大小全部匹配。
 
 [结构化证据](2026-11-26-v1.2.7-release-evidence.json)。没有安装到用户机器；真实 DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收。本版发布核验只证明包、签名和更新清单正确。
+
+<a id="v128"></a>
+
+## v1.2.8 发布验证记录
+
+来源日期：2026-11-26。包含本 fork PR #55 经 #59 整合的二进制 BidiAppend 修复，避免合法 Agent 消息在入口被返回 400；补齐唯一载荷选择、错误日志脱敏和完整 HTTP 回归。自动压缩超时设置不在本版范围。
+
+- 源码合并：`438ec8ffee1ff4e43827e08486006748eb7d6333`；[main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45814261356) 全部通过。发布提交：`f3bf5c355db94d185014e004e319aaa0fd407301`。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45815403898) 四平台构建、签名和最终发布通过；[v1.2.8](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.8) 核验时为 Latest，draft=false，prerelease=false，已补充中文发布说明。
+- 在 OCI 临时目录下载全部 20 项资产，大小与 GitHub SHA-256 全部匹配；未变更的 updater 公钥验证 7 个 Minisign 签名，全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、下载 URL、签名与旧版校验和/大小匹配。
+
+[结构化证据](2026-11-26-v1.2.8-release-evidence.json)；[复现、修复与合入](pull-requests/2026-11-26-pr55-binary-append.md)。本轮未安装到用户机器，未重复真实 Cursor UI/供应商验收；HTTP 共用入口的大请求上限仍是独立待办。
+
+校验记录已取回仓库；OCI 下载/构建临时目录、本机未完成下载和 SSH 插件传输暂存目录均已清理。

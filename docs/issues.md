@@ -1,6 +1,6 @@
 # Issue 清单
 
-更新：2026-11-24；PR #13、#43–#49 已合入 main，并进入最新公开版本 v1.2.1；[发布与核验](history/releases.md#v121)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
+更新：2026-11-26；最新公开版本为 v1.2.8，包含本 fork #54 二进制 BidiAppend 修复；[发布与核验](history/releases.md#v128)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
 
 - **先看进度**：[已做好与未完成工作](work-status.md)。
 - **看安装包包含什么**：[维护状态](maintenance-status.md)。
@@ -12,7 +12,8 @@
 
 | 项目 | 已完成 | 剩余 |
 | --- | --- | --- |
-| [本 fork #54](https://github.com/haohaomin/cursor-byok/issues/54) 二进制 BidiAppend 被拒绝 | HTTP 400 已复现；PR #55 补全后的解码、回复、KV 确认与检查点回归通过 | 合入、发布与真实 Cursor 复测分别记录，见 [PR #55 验证](history/pull-requests/2026-11-26-pr55-binary-append.md) |
+| [本 fork #54](https://github.com/haohaomin/cursor-byok/issues/54) 二进制 BidiAppend 被拒绝 | 经 PR #59 合入，原 PR #55 已标记合并、Issue 已关闭；560 项回归及跨平台 CI 通过 | v1.2.8 已发布核验，真实 Cursor 复测待完成；见 [验证记录](history/pull-requests/2026-11-26-pr55-binary-append.md) |
+| Cursor HTTP 大请求上限 | 已确认共用读取/解压入口缺少大小限制，原十六进制路径也受影响 | 独立设计上限并覆盖合法大图、长历史和解压膨胀请求，见 [PR #55 审查记录](history/pull-requests/2026-11-26-pr55-binary-append.md#审查与合入) |
 | #469 远程 Semble | 主机采集/分页等已随 v1.1.0 发布；本地审批候选回归通过 | 审批修复已通过 PR #13 合入并随 v1.2.1 发布；真实批准/拒绝及 Windows Cursor UI 待验收 |
 | #445 / #481 OAuth | 实现与 API 2 已随 v1.1.0 发布，有隔离测试 | 真实账号验收 |
 | #155 后台任务 | v1.0.17 普通短任务自动续答和去重通过 | 仍为完成一半；审批、压缩等边界未完整覆盖，不测 20 分钟 |

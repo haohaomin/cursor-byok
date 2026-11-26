@@ -8,7 +8,7 @@
 
 | PR / 来源 head | 解决目标与采用范围 | 验证与边界 |
 | --- | --- | --- |
-| [#55](https://github.com/haohaomin/cursor-byok/pull/55) / `26fa33de2c8d` | 接收 BidiAppend 二进制 Agent 消息，补双字段冲突拒绝与共用解码；180 秒压缩超时不纳入本次整合 | 基线 HTTP 400 与原补丁双字段误接受已复现，补全后的 6 项解码、7 项 wire、8 项准入回归通过。真实 Cursor UI 待复测；[完整记录](history/pull-requests/2026-11-26-pr55-binary-append.md)。 |
+| [#55](https://github.com/haohaomin/cursor-byok/pull/55) / `26fa33de2c8d` | 经 [#59](https://github.com/haohaomin/cursor-byok/pull/59) 合入并随 v1.2.8 发布核验；接收二进制 Agent 消息，拒绝双字段歧义；压缩超时由 #56 单独评估 | 基线 HTTP 400 与原补丁双字段误接受已复现；560 项服务端回归、Clippy 和最终跨平台 CI 通过。真实 Cursor UI 待复测；[完整记录](history/pull-requests/2026-11-26-pr55-binary-append.md)。 |
 
 ## 2026-11-23 发布状态核对
 
