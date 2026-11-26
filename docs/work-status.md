@@ -24,6 +24,8 @@
 
 **2026-11-24 PR #485 团队配置：**两个无团队配置接口的本地路由已复现并修复，[PR #53](https://github.com/haohaomin/cursor-byok/pull/53) 合入 main。309 项单元测试、Clippy 和最终跨平台 CI 通过，已随 v1.2.6 发布核验；未扩大 Windows Agent 与真实团队账号验收结论，见 [记录](history/pull-requests/2026-11-24-pr485-team-metadata.md)。
 
+**2026-11-26 PR #485 DeepSeek：**跨 Responses/Chat 续写缺少原生明文 reasoning、最终快照 reasoning 丢失，以及 Chat 显式空 reasoning 被过滤的问题已在隔离 HTTP 服务中复现并独立修复。修复只跨协议转发完整明文 `reasoning_text`，保留原生 Chat 状态和显式空值；摘要、加密或不完整内容不会伪造。服务端全量目标、Clippy 和格式检查通过，待新 fork PR 合入后再发布；未做真实 DeepSeek 账号或 Cursor 原生 Agent UI 验收，见 [记录](history/pull-requests/2026-11-24-pr485-deepseek-review.md)。
+
 ## 1. 已发布的成果
 
 v1.2.6 新增本地身份团队配置路由（[发布核验](history/releases.md#v126)）；v1.2.5 新增 Todo 完整列表与压缩恢复（[发布核验](history/releases.md#v125)）；v1.2.4 新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
