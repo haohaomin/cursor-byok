@@ -10,8 +10,8 @@ use serde_json::{json, Map, Value};
 use crate::{
     config::ProviderConfig,
     model::{
-        ContentPart, ModelInvocation, ModelLatency, ProjectedContent, ProjectedMessage, Role,
-        ToolCallContent, Usage,
+        ContentPart, ModelInvocation, ModelLatency, ProjectedContent, ProjectedMessage,
+        ProviderReplayState, Role, ToolCallContent, Usage,
     },
     Error, Result,
 };
@@ -73,7 +73,7 @@ impl Provider for OpenAiChatProvider {
                 tools_count = request.prompt.tools.len(),
                 "OpenAI Chat provider stream started"
             );
-            let messages = openai_chat_messages(&request.prompt.instructions, &request.history)?;
+            let messages = openai_chat_messages(&request.prompt.instructions, &request.history, &request.model.model_id)?;
             let mut body = json!({
                 "model": request.model.model_id,
                 "messages": messages,
@@ -117,7 +117,7 @@ impl Provider for OpenAiChatProvider {
             futures_util::pin_mut!(source);
             let mut text_open = false;
             let mut thinking_open = false;
-            let mut reasoning = String::new();
+            let mut reasoning = None::<String>;
             let mut tools = BTreeMap::<usize, ChatToolState>::new();
             let mut final_usage = None;
             let mut finish = None;
@@ -159,10 +159,15 @@ impl Provider for OpenAiChatProvider {
                 }
                 let Some(choice) = value.get("choices").and_then(Value::as_array).and_then(|values| values.first()) else { continue; };
                 let delta = choice.get("delta").unwrap_or(&Value::Null);
-                if let Some(reasoning_delta) = delta.get("reasoning_content").or_else(|| delta.get("reasoning")).and_then(Value::as_str).filter(|text| !text.is_empty()) {
-                    if !thinking_open { thinking_open = true; yield ModelEvent::ThinkingStart; }
-                    reasoning.push_str(reasoning_delta);
-                    yield ModelEvent::ThinkingDelta(reasoning_delta.into());
+                if let Some(reasoning_delta) = delta.get("reasoning_content").and_then(Value::as_str)
+                    .or_else(|| delta.get("reasoning").and_then(Value::as_str)) {
+                    // An explicit empty string is native replay data; null or
+                    // an absent field is not evidence of empty reasoning.
+                    reasoning.get_or_insert_with(String::new).push_str(reasoning_delta);
+                    if !reasoning_delta.is_empty() {
+                        if !thinking_open { thinking_open = true; yield ModelEvent::ThinkingStart; }
+                        yield ModelEvent::ThinkingDelta(reasoning_delta.into());
+                    }
                 }
                 if let Some(content) = delta.get("content").and_then(Value::as_str).filter(|text| !text.is_empty()) {
                     if thinking_open { thinking_open = false; yield ModelEvent::ThinkingEnd; }
@@ -203,7 +208,7 @@ impl Provider for OpenAiChatProvider {
                 yield ModelEvent::ToolCallEnd { index: *index };
             }
             if let Some(usage) = final_usage { yield ModelEvent::Usage(usage); }
-            if !reasoning.is_empty() {
+            if let Some(reasoning) = reasoning {
                 yield ModelEvent::ProviderReplayState(crate::model::ProviderReplayState {
                     provider_kind: "openai_chat".into(),
                     value: json!({"reasoning_content": reasoning}),
@@ -236,7 +241,11 @@ fn apply_model(
     Ok(())
 }
 
-fn openai_chat_messages(instructions: &str, messages: &[ProjectedMessage]) -> Result<Vec<Value>> {
+fn openai_chat_messages(
+    instructions: &str,
+    messages: &[ProjectedMessage],
+    model_id: &str,
+) -> Result<Vec<Value>> {
     let mut output = Vec::with_capacity(messages.len() + usize::from(!instructions.is_empty()));
     if !instructions.is_empty() {
         output.push(json!({"role": "system", "content": instructions}));
@@ -257,12 +266,7 @@ fn openai_chat_messages(instructions: &str, messages: &[ProjectedMessage]) -> Re
                 calls,
                 ..
             } => {
-                let replay_reasoning = replay_state
-                    .as_ref()
-                    .filter(|state| state.provider_kind == "openai_chat")
-                    .and_then(|state| state.value.get("reasoning_content"))
-                    .and_then(Value::as_str)
-                    .filter(|reasoning| !reasoning.is_empty());
+                let replay_reasoning = chat_reasoning(replay_state.as_ref(), model_id);
 
                 // Chat Completions rejects an empty assistant content string. Tool-call
                 // assistant messages use null content, while an assistant with no visible
@@ -279,7 +283,7 @@ fn openai_chat_messages(instructions: &str, messages: &[ProjectedMessage]) -> Re
                     },
                 );
                 if let Some(reasoning) = replay_reasoning {
-                    value.insert("reasoning_content".into(), Value::String(reasoning.into()));
+                    value.insert("reasoning_content".into(), Value::String(reasoning));
                 }
                 if !calls.is_empty() {
                     value.insert(
@@ -308,6 +312,44 @@ fn openai_chat_messages(instructions: &str, messages: &[ProjectedMessage]) -> Re
         output.push(Value::Object(value));
     }
     Ok(output)
+}
+
+fn chat_reasoning(state: Option<&ProviderReplayState>, model_id: &str) -> Option<String> {
+    let state = state?;
+    if state.provider_kind == "openai_chat" {
+        return state
+            .value
+            .get("reasoning_content")?
+            .as_str()
+            .map(str::to_owned);
+    }
+    let model = model_id.rsplit('/').next()?.to_ascii_lowercase();
+    if state.provider_kind != "openai_responses" || !model.starts_with("deepseek-") {
+        return None;
+    }
+    // Only complete native plaintext can cross this protocol boundary. Display
+    // summaries, encrypted items and missing parts cannot substitute for it.
+    let items = state.value.get("items")?.as_array()?;
+    if items.is_empty() {
+        return None;
+    }
+    let mut text = String::new();
+    for item in items {
+        if item.get("type")?.as_str()? != "reasoning" {
+            return None;
+        }
+        let parts = item.get("content")?.as_array()?;
+        if parts.is_empty() {
+            return None;
+        }
+        for part in parts {
+            if part.get("type")?.as_str()? != "reasoning_text" {
+                return None;
+            }
+            text.push_str(part.get("text")?.as_str()?);
+        }
+    }
+    Some(text)
 }
 
 fn chat_content(_role: &Role, parts: &[ContentPart]) -> Result<Value> {

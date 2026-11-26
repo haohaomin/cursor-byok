@@ -225,6 +225,15 @@ impl Provider for OpenAiResponsesProvider {
                         if let Some(usage) = value.pointer("/response/usage") { yield ModelEvent::Usage(responses_usage(usage)); }
                         if thinking_open { thinking_open = false; yield ModelEvent::ThinkingEnd; }
                         if let Some(output) = value.pointer("/response/output").and_then(Value::as_array) {
+                            // Some gateways only provide native reasoning in
+                            // the final snapshot. Prefer that complete list to
+                            // avoid losing it or duplicating streamed items.
+                            let snapshot_reasoning = output.iter()
+                                .filter(|item| item.get("type").and_then(Value::as_str) == Some("reasoning"))
+                                .cloned().collect::<Vec<_>>();
+                            if !snapshot_reasoning.is_empty() {
+                                reasoning_items = snapshot_reasoning;
+                            }
                             // Array positions are output_index values, including non-message items.
                             // Reuse the streamed baselines so a full snapshot only adds missing text.
                             for (index, item) in output.iter().enumerate() {

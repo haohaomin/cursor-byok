@@ -1,13 +1,13 @@
 //! Checks issue #102 across streamed tool calls, persisted history and Responses replay.
 use std::time::Duration;
 
-use axum::{routing::post, Json, Router};
+use axum::{http::StatusCode, response::IntoResponse, routing::post, Json, Router};
 use cursor_server::{
     config::{ProviderConfig, ProviderKind},
     cursor::checkpoint::messages::{decode, stable_messages},
     model::{
         project_messages, CanonicalMessage, MessageContent, ModelInvocation, ModelRequest,
-        ModelSpec, Origin, PromptSpec, Role, ToolCallContent, ToolResultContent,
+        ModelSpec, Origin, PromptSpec, Role, ToolCallContent, ToolDefinition, ToolResultContent,
     },
     provider::{OpenAiChatProvider, OpenAiResponsesProvider, Provider},
     run::{consume_model_cycle, ModelCycleResult},
@@ -15,6 +15,9 @@ use cursor_server::{
 };
 use serde_json::{json, Value};
 use tokio_util::sync::CancellationToken;
+
+#[path = "responses_tool_history/deepseek.rs"]
+mod deepseek;
 
 const CALL_ID: &str = "call_issue102_read";
 
@@ -32,6 +35,10 @@ impl Drop for Endpoint {
 
 impl Endpoint {
     async fn new(events: Vec<Value>) -> Self {
+        Self::validating(events, None).await
+    }
+
+    async fn validating(events: Vec<Value>, expected_reasoning: Option<Vec<String>>) -> Self {
         let sse = events
             .iter()
             .map(|event| format!("data: {event}\n\n"))
@@ -42,9 +49,21 @@ impl Endpoint {
             post(move |Json(body): Json<Value>| {
                 let sender = sender.clone();
                 let sse = sse.clone();
+                let expected_reasoning = expected_reasoning.clone();
                 async move {
-                    sender.send(body).unwrap();
-                    ([("content-type", "text/event-stream")], sse)
+                    sender.send(body.clone()).unwrap();
+                    if let Some(expected) = expected_reasoning {
+                        let actual = body["messages"].as_array().unwrap().iter()
+                            .filter(|message| message["role"] == "assistant")
+                            .map(|message| message["reasoning_content"].as_str().map(str::to_owned))
+                            .collect::<Option<Vec<_>>>();
+                        if actual.as_ref() != Some(&expected) {
+                            return (StatusCode::BAD_REQUEST, Json(json!({"error":{
+                                "message":"synthetic DeepSeek: missing or incomplete reasoning_content"
+                            }}))).into_response();
+                        }
+                    }
+                    ([("content-type", "text/event-stream")], sse).into_response()
                 }
             }),
         );
@@ -82,6 +101,14 @@ impl Endpoint {
 }
 
 async fn cycle(provider: &dyn Provider, messages: &[CanonicalMessage]) -> ModelCycleResult {
+    cycle_model(provider, messages, "gpt-test").await
+}
+
+async fn cycle_model(
+    provider: &dyn Provider,
+    messages: &[CanonicalMessage],
+    model: &str,
+) -> ModelCycleResult {
     let invocation = ModelInvocation {
         call_id: "model-call".into(),
         run_id: "run".into(),
@@ -91,9 +118,13 @@ async fn cycle(provider: &dyn Provider, messages: &[CanonicalMessage]) -> ModelC
         request: ModelRequest {
             prompt: PromptSpec {
                 instructions: "test".into(),
-                tools: vec![],
+                tools: vec![ToolDefinition {
+                    name: "Read".into(),
+                    description: "Read a test file".into(),
+                    parameters: json!({"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}),
+                }],
             },
-            model: ModelSpec::new("gpt-test"),
+            model: ModelSpec::new(model),
             history: project_messages(messages).unwrap(),
         },
     };
@@ -158,30 +189,7 @@ async fn verify_replay(kind: ProviderKind, events: Vec<Value>) {
         },
     ];
 
-    let directory = tempfile::tempdir().unwrap();
-    let url = format!("sqlite://{}", directory.path().join("history.db").display());
-    let store = Store::connect(&url).await.unwrap();
-    let checkpoint = store
-        .import_checkpoint(&"issue102".into(), &messages)
-        .await
-        .unwrap();
-    store.pool().close().await;
-    let store = Store::connect(&url).await.unwrap();
-    let saved = store.load_checkpoint_messages(checkpoint).await.unwrap();
-    assert_eq!(saved, messages);
-    store.pool().close().await;
-
-    let encoded = stable_messages("", &saved, "gpt-test").unwrap();
-    let mut recovered = encoded
-        .iter()
-        .zip(&saved)
-        .map(|(bytes, original)| decode(bytes, original.message_id.clone()).unwrap())
-        .collect::<Vec<_>>();
-    assert_eq!(recovered.len(), messages.len());
-    assert_eq!(
-        project_messages(&recovered).unwrap(),
-        project_messages(&messages).unwrap()
-    );
+    let mut recovered = persist_roundtrip(&messages, "gpt-test").await;
 
     let mut destination = Endpoint::new(vec![
         json!({"type":"response.output_text.delta","output_index":0,"delta":"accepted"}),
@@ -225,6 +233,34 @@ async fn verify_replay(kind: ProviderKind, events: Vec<Value>) {
     let next = destination.requests.try_recv().unwrap();
     assert!(next["input"].as_array().unwrap().starts_with(input));
     assert_eq!(next["input"].as_array().unwrap().len(), input.len() + 1);
+}
+
+async fn persist_roundtrip(messages: &[CanonicalMessage], model: &str) -> Vec<CanonicalMessage> {
+    let directory = tempfile::tempdir().unwrap();
+    let url = format!("sqlite://{}", directory.path().join("history.db").display());
+    let store = Store::connect(&url).await.unwrap();
+    let checkpoint = store
+        .import_checkpoint(&"issue102".into(), messages)
+        .await
+        .unwrap();
+    store.pool().close().await;
+    let store = Store::connect(&url).await.unwrap();
+    let saved = store.load_checkpoint_messages(checkpoint).await.unwrap();
+    assert_eq!(saved, messages);
+    store.pool().close().await;
+
+    let encoded = stable_messages("", &saved, model).unwrap();
+    let recovered = encoded
+        .iter()
+        .zip(&saved)
+        .map(|(bytes, original)| decode(bytes, original.message_id.clone()).unwrap())
+        .collect::<Vec<_>>();
+    assert_eq!(recovered.len(), messages.len());
+    // Cursor carries ordered tool calls, not the provider's transient SSE index.
+    // Verify the complete wire history, including replay state and tool pairing.
+    assert_eq!(stable_messages("", &recovered, model).unwrap(), encoded);
+
+    recovered
 }
 
 #[tokio::test]
