@@ -28,6 +28,8 @@
 
 **2026-11-26 PR #485 DeepSeek 发布：**fork [PR #57](https://github.com/haohaomin/cursor-byok/pull/57) 已合入，Pull Request CI 的 Linux、Windows、macOS、前端和 Sourcery 检查全部通过；v1.2.7 已完成 20 项资产、7 个签名和三个更新清单核验。真实 DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收，见 [记录](history/pull-requests/2026-11-24-pr485-deepseek-review.md) 与 [发布核验](history/releases.md#v127)。
 
+**2026-11-26 本 fork PR #55 候选：**已复现并修复二进制 BidiAppend 被拒绝的服务端入口问题，同时拒绝双字段歧义并保留脱敏诊断；隔离 HTTP 完整回复、KV 确认和检查点回归通过。尚不扩大真实 Cursor、Windows Agent 或 #155 的验收结论。压缩超时交由 PR #56 单独评估，见 [验证记录](history/pull-requests/2026-11-26-pr55-binary-append.md)。
+
 ## 1. 已发布的成果
 
 v1.2.7 新增 DeepSeek 跨协议 reasoning 回放修复（[发布核验](history/releases.md#v127)）；v1.2.6 新增本地身份团队配置路由（[发布核验](history/releases.md#v126)）；v1.2.5 新增 Todo 完整列表与压缩恢复（[发布核验](history/releases.md#v125)）；v1.2.4 新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
