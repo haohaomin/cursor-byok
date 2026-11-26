@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { api, type ProxySettings, type ProxySettingsInput, type StatisticsStorage, type StatisticsStorageScope, type TabSettings } from "../../shared/api";
+import { api, type CompactionSettings, type ProxySettings, type ProxySettingsInput, type StatisticsStorage, type StatisticsStorageScope, type TabSettings } from "../../shared/api";
 import { PageContent } from "../../shell/layout/PageContent";
 import { LegacyModelImport } from "../models/LegacyModelImport";
 import { AppLifecycleSettingsCard } from "./AppLifecycleSettingsCard";
 import { CommitSettingsCard } from "./CommitSettingsCard";
+import { CompactionSettingsCard } from "./CompactionSettingsCard";
 import { ExternalApiSettingsCard } from "./ExternalApiSettingsCard";
 import { PricingSettingsCard } from "./PricingSettingsCard";
 import { ProxySettingsCard } from "./ProxySettingsCard";
@@ -40,6 +41,10 @@ export function SettingsPage() {
   const [tabDraft, setTabDraft] = useState<TabSettings>({ mode: "public", address: "" });
   const [editingTab, setEditingTab] = useState(false);
   const [savingTab, setSavingTab] = useState(false);
+  const [compaction, setCompaction] = useState<CompactionSettings | null>(null);
+  const [compactionDraft, setCompactionDraft] = useState("");
+  const [editingCompaction, setEditingCompaction] = useState(false);
+  const [savingCompaction, setSavingCompaction] = useState(false);
   useEffect(() => {
     const report = (cause: unknown) => message(cause instanceof Error ? cause.message : String(cause));
     void api.statisticsStorage().then(setStorage).catch(report);
@@ -50,6 +55,10 @@ export function SettingsPage() {
     void api.tabSettings().then((next) => {
       setTabSettings(next);
       setTabDraft(next);
+    }).catch(report);
+    void api.compactionSettings().then((next) => {
+      setCompaction(next);
+      setCompactionDraft(String(next.auto_compaction_timeout_secs));
     }).catch(report);
   }, [message]);
   useEffect(() => {
@@ -153,6 +162,34 @@ export function SettingsPage() {
       setSavingTab(false);
     }
   };
+  const editCompaction = () => {
+    if (!compaction) return;
+    setCompactionDraft(String(compaction.auto_compaction_timeout_secs));
+    setEditingCompaction(true);
+  };
+  const cancelCompactionEdit = () => {
+    if (compaction) setCompactionDraft(String(compaction.auto_compaction_timeout_secs));
+    setEditingCompaction(false);
+  };
+  const saveCompaction = async () => {
+    const seconds = Number(compactionDraft);
+    if (!Number.isInteger(seconds) || seconds < 30 || seconds > 3600) {
+      message(t("自动压缩超时必须是 30 到 3600 之间的整数"));
+      return;
+    }
+    try {
+      setSavingCompaction(true);
+      const saved = await api.setCompactionSettings({ auto_compaction_timeout_secs: seconds });
+      setCompaction(saved);
+      setCompactionDraft(String(saved.auto_compaction_timeout_secs));
+      setEditingCompaction(false);
+      message(t("自动压缩设置已保存"));
+    } catch (cause) {
+      message(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      setSavingCompaction(false);
+    }
+  };
   const clearTitle = clearScope === "all" ? t("确定要清理全部统计数据吗？") : t("确定要清理详细记录吗？");
   const clearDescription = clearScope === "all"
     ? t("所有调用汇总、详细内容和追踪记录都会被删除。模型配置、CA 和应用设置不会受到影响，此操作无法撤销。")
@@ -228,6 +265,7 @@ export function SettingsPage() {
       <ExternalApiSettingsCard servicePort={ports.service_port} />
       <ProxySettingsCard settings={outboundProxy} draft={proxyDraft} editing={editingProxy} saving={savingProxy} onDraftChange={setProxyDraft} onEdit={editProxy} onCancel={cancelProxyEdit} onSave={() => void saveProxy()} />
       <TabSettingsCard settings={tabSettings} draft={tabDraft} editing={editingTab} saving={savingTab} onDraftChange={setTabDraft} onEdit={editTab} onCancel={cancelTabEdit} onSave={() => void saveTab()} />
+      <CompactionSettingsCard settings={compaction} draft={compactionDraft} editing={editingCompaction} saving={savingCompaction} onDraftChange={setCompactionDraft} onEdit={editCompaction} onCancel={cancelCompactionEdit} onSave={() => void saveCompaction()} />
       <CommitSettingsCard />
       <PricingSettingsCard />
       <AppLifecycleSettingsCard />
