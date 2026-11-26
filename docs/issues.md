@@ -12,6 +12,7 @@
 
 | 项目 | 已完成 | 剩余 |
 | --- | --- | --- |
+| [本 fork #54](https://github.com/haohaomin/cursor-byok/issues/54) 二进制 BidiAppend 被拒绝 | HTTP 400 已复现；PR #55 补全后的解码、回复、KV 确认与检查点回归通过 | 合入、发布与真实 Cursor 复测分别记录，见 [PR #55 验证](history/pull-requests/2026-11-26-pr55-binary-append.md) |
 | #469 远程 Semble | 主机采集/分页等已随 v1.1.0 发布；本地审批候选回归通过 | 审批修复已通过 PR #13 合入并随 v1.2.1 发布；真实批准/拒绝及 Windows Cursor UI 待验收 |
 | #445 / #481 OAuth | 实现与 API 2 已随 v1.1.0 发布，有隔离测试 | 真实账号验收 |
 | #155 后台任务 | v1.0.17 普通短任务自动续答和去重通过 | 仍为完成一半；审批、压缩等边界未完整覆盖，不测 20 分钟 |

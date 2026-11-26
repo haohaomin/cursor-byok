@@ -1,4 +1,6 @@
 //! Accepts ordered Cursor Bidi append requests and routes them by request_id.
+use std::borrow::Cow;
+
 use prost::Message;
 
 use crate::{
@@ -160,19 +162,26 @@ pub fn decode(request: &ai::BidiAppendRequest) -> Result<DecodedAppend> {
         .map(|id| id.request_id.as_str())
         .filter(|id| !id.is_empty())
         .ok_or_else(|| Error::Protocol("BidiAppend request_id is required".into()))?;
-    if !request.data_binary.is_empty() {
-        return Err(Error::Protocol(
-            "BidiAppend data_binary is not part of the captured protocol".into(),
-        ));
-    }
-    if request.data.is_empty() {
-        return Err(Error::Protocol(
-            "BidiAppend contains no AgentClientMessage".into(),
-        ));
-    }
-    let payload = hex::decode(&request.data)
-        .map_err(|error| Error::Protocol(format!("invalid BidiAppend hex: {error}")))?;
-    let message = agent::AgentClientMessage::decode(payload.as_slice()).inspect_err(|error| {
+    // Select exactly one wire representation; never retry a failed decode using
+    // the other field. Borrow binary data instead of copying the request body.
+    let payload: Cow<'_, [u8]> = match (request.data.is_empty(), request.data_binary.is_empty()) {
+        (true, false) => Cow::Borrowed(&request.data_binary),
+        (false, true) => Cow::Owned(
+            hex::decode(&request.data)
+                .map_err(|error| Error::Protocol(format!("invalid BidiAppend hex: {error}")))?,
+        ),
+        (true, true) => {
+            return Err(Error::Protocol(
+                "BidiAppend contains no AgentClientMessage".into(),
+            ))
+        }
+        (false, false) => {
+            return Err(Error::Protocol(
+                "BidiAppend contains both data and data_binary".into(),
+            ))
+        }
+    };
+    let message = agent::AgentClientMessage::decode(payload.as_ref()).inspect_err(|error| {
         tracing::warn!(
             request_id,
             seqno = request.append_seqno,
@@ -226,6 +235,15 @@ mod tests {
 
     #[test]
     fn decode_failure_logs_metadata_without_payload() {
+        check_decode_failure_logs(false);
+    }
+
+    #[test]
+    fn binary_decode_failure_logs_metadata_without_payload() {
+        check_decode_failure_logs(true);
+    }
+
+    fn check_decode_failure_logs(binary: bool) {
         let mut log = tempfile::tempfile().unwrap();
         let writer = log.try_clone().unwrap();
         let subscriber = tracing_subscriber::fmt()
@@ -241,8 +259,12 @@ mod tests {
                 request_id: "decode-failure-test".into(),
             }),
             append_seqno: 7,
-            data: hex::encode(&payload),
-            ..Default::default()
+            data: if binary {
+                String::new()
+            } else {
+                hex::encode(&payload)
+            },
+            data_binary: if binary { payload.clone() } else { Vec::new() },
         };
 
         tracing::subscriber::with_default(subscriber, || {
@@ -258,5 +280,95 @@ mod tests {
         assert!(!output.contains("private-conversation-content"));
         assert!(!output.contains(&hex::encode(&payload)));
         assert!(!output.contains("payload_prefix"));
+    }
+
+    #[test]
+    fn decode_accepts_binary_payload_field() {
+        let message = agent::AgentClientMessage {
+            message: Some(agent::agent_client_message::Message::ClientHeartbeat(
+                Default::default(),
+            )),
+        };
+        let payload = message.encode_to_vec();
+        assert!(!payload.is_empty());
+        let request = ai::BidiAppendRequest {
+            request_id: Some(ai::BidiRequestId {
+                request_id: "binary-payload-test".into(),
+            }),
+            append_seqno: 3,
+            data_binary: payload,
+            ..Default::default()
+        };
+
+        let decoded = match decode(&request) {
+            Ok(decoded) => decoded,
+            Err(error) => panic!("binary payload should decode: {error}"),
+        };
+        assert_eq!(decoded.request_id, "binary-payload-test");
+        assert_eq!(decoded.seqno, 3);
+        assert!(matches!(
+            decoded.message.message.as_ref(),
+            Some(agent::agent_client_message::Message::ClientHeartbeat(_))
+        ));
+    }
+
+    #[test]
+    fn decode_rejects_invalid_binary_payload() {
+        // Field 1 must be length-delimited, not a 32-bit value.
+        let mut payload = vec![0x0d];
+        payload.extend_from_slice(b"not-a-valid-agent-client-message");
+        let request = ai::BidiAppendRequest {
+            request_id: Some(ai::BidiRequestId {
+                request_id: "binary-garbage-test".into(),
+            }),
+            append_seqno: 1,
+            data_binary: payload,
+            ..Default::default()
+        };
+
+        assert!(decode(&request).is_err());
+    }
+
+    #[test]
+    fn decode_rejects_ambiguous_payload_fields() {
+        let payload = agent::AgentClientMessage {
+            message: Some(agent::agent_client_message::Message::ClientHeartbeat(
+                Default::default(),
+            )),
+        }
+        .encode_to_vec();
+        for binary in [payload.clone(), vec![0x0d]] {
+            let request = ai::BidiAppendRequest {
+                request_id: Some(ai::BidiRequestId {
+                    request_id: "ambiguous".into(),
+                }),
+                data: hex::encode(&payload),
+                data_binary: binary,
+                ..Default::default()
+            };
+            assert!(
+                decode(&request).is_err(),
+                "do not silently discard a second payload"
+            );
+        }
+    }
+
+    #[test]
+    fn binary_payload_still_requires_request_id() {
+        let mut request = ai::BidiAppendRequest {
+            data_binary: agent::AgentClientMessage {
+                message: Some(agent::agent_client_message::Message::ClientHeartbeat(
+                    Default::default(),
+                )),
+            }
+            .encode_to_vec(),
+            ..Default::default()
+        };
+        for id in [None, Some(ai::BidiRequestId::default())] {
+            request.request_id = id;
+            assert!(
+                matches!(decode(&request), Err(Error::Protocol(message)) if message == "BidiAppend request_id is required")
+            );
+        }
     }
 }

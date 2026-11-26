@@ -4,6 +4,12 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-26 本 fork PR #55
+
+| PR / 来源 head | 解决目标与采用范围 | 验证与边界 |
+| --- | --- | --- |
+| [#55](https://github.com/haohaomin/cursor-byok/pull/55) / `26fa33de2c8d` | 接收 BidiAppend 二进制 Agent 消息，补双字段冲突拒绝与共用解码；180 秒压缩超时不纳入本次整合 | 基线 HTTP 400 与原补丁双字段误接受已复现，补全后的 6 项解码、7 项 wire、8 项准入回归通过。真实 Cursor UI 待复测；[完整记录](history/pull-requests/2026-11-26-pr55-binary-append.md)。 |
+
 ## 2026-11-23 发布状态核对
 
 2026-11-19 已依次合入以下八项；当时 main 为 `68c4dfb`，本 fork 开放 PR 数为 0。2026-11-23 已随 v1.2.1 发布，[四平台资产与更新清单核验](history/releases.md#v121)通过。下列旧日期的候选 head 和测试描述仅表示当时证据，不能再据此判断为“未合并”。

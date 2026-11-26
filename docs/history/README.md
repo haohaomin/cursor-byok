@@ -7,6 +7,7 @@
 - [2026-09-30 上游同步](upstream-sync/2026-09-30.md)
 
 - [2026-11-26 · PR #485：DeepSeek 跨协议续写复核与选择性修复](pull-requests/2026-11-24-pr485-deepseek-review.md)
+- [2026-11-26 · 本 fork PR #55：BidiAppend 二进制载荷](pull-requests/2026-11-26-pr55-binary-append.md)
 - [2026-11-24 · PR #485：本地身份团队配置路由](pull-requests/2026-11-24-pr485-team-metadata.md)
 - [2026-11-24 · PR #485：Todo 完成回包保留完整列表](pull-requests/2026-11-24-pr485-todo-state.md)
 
