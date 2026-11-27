@@ -8,7 +8,7 @@
 
 | PR / 来源 head | 解决目标与采用范围 | 验证与边界 |
 | --- | --- | --- |
-| [#56](https://github.com/haohaomin/cursor-byok/pull/56) / `b3af330db541` | 自动压缩时限设置，默认 180 秒、范围 30–3600；已补齐存储边界、演示接口、保存竞态及本地管理监听边界 | 本地工作区 629 项通过，Clippy、前端及演示交互通过；未合入/发布，真实 Cursor/供应商待验收；[记录](history/pull-requests/2026-11-27-pr56-compaction-timeout.md) |
+| [#56](https://github.com/haohaomin/cursor-byok/pull/56) / `b3af330db541` | 自动压缩时限设置，默认 180 秒、范围 30–3600；已补齐存储边界、演示接口、保存竞态及本地管理监听边界 | 经 PR #60 合入 main；本地工作区 629 项、跨平台 CI 与 Codex 云端审查通过，v1.2.9 已发布核验，真实 Cursor/供应商待验收；[记录](history/pull-requests/2026-11-27-pr56-compaction-timeout.md) |
 
 ## 2026-11-26 本 fork PR #55
 

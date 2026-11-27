@@ -2,7 +2,7 @@
 
 来源：[本 fork PR #56](https://github.com/haohaomin/cursor-byok/pull/56)，作者 ShowBoy7816，来源 head `b3af330db5412f5484d739b075870d7216921a62`。集成基线 `6f89c9929853b5da165d559bea1c0f42e6f3c6ad`；工作分支 `codex/pr56-compaction-settings`。
 
-当前状态：原始七项提交已采用并补全，本地验证通过；尚未合入 main 或发布。当前公开 v1.2.8 不包含此设置。
+当前状态：原始七项提交已采用并补全，经 [PR #60](https://github.com/haohaomin/cursor-byok/pull/60) 合入 main；原 PR #56 也已自动标记合并。合并提交 `793817a90732808f0f7af97a8442aa7183bbe250`。已随 v1.2.9 发布并完成资产核验，v1.2.8 不包含此设置。
 
 ## 行为与范围
 
@@ -44,4 +44,16 @@ server/src/run/engine/compaction.rs   # 每批摘要独立计时；完整摘要�
 - 800×600 浏览器视口下设置导航与卡片可见，无文档水平溢出。
 - macOS Tauri debug/no-bundle 构建通过。初次编译遇到本机 SQLx 宏动态库的 `mis-aligned LINKEDIT string pool`，沿用既有本地参数 `--config 'profile.dev.package.sqlx-macros.strip="none"'` 重建后成功，未修改发布构建配置。上述 Rust 测试和 Clippy 也使用同一参数。
 
+演示 Vite 记录了 `ResizeObserver loop completed with undelivered notifications` 警告；上述设置交互与小视口检查通过，没有据此声明整页 UI 无警告。
+
 以上为本地自动化及演示 UI 验证，不等同于真实 Cursor 长会话或真实慢供应商验收。本次没有运行 20 分钟任务。
+
+## 合并验证
+
+集成 head `1a2d71d5b6cf12d32d653225cb4186d0bfcf9ebd` 的 [分支 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45942964744) 和 [PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45943026147) 均通过 Linux、macOS、Windows 与前端检查。Codex 云端审查在同一 head 完成，无新发现。Sourcery 因最近七天审查额度用尽跳过；不能把 skipped 记作复审通过。原 #56 的四项意见已在上表逐项补全。
+
+HTTPS Git 传输本轮出现连接停滞；核对 GitHub 官方 API 提供的主机公钥后，使用现有 SSH 身份通过 443 端口完成推送。未修改全局网络配置。
+
+## 发布核验
+
+合并后的 [main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45944074385) 全部通过；[自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45944843713) 四平台成功。v1.2.9 的 20 项资产哈希、7 份签名与 3 份更新清单全部核验通过，发布提交 `c4c5e76af7f2e6d0da117804c8453fc00f82a754`，五处版本均为 1.2.9。见 [发布记录](../releases.md#v129) 和 [结构化证据](../2026-11-27-v1.2.9-release-evidence.json)。未安装到用户机器。

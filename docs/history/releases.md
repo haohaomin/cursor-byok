@@ -513,3 +513,18 @@
 [结构化证据](2026-11-26-v1.2.8-release-evidence.json)；[复现、修复与合入](pull-requests/2026-11-26-pr55-binary-append.md)。本轮未安装到用户机器，未重复真实 Cursor UI/供应商验收；HTTP 共用入口的大请求上限仍是独立待办。
 
 校验记录已取回仓库；OCI 下载/构建临时目录、本机未完成下载和 SSH 插件传输暂存目录均已清理。
+
+<a id="v129"></a>
+
+## v1.2.9 发布验证记录
+
+来源日期：2026-11-27。包含本 fork PR #56 经 #60 补全的自动压缩时限设置：默认 180 秒、范围 30–3600 秒，下一次自动压缩生效；补齐数据库读写边界、演示接口、保存竞态和本地管理监听边界。
+
+- 源码合并：`793817a90732808f0f7af97a8442aa7183bbe250`；[main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45944074385) 全部通过。发布提交：`c4c5e76af7f2e6d0da117804c8453fc00f82a754`。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45944843713) 四平台及最终发布全部成功；[v1.2.9](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.9) 核验时为 Latest、draft=false、prerelease=false，已补充中文发布说明。
+- 在 OCI 隔离临时目录下载全部 20 项资产，大小和 GitHub SHA-256 全部匹配；未变更的 updater 公钥验证 7 份 Minisign 签名，全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台集合、URL、签名、旧版校验和与大小匹配；源码五处版本均为 1.2.9。
+
+[结构化证据](2026-11-27-v1.2.9-release-evidence.json)；[采用与验证](pull-requests/2026-11-27-pr56-compaction-timeout.md)。未安装到用户机器，真实 Cursor 长会话和真实慢供应商仍待验收，没有执行 20 分钟任务。自动压缩设置不改变后台 Shell/普通 Agent/手动压缩时限。
+
+核验证据已取回仓库；OCI 下载/构建临时目录和本机 SSH 传输暂存目录已清理。
