@@ -1,6 +1,6 @@
 # Issue 清单
 
-更新：2026-11-27；最新公开版本为 v1.2.9，新增自动压缩时限设置与本地管理监听边界；[发布与核验](history/releases.md#v129)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
+更新：2026-11-27；最新公开版本为 v1.2.10，新增摘要输出上限与每批有限重试；[发布与核验](history/releases.md#v1210)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
 
 - **先看进度**：[已做好与未完成工作](work-status.md)。
 - **看安装包包含什么**：[维护状态](maintenance-status.md)。
@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | [本 fork #54](https://github.com/haohaomin/cursor-byok/issues/54) 二进制 BidiAppend 被拒绝 | 经 PR #59 合入，原 PR #55 已标记合并、Issue 已关闭；560 项回归及跨平台 CI 通过 | v1.2.8 已发布核验，真实 Cursor 复测待完成；见 [验证记录](history/pull-requests/2026-11-26-pr55-binary-append.md) |
 | [本 fork PR #56](https://github.com/haohaomin/cursor-byok/pull/56) 自动压缩超时 | 经 PR #60 合入并随 v1.2.9 发布；629 项工作区测试、跨平台 CI 和发布资产核验通过 | 真实慢供应商/Cursor 长会话待验收；[记录](history/pull-requests/2026-11-27-pr56-compaction-timeout.md) |
-| [本 fork PR #61](https://github.com/haohaomin/cursor-byok/pull/61) 摘要输出截断 | 已补全候选输出设置、模型/上下文约束和有限重试；定向回归及演示 UI 通过 | 合并前验证中，v1.2.9 未包含；真实 Cursor/原网关未验收；[记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md) |
+| [本 fork PR #61](https://github.com/haohaomin/cursor-byok/pull/61) 摘要输出截断 | 经 PR #62 合入 main，原 #61 已合并；635 项回归、最终跨平台 CI 与演示 UI 通过 | v1.2.10 已发布核验；真实 Cursor/原网关未验收；[记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md) |
 | Cursor HTTP 大请求上限 | 已确认共用读取/解压入口缺少大小限制，原十六进制路径也受影响 | 独立设计上限并覆盖合法大图、长历史和解压膨胀请求，见 [PR #55 审查记录](history/pull-requests/2026-11-26-pr55-binary-append.md#审查与合入) |
 | #469 远程 Semble | 主机采集/分页等已随 v1.1.0 发布；本地审批候选回归通过 | 审批修复已通过 PR #13 合入并随 v1.2.1 发布；真实批准/拒绝及 Windows Cursor UI 待验收 |
 | #445 / #481 OAuth | 实现与 API 2 已随 v1.1.0 发布，有隔离测试 | 真实账号验收 |

@@ -528,3 +528,18 @@
 [结构化证据](2026-11-27-v1.2.9-release-evidence.json)；[采用与验证](pull-requests/2026-11-27-pr56-compaction-timeout.md)。未安装到用户机器，真实 Cursor 长会话和真实慢供应商仍待验收，没有执行 20 分钟任务。自动压缩设置不改变后台 Shell/普通 Agent/手动压缩时限。
 
 核验证据已取回仓库；OCI 下载/构建临时目录和本机 SSH 传输暂存目录已清理。
+
+<a id="v1210"></a>
+
+## v1.2.10 发布验证记录
+
+来源日期：2026-11-27。该版本新增摘要输出上限与每批有限重试，经 [PR #62](https://github.com/haohaomin/cursor-byok/pull/62) 集成原 PR #61，保留来源提交和作者。
+
+- 合并提交：`f5d373eccb7f0af992e24748e7ec5c2b785b8bea`；发布提交：`5c1f8e9b8e46378815ee12c975e2306bf8b8f5dc`，五处版本均为 1.2.10。
+- [main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45966122044) 全部通过；[自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45967213472) 四个平台及最终发布成功。
+- [Release](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.10)：Latest，draft=false，prerelease=false；20 项资产全部下载并匹配大小和 SHA-256，7 份 Minisign 签名有效。
+- 三个更新清单均为 1.2.10，平台集合、标签 URL、签名及旧清单大小/哈希匹配，updater 公钥未变。
+- 本地工作区 635 项通过、0 失败、14 忽略；Clippy、前端构建、Tauri debug/no-bundle 与演示 UI 检查通过。审查发现的跨批次重试额度问题已先复现后修复，并以最终提交完成跨平台 CI。
+- 未安装新包；真实 Cursor/原 GLM 网关仍待验收，#155 状态未扩大，不做 20 分钟验收。
+
+[修复记录](pull-requests/2026-11-27-pr61-compaction-output-cap.md)；[结构化资产、签名与清单证据](2026-11-27-v1.2.10-release-evidence.json)。

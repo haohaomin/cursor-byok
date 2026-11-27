@@ -2,7 +2,7 @@
 
 来源：[本 fork PR #61](https://github.com/haohaomin/cursor-byok/pull/61)，作者 ShowBoy7816；来源 head `f41c4966ff71215a6ebe502412504f32c160b99c`。基线 `34ba1cc511cc7198ea104ee8b30da30c51397528`，工作分支 `codex/pr61-compaction-output-cap`。采用原始提交并在真实合并中补全，不重复 cherry-pick；来源作者与提交保留。
 
-当前状态：已补全候选实现，本地验证通过，待跨平台 CI 与合并；未发布。v1.2.9 不包含本功能。
+当前状态：经 [PR #62](https://github.com/haohaomin/cursor-byok/pull/62) 合入 main，合并提交 `f5d373eccb7f0af992e24748e7ec5c2b785b8bea`；原 #61 已自动标记合并。已随 v1.2.10 发布并核验；v1.2.9 不包含本功能。
 
 ## 解决的行为
 
@@ -54,7 +54,7 @@ server/src/run/engine/compaction.rs                           # 重建检查点�
 - macOS Tauri debug/no-bundle 构建与工作区 Clippy 通过，使用本机既有 SQLx 动态库参数 `--config 'profile.dev.package.sqlx-macros.strip="none"'`，未修改发布构建配置。
 - 首次全量测试发现工具轮次夹具仍假定单批摘要；按新默认预留改为两批后，定向用例通过，验证同一个 Run 可在更多工具输出后再次完成自动压缩。
 
-首轮 `cargo test --locked --workspace --all-targets`：634 通过、0 失败、14 忽略；同一工作区的 Clippy 与格式检查通过。忽略项需要外部环境，不视为验收。跨平台 CI 与合并发布结果在完成后补充。
+首轮 `cargo test --locked --workspace --all-targets`：634 通过、0 失败、14 忽略；同一工作区的 Clippy 与格式检查通过。忽略项需要外部环境，不视为验收。最终验证与发布结果见下文。
 
 这些是确定性 provider、数据库和演示 UI 验证，不是原作者 GLM 网关或真实 Cursor 长会话验收；本轮不运行 20 分钟任务，不改变 #155 的部分完成状态。
 
@@ -62,4 +62,19 @@ server/src/run/engine/compaction.rs                           # 重建检查点�
 
 集成 head `8e93cf2cc9e0090fda7c91fb2028b019d951b241` 的 [PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45963408881) 和 [分支 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45963333377) 均通过。Sourcery 因额度用尽跳过，不记为通过。
 
-Codex 指出该版本把三次重试额度用于整个压缩过程：前一批第三次重试成功后，后续批次的首次截断就直接失败。该场景新增回归在修复前失败，修复后通过；将计数器在每批成功后归零，已经缩小的历史输入限额继续沿用，失败批次仍不能无限重试。验证完整 400K 字符答案在成功批次中逐字覆盖、已有摘要带入后续重试，截断内容不落库。最终提交与复验结果在完成后补充。
+Codex 指出该版本把三次重试额度用于整个压缩过程：前一批第三次重试成功后，后续批次的首次截断就直接失败。该场景新增回归在修复前失败，修复后通过；将计数器在每批成功后归零，已经缩小的历史输入限额继续沿用，失败批次仍不能无限重试。验证完整 400K 字符答案在成功批次中逐字覆盖、已有摘要带入后续重试，截断内容不落库。最终修复提交为 `1606cea860aa1e9a4fe538589aba2c9c3bf2a91d`，对应审查线程已标记解决；没有把原 head 的云端审查当作新 head 的无发现审查。
+
+## 最终验证与合并
+
+- 最终 head `1606cea860aa1e9a4fe538589aba2c9c3bf2a91d`：本地全工作区 **635 通过、0 失败、14 忽略**，Clippy 和格式检查通过。
+- [最终 PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45964936441) 与 [最终分支 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45964930078) 的 Linux、macOS、Windows、前端全部通过，包含 CI 中额外启用的插件测试。
+- main 合并提交的文件树与最终验证 head 完全相同。原始来源提交在 main 历史内；原 #61 的合并标记指向 `8e93cf2cc9e0090fda7c91fb2028b019d951b241`，随后补丁 `1606cea` 同样包含在 main。
+- [合并后 main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45966122044) 全部通过。
+
+## 发布核验
+
+[v1.2.10](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.10) 已由 [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45967213472) 四平台构建并发布为 Latest。发布提交 `5c1f8e9b8e46378815ee12c975e2306bf8b8f5dc` 仅在已通过 CI 的合并提交之上更新五个版本文件，五处均为 1.2.10。
+
+Oracle Linux ARM64 隔离目录中实际下载 20 项资产并逐一匹配 GitHub 大小与 SHA-256，7 个包的 Minisign 签名全部有效；`latest.json`、`portable-latest.json`、`update.json` 的版本、平台集合、标签下载 URL、签名串及旧清单大小/哈希均匹配。使用既有 updater 公钥，未更换签名或更新源，也未安装新包到用户机器。
+
+[结构化证据](../2026-11-27-v1.2.10-release-evidence.json)；[发布清单](../releases.md#v1210)。

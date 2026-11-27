@@ -6,7 +6,7 @@
 
 ## 2026-11-27 本 fork PR #61
 
-[#61](https://github.com/haohaomin/cursor-byok/pull/61)，head `f41c4966ff71215a6ebe502412504f32c160b99c`：摘要输出上限可配置，截断时有限重试。原补丁的模型上限、输入预算、重试门槛、并发设置和 UI 保存问题已补全，当前为待合入候选；详见 [验证记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md)。真实 Cursor/原网关未验收。
+[#61](https://github.com/haohaomin/cursor-byok/pull/61)，head `f41c4966ff71215a6ebe502412504f32c160b99c`：摘要输出上限可配置，截断时有限重试。经 [PR #62](https://github.com/haohaomin/cursor-byok/pull/62) 合入 main，原 #61 已标记合并。补齐模型上限、输入预算、跨批次重试、并发设置和 UI 保存问题；635 项回归及最终跨平台 CI 通过，v1.2.10 已发布核验；详见 [验证记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md)。真实 Cursor/原网关未验收。
 
 ## 2026-11-27 本 fork PR #56
 

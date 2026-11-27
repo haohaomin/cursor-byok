@@ -1,6 +1,6 @@
 # 维护状态与上游问题处理
 
-更新：2026-11-27；v1.2.9 发布及资产核验已完成。维护者：haohaomin。
+更新：2026-11-27；v1.2.10 发布及资产核验已完成。维护者：haohaomin。
 
 原仓库 [leookun/cursor-byok](https://github.com/leookun/cursor-byok) 已归档。这个 fork 继续收集原仓库的问题和候选补丁，复现后修复，并保留原作者与贡献者署名。它不是 Cursor 官方项目，也不是原作者指定的继任仓库。
 
@@ -8,7 +8,7 @@
 - 反馈：[本仓库 Issues](https://github.com/haohaomin/cursor-byok/issues)。请附原 Issue/PR 编号、操作系统、Cursor/BYOK 版本、模型协议、复现步骤和脱敏错误。
 - 贡献：[本仓库 Pull Requests](https://github.com/haohaomin/cursor-byok/pulls)。
 
-源码与安装包分别标记。v1.2.9 新增自动压缩时限设置及本地管理接口边界，具体内容与资产核验见 [发布记录](history/releases.md#v129)；未复现、部分通过或缺少原环境的条目不会标记为彻底解决。
+源码与安装包分别标记。v1.2.10 新增摘要输出上限和每批有限重试，具体内容与资产核验见 [发布记录](history/releases.md#v1210)；未复现、部分通过或缺少原环境的条目不会标记为彻底解决。
 
 PR #13、#43–#49 已于 2026-11-19 合入 main，并随 v1.2.1 发布。其中包括 Windows 用户级 CA、模型备份、批量添加模型、上下文上限与终端文件提示。Windows 普通用户下，有效 CA 的安装、生产 Ready 状态、系统信任 HTTPS、错误主机名拒绝及移除后拒绝连接均已实测通过；临时信任和私钥等已清理。BYOK 安装包的 CA 初始化和 Cursor 接管 UI 已通过；真实 Agent 验收尚未完成：提交与 provider 存活未可靠确认，账号 401 和空日志不足以定位根因（2026-11-24 更正），见 [CA 记录](history/issues/2026-11-23-windows-ca-valid-check.md) 与 [Agent 记录](history/issues/2026-11-23-windows-cursor-agent-acceptance.md)。
 
@@ -20,6 +20,7 @@ PR #13、#43–#49 已于 2026-11-19 合入 main，并随 v1.2.1 发布。其中
 
 | 上游问题 / PR | fork 中的处理 | 可用范围与证据 |
 | --- | --- | --- |
+| [本 fork PR #61](https://github.com/haohaomin/cursor-byok/pull/61)：摘要输出截断 | 经 #62 合入，可设输出上限并按模型/上下文限制；每批最多三次缩小输入重试 | v1.2.10 已发布；635 项回归、跨平台 CI、演示 UI 与资产核验通过；真实 Cursor/原网关待验收；[记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md) |
 | [本 fork PR #56](https://github.com/haohaomin/cursor-byok/pull/56)：自动摘要固定时限过短 | 经 #60 整合，可设 30–3600 秒，默认 180；补齐读写/UI/监听边界 | v1.2.9 已发布；629 项工作区回归、跨平台 CI、演示交互和发布核验通过；真实 Cursor/供应商待验收；[记录](history/pull-requests/2026-11-27-pr56-compaction-timeout.md) |
 | [本 fork Issue #54](https://github.com/haohaomin/cursor-byok/issues/54)、[PR #55](https://github.com/haohaomin/cursor-byok/pull/55)：二进制 Agent 消息被返回 400 | 经 #59 整合，支持明确的二进制载荷并拒绝双字段歧义 | v1.2.8 已发布；560 项服务端回归、跨平台 CI 和资产核验通过，真实 Cursor UI 待复测；[记录](history/pull-requests/2026-11-26-pr55-binary-append.md) |
 | [PR #424](https://github.com/leookun/cursor-byok/pull/424)：Steer 后子代理结果丢失 | 已修复，保留执行并交付完成结果 | v1.0.4 起；[真实 Cursor 验证](history/pull-requests/2026-09-29-pr424-fix-result.md) |
