@@ -53,7 +53,6 @@ fn router_with_proxy(
 ) -> Router {
     let free_entitlements = FreeEntitlementCache::default();
     Router::new()
-        .route("/__byok-api__/healthz", get(health))
         .route("/agent.v1.AgentService/RunSSE", post(run_sse_handler))
         .route("/aiserver.v1.BidiService/BidiAppend", post(bidi_handler))
         .route(
@@ -107,10 +106,6 @@ fn router_with_proxy(
         .route(
             "/aiserver.v1.AiService/WriteGitCommitMessage",
             post(commit_message::write_git_commit_message),
-        )
-        .route(
-            "/aiserver.v1.NetworkService/IsConnected",
-            post(is_connected),
         )
         .route(
             "/agent.v1.AgentService/GetDefaultModelForCli",
@@ -185,6 +180,12 @@ fn router_with_proxy(
         .route_layer(from_fn(request_body::buffer))
         .route_layer(RequestDecompressionLayer::new())
         .route_layer(from_fn(request_body::buffer))
+        // Probes ignore request bodies and must answer even if an upload stalls.
+        .route("/__byok-api__/healthz", get(health))
+        .route(
+            "/aiserver.v1.NetworkService/IsConnected",
+            post(is_connected),
+        )
         .merge(
             tab::router()
                 .route_layer(DefaultBodyLimit::disable())
