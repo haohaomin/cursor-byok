@@ -88,12 +88,12 @@ async fn compaction_settings_round_trip_and_reject_invalid_types() {
     assert_eq!(status, StatusCode::OK);
     assert_eq!(
         serde_json::from_str::<Value>(&body).unwrap(),
-        json!({"auto_compaction_timeout_secs":180})
+        json!({"auto_compaction_timeout_secs":180,"auto_compaction_output_tokens":16384})
     );
     for (requested, expected) in [(600, 600), (0, 30), (7200, 3600)] {
         let (status, body) = send(
             router.clone(),
-            "PUT",
+            "PATCH",
             path,
             None,
             json!({"auto_compaction_timeout_secs":requested}),
@@ -102,7 +102,7 @@ async fn compaction_settings_round_trip_and_reject_invalid_types() {
         assert_eq!(status, StatusCode::OK);
         assert_eq!(
             serde_json::from_str::<Value>(&body).unwrap(),
-            json!({"auto_compaction_timeout_secs":expected})
+            json!({"auto_compaction_timeout_secs":expected,"auto_compaction_output_tokens":16384})
         );
         assert_eq!(
             store
@@ -116,13 +116,13 @@ async fn compaction_settings_round_trip_and_reject_invalid_types() {
         assert_eq!(status, StatusCode::OK);
         assert_eq!(
             serde_json::from_str::<Value>(&body).unwrap(),
-            json!({"auto_compaction_timeout_secs":expected})
+            json!({"auto_compaction_timeout_secs":expected,"auto_compaction_output_tokens":16384})
         );
     }
     for invalid in [json!(-1), json!(30.5), json!("600"), Value::Null] {
         let (status, _) = send(
             router.clone(),
-            "PUT",
+            "PATCH",
             path,
             None,
             json!({"auto_compaction_timeout_secs":invalid}),
@@ -138,6 +138,64 @@ async fn compaction_settings_round_trip_and_reject_invalid_types() {
             3600
         );
     }
+}
+
+#[tokio::test]
+async fn compaction_patch_updates_only_named_fields_and_rejects_invalid_output() {
+    let (router, _, _, _directory) = setup().await;
+    let path = "/__byok-api__/api/settings/compaction";
+    let (status, _) = send(
+        router.clone(),
+        "PATCH",
+        path,
+        None,
+        json!({"auto_compaction_timeout_secs":600}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    for (requested, expected) in [(1, 1024), (999_999, 65_536), (24_000, 24_000)] {
+        let (status, body) = send(
+            router.clone(),
+            "PATCH",
+            path,
+            None,
+            json!({"auto_compaction_output_tokens":requested}),
+        )
+        .await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(
+            serde_json::from_str::<Value>(&body).unwrap(),
+            json!({"auto_compaction_timeout_secs":600,"auto_compaction_output_tokens":expected})
+        );
+    }
+    for invalid in [json!(-1), json!(1.5), json!("8192"), Value::Null] {
+        let (status, _) = send(
+            router.clone(),
+            "PATCH",
+            path,
+            None,
+            json!({"auto_compaction_timeout_secs":900,"auto_compaction_output_tokens":invalid}),
+        )
+        .await;
+        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    }
+    let (status, _) = send(router.clone(), "PATCH", path, None, json!({"unknown":8192})).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    let (status, _) = send(
+        router.clone(),
+        "PUT",
+        path,
+        None,
+        json!({"auto_compaction_timeout_secs":900}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::METHOD_NOT_ALLOWED);
+    let (status, body) = send(router, "GET", path, None, json!({})).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(
+        serde_json::from_str::<Value>(&body).unwrap(),
+        json!({"auto_compaction_timeout_secs":600,"auto_compaction_output_tokens":24_000})
+    );
 }
 
 #[tokio::test]

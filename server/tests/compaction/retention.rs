@@ -148,12 +148,13 @@ async fn provider_overflow_without_configured_window_retries_summary_and_continu
     provider.push_error(cursor_server::Error::Provider(
         "context_length_exceeded".into(),
     ));
-    provider.push(text_response(
-        "ORIGINAL_GOAL; COMPLETED_TASK; next pending work",
-        8_000,
-        30,
-    ));
-    provider.push(text_response("continue only pending work", 500, 10));
+    for _ in 0..8 {
+        provider.push(text_response(
+            "ORIGINAL_GOAL; COMPLETED_TASK; next pending work",
+            8_000,
+            30,
+        ));
+    }
     let registry = registry(store, &provider);
     let first = run(
         &registry,
@@ -186,14 +187,17 @@ async fn provider_overflow_without_configured_window_retries_summary_and_continu
     );
     assert_eq!(second.summary_completed, 1);
     let requests = provider.requests();
-    assert_eq!(requests.len(), 5);
+    assert!(
+        requests.len() >= 6,
+        "rejected batch is split into strictly smaller pieces"
+    );
     for index in [2, 3] {
         assert!(requests[index].prompt.tools.is_empty());
         assert!(serde_json::to_string(&requests[index].history)
             .unwrap()
             .contains("ORIGINAL_GOAL"));
     }
-    assert!(serde_json::to_string(&requests[4].history)
+    assert!(serde_json::to_string(&requests.last().unwrap().history)
         .unwrap()
         .contains("COMPLETED_TASK"));
 }
@@ -221,8 +225,9 @@ async fn stalled_large_summary_times_out_without_replacing_history() {
 async fn check_failed_summary(kind: &str) {
     let (_directory, store) = fixtures::temp_store().await;
     store
-        .set_compaction_settings(cursor_server::store::CompactionSettings {
-            auto_compaction_timeout_secs: 30,
+        .set_compaction_settings(cursor_server::store::CompactionSettingsUpdate {
+            auto_compaction_timeout_secs: Some(30),
+            ..Default::default()
         })
         .await
         .unwrap();
@@ -239,7 +244,9 @@ async fn check_failed_summary(kind: &str) {
         "length" => {
             let mut partial = text_response("UNCOMMITTED_PARTIAL_SUMMARY", 100, 4096);
             *partial.last_mut().unwrap() = ModelEvent::Done(FinishReason::Length);
-            provider.push(partial);
+            for _ in 0..4 {
+                provider.push(partial.clone());
+            }
         }
         "later" => {
             provider.push(text_response("UNCOMMITTED_FIRST_BATCH", 80_000, 20));
@@ -290,7 +297,13 @@ async fn check_failed_summary(kind: &str) {
     assert_eq!(second.summary_completed, 0);
     assert_eq!(
         provider.requests().len(),
-        if kind == "later" { 3 } else { 2 }
+        if kind == "length" {
+            5
+        } else if kind == "later" {
+            3
+        } else {
+            2
+        }
     );
     let retained = store
         .load_current_messages(&ConversationId::new("retention-failed"))

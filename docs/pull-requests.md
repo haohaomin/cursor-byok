@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-27 本 fork PR #61
+
+[#61](https://github.com/haohaomin/cursor-byok/pull/61)，head `f41c4966ff71215a6ebe502412504f32c160b99c`：摘要输出上限可配置，截断时有限重试。原补丁的模型上限、输入预算、重试门槛、并发设置和 UI 保存问题已补全，当前为待合入候选；详见 [验证记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md)。真实 Cursor/原网关未验收。
+
 ## 2026-11-27 本 fork PR #56
 
 | PR / 来源 head | 解决目标与采用范围 | 验证与边界 |

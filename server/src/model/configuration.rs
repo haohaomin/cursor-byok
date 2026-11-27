@@ -198,6 +198,9 @@ impl ModelConfig {
             return;
         }
         model.strip_images = self.strip_images;
+        // Expose the configured output budget before provider dispatch so the
+        // compaction planner can reserve and cap the same amount.
+        model.max_output_tokens = model.max_output_tokens.or(self.max_output_tokens());
         // A configured context is authoritative for this model. Cursor's
         // picker still supplies a value when no custom context is configured.
         if let Some(context_window_tokens) = self.context_window_tokens {

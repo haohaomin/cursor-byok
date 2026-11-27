@@ -30,6 +30,7 @@ pub struct ModelCycleFailure {
     pub partial_reasoning: String,
     pub usage: Option<Usage>,
     pub retryable: bool,
+    pub finish_reason: Option<FinishReason>,
 }
 
 struct OpenTool {
@@ -305,12 +306,14 @@ pub async fn consume_model_cycle(
         .map(|tool| tool.call)
         .collect::<Vec<_>>();
     if finish_reason == FinishReason::Length {
-        return Err(terminal_failure(
+        let mut failure = terminal_failure(
             RunFailure::Provider("model stopped before completing the response".into()),
             text,
             reasoning,
             usage,
-        ));
+        );
+        failure.finish_reason = Some(finish_reason);
+        return Err(failure);
     }
     let has_tool_calls = !calls.is_empty();
     if matches!(finish_reason, FinishReason::ToolUse) != has_tool_calls {
@@ -387,6 +390,7 @@ fn failure(
         partial_reasoning,
         usage,
         retryable,
+        finish_reason: None,
     })
 }
 
@@ -417,6 +421,7 @@ fn terminal_failure(
         partial_reasoning,
         usage,
         retryable: false,
+        finish_reason: None,
     })
 }
 

@@ -3,6 +3,8 @@
 mod fake_provider;
 #[path = "support/fixtures.rs"]
 mod fixtures;
+#[path = "compaction/output_cap.rs"]
+mod output_cap;
 #[path = "compaction/recovery.rs"]
 mod recovery;
 #[path = "compaction/retention.rs"]
@@ -330,8 +332,9 @@ async fn automatic_compaction_preflights_provider_input_and_records_rebuilt_toke
 async fn compaction_setting_changed_after_start_allows_a_slow_summary() {
     let (_directory, store) = fixtures::temp_store().await;
     store
-        .set_compaction_settings(cursor_server::store::CompactionSettings {
-            auto_compaction_timeout_secs: 30,
+        .set_compaction_settings(cursor_server::store::CompactionSettingsUpdate {
+            auto_compaction_timeout_secs: Some(30),
+            ..Default::default()
         })
         .await
         .unwrap();
@@ -365,8 +368,9 @@ async fn compaction_setting_changed_after_start_allows_a_slow_summary() {
     .await;
     // Updating a running instance must affect its next compaction without restart.
     store
-        .set_compaction_settings(cursor_server::store::CompactionSettings {
-            auto_compaction_timeout_secs: 600,
+        .set_compaction_settings(cursor_server::store::CompactionSettingsUpdate {
+            auto_compaction_timeout_secs: Some(600),
+            ..Default::default()
         })
         .await
         .unwrap();
@@ -414,8 +418,9 @@ async fn compaction_setting_changed_after_start_allows_a_slow_summary() {
 async fn stalled_automatic_compaction_preserves_small_history() {
     let (_directory, store) = fixtures::temp_store().await;
     store
-        .set_compaction_settings(cursor_server::store::CompactionSettings {
-            auto_compaction_timeout_secs: 30,
+        .set_compaction_settings(cursor_server::store::CompactionSettingsUpdate {
+            auto_compaction_timeout_secs: Some(30),
+            ..Default::default()
         })
         .await
         .unwrap();

@@ -23,9 +23,9 @@ use crate::{
     plugin::{PluginDescriptor, PluginRegistry, PluginRuntime, PluginRuntimeStatus},
     provider::{is_valid_response_event, ModelEvent, Provider},
     store::{
-        CommitSettings, CompactionSettings, DesktopSettings, ExternalApiSettings,
-        ModelTokenPricing, PortSettings, ProxySettings, ProxySettingsInput, StatisticsStorage,
-        Store, TabSettings, TokenPricingSettings,
+        CommitSettings, CompactionSettings, CompactionSettingsUpdate, DesktopSettings,
+        ExternalApiSettings, ModelTokenPricing, PortSettings, ProxySettings, ProxySettingsInput,
+        StatisticsStorage, Store, TabSettings, TokenPricingSettings,
     },
     Error, Result,
 };
@@ -693,7 +693,7 @@ impl ControlService {
 
     pub async fn set_compaction_settings(
         &self,
-        settings: CompactionSettings,
+        settings: CompactionSettingsUpdate,
     ) -> Result<CompactionSettings> {
         self.store.set_compaction_settings(settings).await
     }
