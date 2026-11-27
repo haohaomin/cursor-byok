@@ -273,7 +273,7 @@ async fn user_driven_worker_updates_preserve_user_ownership() {
     let provider = fake_provider::FakeProvider::default();
     let registry = registry(store, &provider);
     let mut state = pb::ConversationStateStructure::default();
-    for reason in [4, 1] {
+    for reason in [3, 4, 5, 1] {
         provider.push(stop_response(&format!("user-driven-{reason}"), "Recorded."));
         let mut notice = notification(reason, Some(100), false, "User's worker update.", state);
         completions(&mut notice)[0].notification_context =

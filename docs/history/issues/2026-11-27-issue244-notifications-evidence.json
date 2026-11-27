@@ -71,32 +71,38 @@
     "record_only_limit": "prepareFollowupTurn (local runtime 3101770–3102450) records run/shell/voice state before filtering recordOnly. This patch only suppresses model wakeups; full state synchronization remains unimplemented.",
     "batch_order": "local runtime KCe maps input array; AgentHost holdSettled/takeHeld use push/splice (1511460+) and queued action completions.push (15150xx). Preserve input order, not event-hash or timestamp order.",
     "finished_identity": "No proven producer path for same task_id TaskFinished with changing completedAtMs. Workbench GdS (30662290) and AgentHost Za (1560606) omit the timestamp; host bc.take adds one to a persisted clone after notification queuing. Existing TaskFinished identity is retained.",
-    "source_limits": "Static consumer and bounded producer searches in the three SHA-bound Cursor 3.31.15 JS artifacts; not live execution."
+    "source_limits": "Static consumer and bounded producer searches in the three SHA-bound Cursor 3.31.15 JS artifacts; not live execution.",
+    "user_ownership": "ACe classifies USER_DRIVEN_INTERACTIVE_CHILD before reparented/needs-attention/completion, except project-session messages. The context rule now applies to all worker reasons."
   },
   "tests": {
     "conversation_delivery": {
       "passed": 25,
       "failed": 0,
       "ignored": 0,
-      "log_sha256": "c69a998fefbe385b60e4ba4f6e47365effb9c1bf37c415533127ce964ba7a3a1"
+      "log_sha256": "4e4eab4610eb698ba6237633902deb3530f2321573fdcc9a32e807c683f01f62"
     },
     "workspace": {
       "passed": 671,
       "failed": 0,
       "ignored": 14,
-      "log_sha256": "f770b9792481631c32652b3dda6b5e9669bf3a3daf09228b129cbe2573526340"
+      "log_sha256": "8b2261876a571c3ada725a63f63101bb806adea546774136579e5c67fb4a3aaf"
     },
     "clippy": {
       "result": "passed --locked --workspace --all-targets -- -D warnings",
-      "log_sha256": "3ef2d9b49dd0d2b354770c0f62c25ebb870a5635318bdae2ceef407dfb99db37"
+      "log_sha256": "e968f2feb18a9e9398a1ee0e5a3208c955382c184d144e2cb6b948c79698233d"
     },
     "format": "cargo fmt --all -- --check passed"
   },
   "tested_files": {
     "protocols/cursor/agent_v1.proto": "2ba9c8a4c713c19476e04dc7df4e960ee201b69758bc74b859fe310da42aa94a",
     "protocols/cursor/aiserver_v1.proto": "1206dad17567ff95ab9370d31e82d81a4e3502ccc1e298213bb1d07ce1bc122e",
-    "server/src/cursor/compile/insert_messages.rs": "2c6f8399c27b5412c3b958a2703449a142e0a09d85f381243b061fc9e920cc57",
+    "server/src/cursor/compile/insert_messages.rs": "405f7ed49e1bd002fe3468e91abba18bea854daf96bccc95f59b85ffbe69cf64",
     "server/tests/conversation_delivery.rs": "a82559c25c0ba02210f92a15f9bfaa08a6cf765d736b0e5a886c414088c09c0c",
-    "server/tests/conversation_delivery/worker_notifications.rs": "39e704c4616e297add3483a4babb269082501b212b9a0fd99cc64333c0061243"
+    "server/tests/conversation_delivery/worker_notifications.rs": "a0268754c67c3cb56e721f8f3f9b906f73007841323385450fa6aa09efc1a36f"
+  },
+  "user_ownership_red": {
+    "reason": "user-driven reparented / needs-attention updates must not take over or notify the user from the parent",
+    "log_sha256": "035b569bd24da0d06bdb4309af5b38b36f84f24df250886983aa3dbd7f90ab01",
+    "result": "1 failed before expanding the context rule; revised 25-test notification suite passed"
   }
 }

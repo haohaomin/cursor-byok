@@ -247,7 +247,7 @@ fn follow_up(
     reason: pb::BackgroundTaskCompletionReason,
 ) -> &'static str {
     use pb::BackgroundTaskCompletionReason as Reason;
-    if matches!(reason, Reason::TaskFinished | Reason::WorkerMessage)
+    if reason != Reason::ProjectSessionMessage
         && kind == pb::BackgroundTaskKind::Subagent
         && completion.notification_context
             == pb::BackgroundTaskNotificationContext::UserDrivenInteractiveChild as i32
