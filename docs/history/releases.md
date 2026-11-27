@@ -580,3 +580,21 @@
 - 未安装到用户机器；验收证据已取回，OCI 下载/构建目录、本机传输暂存目录和已合并分支均已清理。
 
 [修复与审查记录](issues/2026-11-27-issue251-custom-subagent-role.md)；[结构化发布证据](2026-11-27-v1.2.12-release-evidence.json)。
+
+<a id="v1213"></a>
+
+## v1.2.13 发布验证记录
+
+来源日期：2026-11-27。经 [PR #65](https://github.com/haohaomin/cursor-byok/pull/65) 补齐 CreateGoal/UpdateGoal、目标检查点保存与客户端续跑动作，支持暂停/恢复/清除、压缩恢复及并发和延迟通知保护。
+
+- 最终测试 head：`2229484a0ec9b9d43b8c6b72ecc3fd14b726ce30`；合并：`c7e532ef5e80d33949c91be4f8b13c25fa09a9b9`，树内容一致。
+- [最终 PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45999094853)、[主线 CI](https://github.com/haohaomin/cursor-byok/actions/runs/46000533768) 全部通过；[自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/46001660185) 四个平台及最终发布全部成功。
+- 发布提交：`0bfa0ba602c149c5329db8ee6d1b4096d3bac844`，仅更新五处版本文件，均为 1.2.13；标签指向该主线提交。
+- [v1.2.13](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.13) 已公开为 Latest，draft=false、prerelease=false；中文发布说明已补齐并读回核对，原始自动变更列表保留。
+- OCI 临时目录实际下载全部 20 项资产，大小及 GitHub SHA-256 一致；7 份 Minisign 签名使用未变更的 updater 公钥验证通过。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、标签 URL、签名及旧版大小/校验和一致。
+- 最终工作区 664 通过、0 失败、14 忽略；13 项目标协议测试及独立子代理续跑回归通过，Clippy、格式及跨平台 CI 通过。
+- Codex 初审指出的延迟通知覆盖新空转计数已先复现后修复；Sourcery 因额度跳过，未宣称补丁版已独立复审。
+- 未安装新包到用户机器。真实 Cursor 自动通知、原生目标界面与真实供应商仍待验收，Issue #327 保持部分完成；#155 范围不变，不做 20 分钟验收。
+
+[修复与审查记录](issues/2026-11-27-issue327-goal-mode.md)；[结构化发布证据](2026-11-27-v1.2.13-release-evidence.json)。

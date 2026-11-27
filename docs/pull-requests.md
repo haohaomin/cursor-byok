@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-27 本 fork PR #65
+
+[#65](https://github.com/haohaomin/cursor-byok/pull/65) 已合入 main：补齐目标工具、状态保存和客户端续跑动作，处理暂停/恢复/清除、并发与延迟通知。最终 head `2229484`、合并 `c7e532e`；664 项工作区回归、Clippy、最终 PR 与主线跨平台 CI 通过，v1.2.13 已发布并完成 20 项资产、7 份签名及三个更新清单核验。Codex 初审的旧计数覆盖问题已复现并补齐；Sourcery 因额度跳过。真实 Cursor/供应商尚未验收，Issue #327 保持部分完成。[完整记录](history/issues/2026-11-27-issue327-goal-mode.md)。
+
 ## 2026-11-27 本 fork PR #64
 
 [#64](https://github.com/haohaomin/cursor-byok/pull/64) 已合入 main：选中自定义子代理的角色正文投影，角色清除时明确撤销旧指令。最终 head `ce5d9e4`、合并 `d842235`；650 项工作区回归、Clippy 和跨平台 CI 通过，已随 v1.2.12 发布并完成全部资产、签名和更新清单核验。Codex 初审意见已补齐；Sourcery 因额度跳过。真实 Cursor/模型与 #251 的提示词编辑面板仍待处理。[完整记录](history/issues/2026-11-27-issue251-custom-subagent-role.md)。
