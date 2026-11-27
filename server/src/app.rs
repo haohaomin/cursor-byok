@@ -23,6 +23,7 @@ use crate::{
 pub struct App {
     config: Config,
     router: axum::Router,
+    control_router: axum::Router,
     registry: TransportRegistry,
     harness: CursorHarness,
     store: Store,
@@ -82,18 +83,17 @@ impl App {
             clients.clone(),
         )?;
         let harness = control.cursor_harness().clone();
-        let mut router = api::router(registry.clone(), clients)?.merge(byok);
-        router = match &config.console {
-            Some(ConsoleSource::Directory(directory)) => {
-                router.merge(control::web_router(control.clone(), directory))
-            }
+        let router = api::router(registry.clone(), clients)?.merge(byok);
+        let control_router = match &config.console {
+            Some(ConsoleSource::Directory(directory)) => control::web_router(control, directory),
             Some(ConsoleSource::Proxy(target)) => {
-                router.merge(control::proxy_web_router(control.clone(), target.clone()))
+                control::proxy_web_router(control, target.clone())
             }
-            None => router.merge(control::api_router(control.clone())),
+            None => control::api_router(control),
         };
         Ok(Self {
             router,
+            control_router,
             registry,
             harness,
             store,
@@ -101,8 +101,9 @@ impl App {
         })
     }
 
-    pub fn merge_router(mut self, router: axum::Router) -> Self {
-        self.router = self.router.merge(router);
+    /// Adds desktop management routes and frontend assets to the local interface.
+    pub fn merge_control_router(mut self, router: axum::Router) -> Self {
+        self.control_router = self.control_router.merge(router);
         self
     }
 
@@ -148,7 +149,8 @@ impl App {
         let registry = self.registry;
         let harness = self.harness;
         let graceful = shutdown.clone();
-        let server = axum::serve(listener, self.router)
+        let router = router_for_listener(self.router, self.control_router, address);
+        let server = axum::serve(listener, router)
             .with_graceful_shutdown(async move {
                 graceful.cancelled().await;
             })
@@ -176,6 +178,36 @@ impl App {
         Ok(())
     }
 }
+
+// Management APIs have no remote authentication. Decide from the actual bound
+// listener, including listeners supplied by the desktop shell via serve_on.
+fn router_for_listener(
+    router: axum::Router,
+    control_router: axum::Router,
+    address: SocketAddr,
+) -> axum::Router {
+    if address.ip().is_loopback() {
+        router.merge(control_router)
+    } else {
+        tracing::warn!(%address, "control API and console disabled on a non-loopback listener");
+        // Reserve the namespace so these requests cannot reach the Cursor proxy.
+        router
+            .route("/__byok-api__", axum::routing::any(control_unavailable))
+            .route("/__byok-api__/", axum::routing::any(control_unavailable))
+            .route(
+                "/__byok-api__/{*path}",
+                axum::routing::any(control_unavailable),
+            )
+    }
+}
+
+async fn control_unavailable() -> axum::http::StatusCode {
+    axum::http::StatusCode::FORBIDDEN
+}
+
+#[cfg(test)]
+#[path = "app_tests.rs"]
+mod tests;
 
 async fn bind_service_listener(
     requested: SocketAddr,

@@ -8,9 +8,9 @@ use axum::{
 use serde::{Deserialize, Serialize};
 
 use crate::store::{
-    CommitPromptLocale, CommitSettings, DesktopSettings, ExternalApiSettings, ModelTokenPricing,
-    PortSettings, ProxySettings, ProxySettingsInput, StatisticsStorage, StatisticsStorageScope,
-    TabSettings, TokenPricingSettings,
+    CommitPromptLocale, CommitSettings, CompactionSettings, DesktopSettings, ExternalApiSettings,
+    ModelTokenPricing, PortSettings, ProxySettings, ProxySettingsInput, StatisticsStorage,
+    StatisticsStorageScope, TabSettings, TokenPricingSettings,
 };
 
 use super::{ControlService, ObservabilitySettings};
@@ -92,6 +92,19 @@ pub async fn update_tab(
     Json(settings): Json<TabSettings>,
 ) -> Result<Json<TabSettings>> {
     Ok(Json(service.set_tab_settings(settings).await?))
+}
+
+pub async fn get_compaction(
+    State(service): State<ControlService>,
+) -> Result<Json<CompactionSettings>> {
+    Ok(Json(service.compaction_settings().await?))
+}
+
+pub async fn update_compaction(
+    State(service): State<ControlService>,
+    Json(settings): Json<CompactionSettings>,
+) -> Result<Json<CompactionSettings>> {
+    Ok(Json(service.set_compaction_settings(settings).await?))
 }
 
 pub async fn get_desktop(State(service): State<ControlService>) -> Result<Json<DesktopSettings>> {

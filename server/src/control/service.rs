@@ -23,9 +23,9 @@ use crate::{
     plugin::{PluginDescriptor, PluginRegistry, PluginRuntime, PluginRuntimeStatus},
     provider::{is_valid_response_event, ModelEvent, Provider},
     store::{
-        CommitSettings, DesktopSettings, ExternalApiSettings, ModelTokenPricing, PortSettings,
-        ProxySettings, ProxySettingsInput, StatisticsStorage, Store, TabSettings,
-        TokenPricingSettings,
+        CommitSettings, CompactionSettings, DesktopSettings, ExternalApiSettings,
+        ModelTokenPricing, PortSettings, ProxySettings, ProxySettingsInput, StatisticsStorage,
+        Store, TabSettings, TokenPricingSettings,
     },
     Error, Result,
 };
@@ -685,6 +685,17 @@ impl ControlService {
 
     pub async fn set_tab_settings(&self, settings: TabSettings) -> Result<TabSettings> {
         self.cursor_harness.set_tab_settings(settings).await
+    }
+
+    pub async fn compaction_settings(&self) -> Result<CompactionSettings> {
+        self.store.compaction_settings().await
+    }
+
+    pub async fn set_compaction_settings(
+        &self,
+        settings: CompactionSettings,
+    ) -> Result<CompactionSettings> {
+        self.store.set_compaction_settings(settings).await
     }
 
     pub async fn desktop_settings(&self) -> Result<DesktopSettings> {

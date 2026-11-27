@@ -232,9 +232,9 @@ pub fn run() -> ExitCode {
                 config
             };
             let server = tauri::async_runtime::block_on(App::new(config))?
-                .merge_router(desktop_api_router(app.handle().clone()));
+                .merge_control_router(desktop_api_router(app.handle().clone()));
             #[cfg(not(dev))]
-            let server = server.merge_router(frontend::router(app.handle().clone()));
+            let server = server.merge_control_router(frontend::router(app.handle().clone()));
             let listener = tauri::async_runtime::block_on(server.bind())?;
             let address = listener.local_addr()?;
             tauri::async_runtime::block_on(server.harness().cleanup_stale_settings())?;

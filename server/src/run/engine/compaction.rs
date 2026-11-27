@@ -5,7 +5,10 @@ use super::*;
 use crate::run::compaction;
 
 /// Bound each provider call; cancellation remains active between batches.
-const AUTO_COMPACTION_DEADLINE: Duration = Duration::from_secs(30);
+/// Used as the fallback when persisted compaction settings cannot be read;
+/// the configured deadline comes from `Store::compaction_settings`.
+const AUTO_COMPACTION_DEADLINE: Duration =
+    Duration::from_secs(crate::store::DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS);
 
 impl RunEngine {
     pub(super) async fn auto_compact(
@@ -66,6 +69,16 @@ impl RunEngine {
         let mut summary_window = model
             .context_window_tokens
             .unwrap_or(compaction::DEFAULT_CONTEXT_WINDOW);
+        let compaction_deadline = match self.store.compaction_settings().await {
+            Ok(settings) => Duration::from_secs(settings.auto_compaction_timeout_secs),
+            Err(error) => {
+                tracing::warn!(
+                    %error,
+                    "failed to load compaction settings; using default deadline"
+                );
+                AUTO_COMPACTION_DEADLINE
+            }
+        };
         let summary_result = loop {
             if cancellation.is_cancelled() {
                 return Err(RunOutcome::Cancelled);
@@ -110,7 +123,7 @@ impl RunEngine {
                     &cycle_cancellation,
                 );
                 tokio::pin!(cycle);
-                let deadline = tokio::time::sleep(AUTO_COMPACTION_DEADLINE);
+                let deadline = tokio::time::sleep(compaction_deadline);
                 tokio::pin!(deadline);
                 loop {
                     tokio::select! {
@@ -149,7 +162,7 @@ impl RunEngine {
                             break Err(Box::new(crate::run::ModelCycleFailure {
                                 failure: RunFailure::Provider(format!(
                                     "automatic compaction timed out after {} seconds",
-                                    AUTO_COMPACTION_DEADLINE.as_secs()
+                                    compaction_deadline.as_secs()
                                 )),
                                 partial_text: String::new(),
                                 partial_reasoning: String::new(),

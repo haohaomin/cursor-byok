@@ -4,6 +4,12 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-27 本 fork PR #56
+
+| PR / 来源 head | 解决目标与采用范围 | 验证与边界 |
+| --- | --- | --- |
+| [#56](https://github.com/haohaomin/cursor-byok/pull/56) / `b3af330db541` | 自动压缩时限设置，默认 180 秒、范围 30–3600；已补齐存储边界、演示接口、保存竞态及本地管理监听边界 | 本地工作区 629 项通过，Clippy、前端及演示交互通过；未合入/发布，真实 Cursor/供应商待验收；[记录](history/pull-requests/2026-11-27-pr56-compaction-timeout.md) |
+
 ## 2026-11-26 本 fork PR #55
 
 | PR / 来源 head | 解决目标与采用范围 | 验证与边界 |

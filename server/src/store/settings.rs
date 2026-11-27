@@ -10,6 +10,7 @@ use super::{now_ms, Store};
 const PORT_SETTINGS_KEY: &str = "network_ports";
 const PROXY_SETTINGS_KEY: &str = "outbound_proxy";
 const TAB_SETTINGS_KEY: &str = "cursor_tab";
+const COMPACTION_SETTINGS_KEY: &str = "run_compaction";
 const DESKTOP_SETTINGS_KEY: &str = "desktop_lifecycle";
 const COMMIT_SETTINGS_KEY: &str = "commit_settings";
 const CURSOR_TAKEOVER_ENABLED_KEY: &str = "cursor_takeover_enabled";
@@ -88,6 +89,37 @@ pub enum TabMode {
 pub struct TabSettings {
     pub mode: TabMode,
     pub address: String,
+}
+
+/// Tuning for automatic context compaction. BYOK providers may stream large
+/// summaries slowly, so the per-batch provider-call deadline is configurable.
+pub const DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 180;
+const MIN_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 30;
+const MAX_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 3600;
+
+fn normalize_auto_compaction_timeout_secs(value: u64) -> u64 {
+    value.clamp(
+        MIN_AUTO_COMPACTION_TIMEOUT_SECS,
+        MAX_AUTO_COMPACTION_TIMEOUT_SECS,
+    )
+}
+
+fn default_auto_compaction_timeout_secs() -> u64 {
+    DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
+pub struct CompactionSettings {
+    #[serde(default = "default_auto_compaction_timeout_secs")]
+    pub auto_compaction_timeout_secs: u64,
+}
+
+impl Default for CompactionSettings {
+    fn default() -> Self {
+        Self {
+            auto_compaction_timeout_secs: DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
@@ -385,6 +417,39 @@ impl Store {
         let _write = self.writes.lock().await;
         sqlx::query("INSERT INTO service_settings(setting_key, value_json, updated_at_ms) VALUES (?, ?, ?) ON CONFLICT(setting_key) DO UPDATE SET value_json = excluded.value_json, updated_at_ms = excluded.updated_at_ms")
             .bind(TAB_SETTINGS_KEY)
+            .bind(value_json)
+            .bind(now_ms())
+            .execute(&self.pool)
+            .await?;
+        Ok(settings)
+    }
+
+    pub async fn compaction_settings(&self) -> Result<CompactionSettings> {
+        let value = sqlx::query_scalar::<_, String>(
+            "SELECT value_json FROM service_settings WHERE setting_key = ?",
+        )
+        .bind(COMPACTION_SETTINGS_KEY)
+        .fetch_optional(&self.pool)
+        .await?;
+        let mut settings = match value {
+            Some(value) => serde_json::from_str::<CompactionSettings>(&value)?,
+            None => CompactionSettings::default(),
+        };
+        settings.auto_compaction_timeout_secs =
+            normalize_auto_compaction_timeout_secs(settings.auto_compaction_timeout_secs);
+        Ok(settings)
+    }
+
+    pub async fn set_compaction_settings(
+        &self,
+        mut settings: CompactionSettings,
+    ) -> Result<CompactionSettings> {
+        settings.auto_compaction_timeout_secs =
+            normalize_auto_compaction_timeout_secs(settings.auto_compaction_timeout_secs);
+        let value_json = serde_json::to_string(&settings)?;
+        let _write = self.writes.lock().await;
+        sqlx::query("INSERT INTO service_settings(setting_key, value_json, updated_at_ms) VALUES (?, ?, ?) ON CONFLICT(setting_key) DO UPDATE SET value_json = excluded.value_json, updated_at_ms = excluded.updated_at_ms")
+            .bind(COMPACTION_SETTINGS_KEY)
             .bind(value_json)
             .bind(now_ms())
             .execute(&self.pool)
