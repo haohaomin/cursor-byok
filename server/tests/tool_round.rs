@@ -47,6 +47,7 @@ fn exec_context() -> ExecContext {
     ExecContext {
         conversation_id: "conversation".into(),
         root_conversation_id: "conversation".into(),
+        agent_session_id: None,
         default_subagent_model: "model".into(),
         subagent_model: None,
         terminals_folder: "/tmp/terminals".into(),
@@ -178,6 +179,7 @@ async fn dynamic_mcp_uses_one_definition_for_stream_ui_exec_and_result() {
         .start_batch(
             &[invocation],
             ToolBatchState {
+                goal_state: None,
                 completed: &HashSet::new(),
                 started: &HashSet::new(),
                 response_text: "",
@@ -255,6 +257,7 @@ async fn call_mcp_tool_uses_the_request_descriptor_and_returns_client_errors_to_
         .start_batch(
             &[invocation],
             ToolBatchState {
+                goal_state: None,
                 completed: &completed,
                 started: &started,
                 response_text: "",
@@ -324,6 +327,7 @@ async fn mcp_auth_uses_the_cursor_auth_interaction_without_a_tool_definition() {
         .start_batch(
             &[auth],
             ToolBatchState {
+                goal_state: None,
                 completed: &completed,
                 started: &started,
                 response_text: "",
@@ -388,6 +392,7 @@ async fn unknown_mcp_descriptor_returns_a_tool_error_without_client_discovery() 
         .start_batch(
             &[invocation],
             ToolBatchState {
+                goal_state: None,
                 completed: &completed,
                 started: &started,
                 response_text: "",
@@ -414,6 +419,7 @@ async fn invalid_tool_arguments_complete_as_tool_errors() {
     let completed = HashSet::new();
     let started = HashSet::new();
     let state = || ToolBatchState {
+        goal_state: None,
         completed: &completed,
         started: &started,
         response_text: "",
@@ -472,6 +478,7 @@ async fn invalid_web_fetch_paging_completes_without_reserving_approval() {
             .start_batch(
                 &[invocation],
                 ToolBatchState {
+                    goal_state: None,
                     completed: &HashSet::new(),
                     started: &HashSet::new(),
                     response_text: "",
@@ -503,6 +510,7 @@ async fn issue300_retired_await_shell_returns_immediately_for_both_id_types() {
             dispatcher.start_batch(
                 &[invocation],
                 ToolBatchState {
+                    goal_state: None,
                     completed: &HashSet::new(),
                     started: &HashSet::new(),
                     response_text: "",
@@ -1573,6 +1581,7 @@ async fn task_model_priority_is_preserved_in_cursor_execution_messages() {
             .start_batch(
                 &[task],
                 ToolBatchState {
+                    goal_state: None,
                     completed: &HashSet::new(),
                     started: &HashSet::new(),
                     response_text: "",
@@ -1621,6 +1630,7 @@ async fn explicit_task_model_cannot_bypass_disabled_subagents() {
             .start_batch(
                 &[task],
                 ToolBatchState {
+                    goal_state: None,
                     completed: &HashSet::new(),
                     started: &HashSet::new(),
                     response_text: "",

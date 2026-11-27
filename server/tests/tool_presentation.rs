@@ -3,6 +3,8 @@
 mod fake_provider;
 #[path = "support/fixtures.rs"]
 mod fixtures;
+#[path = "tool_presentation/goals.rs"]
+mod goals;
 #[path = "tool_presentation/todos.rs"]
 mod todos;
 

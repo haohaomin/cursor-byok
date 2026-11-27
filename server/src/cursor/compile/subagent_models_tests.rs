@@ -136,6 +136,7 @@ fn task_execution_prioritizes_explicit_model_over_cursor_default() {
     let mut context = ExecContext {
         conversation_id: "conversation".into(),
         root_conversation_id: "conversation".into(),
+        agent_session_id: None,
         default_subagent_model: "parent".into(),
         subagent_model: Some(SubagentModel::Model("chosen-custom".into())),
         allow_subagents: true,

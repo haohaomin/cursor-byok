@@ -49,6 +49,7 @@ pub struct ToolBatchState<'a> {
     pub started: &'a HashSet<String>,
     pub response_text: &'a str,
     pub response_thinking: &'a str,
+    pub goal_state: Option<pb::GoalState>,
 }
 
 pub enum ClientToolEvent {
@@ -98,6 +99,10 @@ impl ToolDispatcher {
             + usize::from(!state.response_text.is_empty())
             + 1;
         let mut dispatched = Vec::new();
+        let mut goal_state = state.goal_state;
+        if let Some(goal) = goal_state.as_mut() {
+            goal.idle_continuations_without_tool_calls = 0;
+        }
         for (position, call) in calls.iter().enumerate() {
             if state.completed.contains(&call.call_id) {
                 continue;
@@ -106,6 +111,17 @@ impl ToolDispatcher {
             let publish_started = !state.started.contains(&call.call_id);
             if let Some(error) = &call.argument_error {
                 dispatched.push(validation_failure(call, error.clone()));
+                continue;
+            }
+            if !dynamic_mcp.contains_key(&call.name) && super::goals::is_goal_tool(&call.name) {
+                dispatched.push(DispatchedTool {
+                    messages: if publish_started {
+                        vec![codec::tool_started(call, None)?]
+                    } else {
+                        Vec::new()
+                    },
+                    completion: Some(super::goals::execute(call, context, &mut goal_state)?),
+                });
                 continue;
             }
             let edit_path = if dynamic_mcp.contains_key(&call.name) {

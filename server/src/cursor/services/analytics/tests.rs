@@ -60,9 +60,14 @@ async fn upstream_bootstrap_pins_agent_gates_and_preserves_other_config() {
             let patched = config_from_response(patch_upstream(response).unwrap(), framed).await;
 
             assert_eq!(patched["feature_gates"][jobs_key]["value"], true);
+            assert_eq!(
+                patched["feature_gates"][statsig_key(&original, "agent_goal_continuation")]
+                    ["value"],
+                true
+            );
             assert_eq!(patched["feature_gates"][retries_key]["value"], true);
             assert_eq!(patched["feature_gates"][local_loop_key]["value"], false);
-            assert_eq!(patched["feature_gates"].as_object().unwrap().len(), 4);
+            assert_eq!(patched["feature_gates"].as_object().unwrap().len(), 5);
             for field in ["user", "dynamic_configs", "layer_configs", "hash_used"] {
                 assert_eq!(patched[field], original[field]);
             }

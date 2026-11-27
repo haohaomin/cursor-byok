@@ -461,6 +461,13 @@ impl ConversationOutput {
                             interrupted_tool_calls.extend(active_tool_calls.iter().cloned());
                             continue;
                         }
+                        let messages = self
+                            .store
+                            .load_current_messages(&crate::model::ConversationId::new(
+                                &self.context.exec.conversation_id,
+                            ))
+                            .await?;
+                        let goal_state = self.checkpoint.record_goals(&messages)?;
                         for dispatched in self
                             .tools
                             .start_batch(
@@ -470,13 +477,9 @@ impl ConversationOutput {
                                     started: &HashSet::new(),
                                     response_text: &response_text,
                                     response_thinking: &response_thinking,
+                                    goal_state,
                                 },
-                                &self
-                                    .store
-                                    .load_current_messages(&crate::model::ConversationId::new(
-                                        &self.context.exec.conversation_id,
-                                    ))
-                                    .await?,
+                                &messages,
                                 &self.context.dynamic_tools,
                                 &self.context.exec,
                             )
@@ -678,6 +681,7 @@ impl ConversationOutput {
                                 .map_err(|_| Error::Protocol("checkpoint worker stopped".into()))?
                             {
                                 Ok(checkpoint) => {
+                                    self.checkpoint.restore_goal(checkpoint.goal_state.clone());
                                     context_tokens = checkpoint_context_tokens(&checkpoint);
                                     compaction_checkpoint = Some(checkpoint);
                                     state.barrier.complete(Ok(()));

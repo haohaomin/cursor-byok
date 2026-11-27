@@ -1,6 +1,6 @@
 # Issue 清单
 
-更新：2026-11-27；最新公开版本为 v1.2.11，新增 Cursor 请求体与解压大小限制；[发布与核验](history/releases.md#v1211)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
+更新：2026-11-27；最新公开版本为 v1.2.12，新增自定义子代理角色传递及明确停用；[发布与核验](history/releases.md#v1212)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
 
 - **先看进度**：[已做好与未完成工作](work-status.md)。
 - **看安装包包含什么**：[维护状态](maintenance-status.md)。
@@ -95,7 +95,7 @@
 | ◐（完成一半） | [#155](https://github.com/leookun/cursor-byok/issues/155) shell 超时 | B | 普通后台自动续答及去重重放通过；审批、压缩实机边界待覆盖，20 分钟按用户要求跳过 | 2026-10-19 当前补丁普通后台 25 秒实机自动续答通过；请求沙箱权限的第二组也完成，但没有审批弹窗，审批等待未覆盖。两条真实完成通知经单条、合批、倒序、拆批重放，模型调用总数保持 6、历史不变。界面输入故障导致压缩测试未发出；最终补丁 notify_on_output 与官方→BYOK 转入未重测。既有工作区 426 项回归通过。正式代理已恢复，正式库保持版本 10；未替换正式应用；修复已提交 main（2df03e3），v1.0.17 已发布，资产及更新清单核验通过。见 [验收报告](history/issues/2026-10-19-issue155-acceptance.md)、[验收证据](history/issues/2026-10-19-issue155-acceptance-evidence.json)、[补修报告](history/issues/2026-10-18-issue155-audit-fix.md)。 |
 | ☐ | [#102](https://github.com/leookun/cursor-byok/issues/102) 之前的那个issue关闭了，日志输出如下 | B | 现版自动化未复现；原环境待验 | Chat → Responses 与 Responses 自身回放均保留 call_id 配对；SQLite 重开、Cursor 检查点及出站 HTTP 检查通过，相关回归 36 项通过。未改生产代码，见 [复测记录](history/issues/2026-11-24-issue102-check.md)。 |
 | ☐（协议缺口已修复 / UI 未复现） | [#55](https://github.com/leookun/cursor-byok/issues/55) AGENTS.md作用域问题 | B | 2026-10-14 已保留规则来源和范围；原 UI 行为未复现 | 原 2 项失败转通过，新增共 7 项回归；相关 211 项、Clippy 与格式检查通过。此前真实前后端三轮规则正确，修改后未重跑 UI；已合入 main，v1.0.15 发布已触发，未监视结果。见 [修复记录](history/issues/2026-10-14-issue55-fix.md)。 |
-| ☐ | [#327](https://github.com/leookun/cursor-byok/issues/327) 最新版beta5 版本缺少CreateGoal 工具，无法使用目标模式 | C | 需求待评估 | 核对当前 CreateGoal 工具声明与执行能力，旧 beta 的缺失需重新确认。 |
+| ◐ | [#327](https://github.com/leookun/cursor-byok/issues/327) 最新版beta5 版本缺少CreateGoal 工具，无法使用目标模式 | C | 源码修复已验证，待 CI / 真实 UI | 已补完整目标生命周期、并发保护和工具栏恢复/移除；664 项回归与 Clippy 通过，合入/发布及真实 Cursor/供应商待验收。[记录](history/issues/2026-11-27-issue327-goal-mode.md)。 |
 | ☐ | [#139](https://github.com/leookun/cursor-byok/issues/139) cursorplan模式可以直接改之前的计划 | C | 需求待评估 | 核对 Plan 编辑工具与当前协议能力，补修改已有计划的步骤。 |
 | ☐ | [#123](https://github.com/leookun/cursor-byok/issues/123) debug模式稳定性提升，如服务启动，日志追踪链路 | C | 需求待评估 | 拆分 Debug 的服务启动和日志追踪需求，先给可验证的验收场景。 |
 | ☐ | [#473](https://github.com/leookun/cursor-byok/issues/473) 内置读取文件工具不可用？ | D | 待补信息 | 主要证据为截图；补 Read 参数、返回结果及当前版本后复测。 |

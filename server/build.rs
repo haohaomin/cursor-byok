@@ -13,6 +13,10 @@ fn main() {
     );
 
     prost_build::Config::new()
+        .type_attribute(
+            "agent.v1.GoalState",
+            "#[derive(serde::Serialize, serde::Deserialize)]",
+        )
         .compile_protos(
             &protos,
             &[
