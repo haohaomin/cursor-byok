@@ -2,7 +2,7 @@
 
 更新：2026-11-27；v1.2.13 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
-**2026-11-27 Issue #244 / 上游 PR #245：**已逐项核对旧补丁和 Cursor 3.31.15；原 create-agent 映射无法创建代理，Projects 提示依赖缺失的通信工具，旧模式 6 已不在现客户端枚举中，因此不采用原补丁。现有 Task 的新建/恢复后台参数探针、旧模式错误探针及 59 项相关回归通过；无生产改动、无新发版。现代 Await、项目协调器通信和 Agent Store 仍待实现/实机验收。[审查与验证](history/issues/2026-11-27-issue244-orchestration-check.md)。
+**2026-11-27 Issue #244 / 上游 PR #245：**不采用旧编排补丁；继续调查已复现并修复当前 Cursor 新通知 reason 3–6 被拒绝、record-only 误唤醒以及新消息排序问题。25 项通知与 671 项工作区回归、Clippy 通过；候选待 PR CI、合入和发布。完整现代 Await、项目协调器通信和 Agent Store/原生通知状态同步仍待实现及实机验收。[通知修复](history/issues/2026-11-27-issue244-notifications-fix.md)；[旧补丁审查](history/issues/2026-11-27-issue244-orchestration-check.md)。
 
 **2026-11-27 Issue #327：**目标模式已在隔离协议测试中实现创建、续跑、完成、暂停/恢复和清除；补齐并发、延迟通知与压缩恢复保护。13 项目标测试、子代理续跑测试、664 项工作区回归及 Clippy 通过；PR #65 已合入 main，审查补齐延迟通知对最新计数的保留，最终 PR 与主线 CI 全部通过，v1.2.13 已发布并完成 20 项资产、7 份签名和三个更新清单核验；真实 Cursor 自动通知/原生 UI 与供应商尚未验收。[验证记录](history/issues/2026-11-27-issue327-goal-mode.md)。
 

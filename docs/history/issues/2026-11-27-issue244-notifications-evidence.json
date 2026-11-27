@@ -1,0 +1,108 @@
+{
+  "checked_at": "2026-11-27T13:34:41.731586+00:00",
+  "base_commit": "11ccadb21a7d1d53a4e57f8aee61e6315051cb22",
+  "cursor_version": "3.31.15",
+  "local_runtime": {
+    "path": "extensions/cursor-local-agent-runtime/dist/main.js",
+    "sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+    "bytes": 5277933,
+    "anchors": {
+      "BackgroundTaskCompletion|": {
+        "character_offset": 4624643,
+        "end_offset": 4624891,
+        "sha256": "3ffc01e0974f9000d8e629d70ac0105c8b80c915d09256d0d5d35f64e37044b4",
+        "excerpt": "BackgroundTaskCompletion|1 task_id 9|2 kind #0|3 status #1|4 title 9|5 detail 9?|6 output_path 9?|7 thread_id 9?|8 reason #2|9 subagent_id 9?|10 tool_call_id 9?|11 notification_context #3|12 completed_at_ms 4?|13 record_only 8|14 subagent_state #4?"
+      },
+      "BackgroundTaskCompletionReason\",": {
+        "character_offset": 5019879,
+        "end_offset": 5020156,
+        "sha256": "5f22fe757b380b08ca24aaf9a76abbe8309427f5f9c060c8c33caf5992c69eb8",
+        "excerpt": "BackgroundTaskCompletionReason\",[[0,\"UNSPECIFIED\"],[1,\"TASK_FINISHED\"],[2,\"TASK_PROGRESS\"],[3,\"WORKER_REPARENTED\"],[4,\"WORKER_MESSAGE\"],[5,\"WORKER_NEEDS_ATTENTION\"],[6,\"PROJECT_SESSION_MESSAGE\"]],1),d=(0,o.QT)(r.proto3,s,\"TaskMode\",[[0,\"UNSPECIFIED\"],[1,\"AGENT\"],[2,\"PLAN\"]],1)"
+      },
+      "function XCe(e,t)": {
+        "character_offset": 3099400,
+        "end_offset": 3099666,
+        "sha256": "ce315a05d1c4c43b3d75cd9e7e9acfcf213076d7e6b3dc5a66b771725d624224",
+        "excerpt": "function XCe(e,t){if(!t.completedAtMs)return;return`background-task-completion-${(0,tD.createHash)(\"sha256\").update(JSON.stringify([t.taskId,t.toolCallId??\"\",t.completedAtMs.toString(),t.reason,t.detail??\"\"])).digest(\"hex\").slice(0,32)}-${e.completions.indexOf(t)}`}"
+      },
+      "async prepareFollowupTurn(e,t,n,r,o,s)": {
+        "character_offset": 3101774,
+        "end_offset": 3102684,
+        "sha256": "1d478981a1ee84548b6fa358d3407abab2ec532b9f21fc686ddd9db857d65d2a",
+        "excerpt": "async prepareFollowupTurn(e,t,n,r,o,s){const i=gA(t,ht.UNSAFE_ALWAYS_ALLOWED);await r.ensureSubagentStatesLoaded(e);const a=new Set;for(const t of i.completions)r.recordSubagentRunCompletion(t),iIe(e,t),r.settleVoiceCallTimeTask(t)&&a.add(t);if(this.config.featureFlags?.disableBackgroundTaskFollowUp)return sIe(e,\"skipped_disabled\",eIe(i.completions … ly\",eIe(i.completions),{task_ids:lIe(i.completions)}),{kind:\"record_only\",ctx:e,state:await r.computeNewStructure(e)};const c=this.config.featureFlags?.enableBackgroundTaskProgress?l:l.filter((e=>!tIe(e))),u=eIe(c);if(0===c.length)return sIe(e,\"skipped_empty\",u,{task_ids:lIe(i.completions)}),{kind:\"skip\",ctx:e,state:await r.computeNewStructure(e)};"
+      },
+      "function oIe(e)": {
+        "character_offset": 3100385,
+        "end_offset": 3100447,
+        "sha256": "9fa6e0c7a8c7376f3246666a33fdb8b6fda3517bb0ba9c2fdb4ef734c4743ed6",
+        "excerpt": "function oIe(e){return e.reason===$.U6.WORKER_NEEDS_ATTENTION}"
+      },
+      "enableAwaitForSubagents:!1": {
+        "character_offset": 4553874,
+        "end_offset": 4554040,
+        "sha256": "184ffe84c14f99f578442aed4d6bbe89c03eeaf08ebabc251a3128e4b69ef4d4",
+        "excerpt": "enableAwaitForSubagents:!1,enableExploreSubagent:!0,enableExploreParentModelInheritance:!0,enableReadToolNegativeOffset:!0,longRunningJobs:!0,useClientSideSubagent:!0"
+      }
+    }
+  },
+  "rea_inventory_evidence": "ev_a485fa596bb60a5bf97cc88b22f0197ca1c4331db3c49acfa96d3cc6ff31806b",
+  "limits": [
+    "Static read-only inspection of the installed Cursor 3.31.15 artifact; no live Cursor run or provider account.",
+    "The retained REA inventory is reused; semantic coverage of the full package is incomplete.",
+    "The fix handles incoming notification projection only; it does not add modern Projects/SendToAgent/Await or Agent Store/SubagentStatePointer persistence."
+  ],
+  "red": {
+    "log_sha256": "3148284d17de2389b1dc22e6192873399ed687a87f70341062a0b4226194a4ed",
+    "summary": [
+      "{\"error\":{\"code\":\"invalid_argument\",\"message\":\"unknown background task completion reason: 4\"}}",
+      "{\"error\":{\"code\":\"invalid_argument\",\"message\":\"unknown background task completion reason: 3\"}}",
+      "assertion `left == right` failed: record-only input should only acknowledge the turn",
+      "test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 18 filtered out; finished in 2.22s"
+    ]
+  },
+  "order_red": {
+    "log_sha256": "b53edfea2117755eb50ec6e6d1e2acd01c983ad023f5299eb3495cf21fb81596",
+    "summary": [
+      "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 24 filtered out; finished in 2.11s"
+    ]
+  },
+  "independent_static_review": {
+    "project_session_optional_agent_id": "xCe/HCe conditionally render subagentId; no required-ID check in the consumer. Producer path not established.",
+    "record_only_limit": "prepareFollowupTurn (local runtime 3101770–3102450) records run/shell/voice state before filtering recordOnly. This patch only suppresses model wakeups; full state synchronization remains unimplemented.",
+    "batch_order": "local runtime KCe maps input array; AgentHost holdSettled/takeHeld use push/splice (1511460+) and queued action completions.push (15150xx). Preserve input order, not event-hash or timestamp order.",
+    "finished_identity": "No proven producer path for same task_id TaskFinished with changing completedAtMs. Workbench GdS (30662290) and AgentHost Za (1560606) omit the timestamp; host bc.take adds one to a persisted clone after notification queuing. Existing TaskFinished identity is retained.",
+    "source_limits": "Static consumer and bounded producer searches in the three SHA-bound Cursor 3.31.15 JS artifacts; not live execution.",
+    "user_ownership": "ACe classifies USER_DRIVEN_INTERACTIVE_CHILD before reparented/needs-attention/completion, except project-session messages. The context rule now applies to all worker reasons."
+  },
+  "tests": {
+    "conversation_delivery": {
+      "passed": 25,
+      "failed": 0,
+      "ignored": 0,
+      "log_sha256": "4e4eab4610eb698ba6237633902deb3530f2321573fdcc9a32e807c683f01f62"
+    },
+    "workspace": {
+      "passed": 671,
+      "failed": 0,
+      "ignored": 14,
+      "log_sha256": "8b2261876a571c3ada725a63f63101bb806adea546774136579e5c67fb4a3aaf"
+    },
+    "clippy": {
+      "result": "passed --locked --workspace --all-targets -- -D warnings",
+      "log_sha256": "e968f2feb18a9e9398a1ee0e5a3208c955382c184d144e2cb6b948c79698233d"
+    },
+    "format": "cargo fmt --all -- --check passed"
+  },
+  "tested_files": {
+    "protocols/cursor/agent_v1.proto": "2ba9c8a4c713c19476e04dc7df4e960ee201b69758bc74b859fe310da42aa94a",
+    "protocols/cursor/aiserver_v1.proto": "1206dad17567ff95ab9370d31e82d81a4e3502ccc1e298213bb1d07ce1bc122e",
+    "server/src/cursor/compile/insert_messages.rs": "405f7ed49e1bd002fe3468e91abba18bea854daf96bccc95f59b85ffbe69cf64",
+    "server/tests/conversation_delivery.rs": "a82559c25c0ba02210f92a15f9bfaa08a6cf765d736b0e5a886c414088c09c0c",
+    "server/tests/conversation_delivery/worker_notifications.rs": "a0268754c67c3cb56e721f8f3f9b906f73007841323385450fa6aa09efc1a36f"
+  },
+  "user_ownership_red": {
+    "reason": "user-driven reparented / needs-attention updates must not take over or notify the user from the parent",
+    "log_sha256": "035b569bd24da0d06bdb4309af5b38b36f84f24df250886983aa3dbd7f90ab01",
+    "result": "1 failed before expanding the context rule; revised 25-test notification suite passed"
+  }
+}

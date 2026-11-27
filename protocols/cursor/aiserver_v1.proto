@@ -3337,6 +3337,8 @@ message BackgroundTaskCompletion {
   optional string subagent_id = 9;
   optional string tool_call_id = 10;
   BackgroundTaskNotificationContext notification_context = 11;
+  optional uint64 completed_at_ms = 12;
+  bool record_only = 13;
 }
 
 // Copied from: agent.v1.BackgroundTaskCompletionAction (var: tvs)
@@ -3349,6 +3351,10 @@ enum BackgroundTaskCompletionReason {
   BACKGROUND_TASK_COMPLETION_REASON_UNSPECIFIED = 0;
   BACKGROUND_TASK_COMPLETION_REASON_TASK_FINISHED = 1;
   BACKGROUND_TASK_COMPLETION_REASON_TASK_PROGRESS = 2;
+  BACKGROUND_TASK_COMPLETION_REASON_WORKER_REPARENTED = 3;
+  BACKGROUND_TASK_COMPLETION_REASON_WORKER_MESSAGE = 4;
+  BACKGROUND_TASK_COMPLETION_REASON_WORKER_NEEDS_ATTENTION = 5;
+  BACKGROUND_TASK_COMPLETION_REASON_PROJECT_SESSION_MESSAGE = 6;
 }
 
 // Copied from: agent.v1.BackgroundTaskKind (var: Ewi)

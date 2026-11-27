@@ -3,6 +3,8 @@
 mod fake_provider;
 #[path = "support/fixtures.rs"]
 mod fixtures;
+#[path = "conversation_delivery/worker_notifications.rs"]
+mod worker_notifications;
 
 use std::{collections::HashMap, sync::Arc};
 
