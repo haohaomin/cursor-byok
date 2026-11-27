@@ -20,7 +20,7 @@ AgentRunRequest.subagent_type_name          # 选中的角色名称
   → provider ModelRequest                   # 当前角色指令可见，其他角色正文不可见
 ```
 
-根 Agent 仍仅看到角色目录。没有选中名称、名称不匹配、或正文为空时，不注入其他角色指令。角色更新追加新上下文；原系统提示、工具定义及已有消息不因角色更新而改写。自动压缩沿用已有机制，只保留最新上下文。
+根 Agent 看到角色目录和明确的未启用状态。没有选中名称、名称不匹配、或正文为空时，输出 `active="false"` 并说明旧角色指令不再生效，不注入其他角色正文。启用角色时输出 `active="true"` 并说明当前定义替代旧角色定义。角色更新追加新上下文；原系统提示、工具定义及已有消息不因角色更新而改写。自动压缩沿用已有机制，只保留最新上下文。
 
 不改模型选择、工具权限、客户端安装文件，也未实现 `custom_system_prompt` 的全量系统提示替换。
 
@@ -50,7 +50,11 @@ AgentRunRequest.subagent_type_name          # 选中的角色名称
 1. docs-writer/reviewer 只收到各自正文；根 Agent、未知名称、内置 explore 不收到自定义角色正文。
 2. 相同角色不重复注入；A → B → A 保留三个不同事件；重试同一输入去重；每轮重建传输注册表并从检查点恢复，历史、系统提示和工具前缀不变。
 3. `RequestContextPartReferences` + `PreFetchedBlob` 的角色定义可到达模型。
-4. 清空角色正文追加新上下文，不取另一角色的正文，也不改写旧历史。
+4. 清空角色正文、删除角色定义、取消角色选择三种情况均追加未启用状态，明确撤销旧角色；不取另一角色的正文，也不改写旧历史。
 5. 模拟 provider 上下文超限，实际经过摘要和继续调用后，只保留最新角色上下文。
 
-全工作区回归 **650 通过、0 失败、14 忽略**；`cargo clippy --locked --workspace --all-targets -- -D warnings`、格式、差异和文档链接检查通过。本机构建沿用 `profile.dev.package.sqlx-macros.strip="none"` 命令参数，未改项目构建配置。提交、合并和发布状态待后续补齐。FakeProvider 测试只证明传递、存储和恢复行为，不证明真实模型遵循角色，也不替代 Cursor UI 验收。
+初版全工作区回归 **650 通过、0 失败、14 忽略**；Clippy、格式、差异和文档链接检查通过。本机构建沿用 `profile.dev.package.sqlx-macros.strip="none"` 命令参数，未改项目构建配置。FakeProvider 测试只证明传递、存储和恢复行为，不证明真实模型遵循角色，也不替代 Cursor UI 验收。
+
+## PR 审查补充
+
+[本 fork PR #64](https://github.com/haohaomin/cursor-byok/pull/64)，初版 head `49fffc6780fdccdba9bc6d06555d53eb10d0e640`。Codex 指出清空角色时仅省略正文不能撤销历史中的旧指令；新增断言在初版失败，现已补充明确的启用/未启用状态，覆盖三种清除方式。最终回归、合并与发布待补齐。Sourcery 因每周额度用完跳过，没有记为审查通过。

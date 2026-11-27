@@ -197,6 +197,12 @@ async fn custom_role_is_loaded_from_the_request_context_blob() {
 
 #[tokio::test]
 async fn clearing_a_role_appends_context_without_inheriting_another_role() {
+    for removal in ["blank-prompt", "removed-definition", "no-selection"] {
+        check_role_removal(removal).await;
+    }
+}
+
+async fn check_role_removal(removal: &str) {
     let (_directory, store) = fixtures::temp_store().await;
     let provider = fake_provider::FakeProvider::default();
     let registry = registry(&store, &provider);
@@ -208,19 +214,41 @@ async fn clearing_a_role_appends_context_without_inheriting_another_role() {
         role_run("u1", None, Some("docs-writer"), WRITER),
     )
     .await;
-    complete(
-        &registry,
-        &provider,
-        "clear-role-2",
-        &[],
-        role_run("u2", Some(first), Some("docs-writer"), " \n"),
-    )
-    .await;
+    let mut cleared = role_run("u2", Some(first), Some("docs-writer"), " \n");
+    let Some(pb::agent_client_message::Message::RunRequest(request)) = cleared.message.as_mut()
+    else {
+        unreachable!()
+    };
+    if removal == "no-selection" {
+        request.subagent_type_name = None;
+    } else if removal == "removed-definition" {
+        let Some(pb::conversation_action::Action::UserMessageAction(action)) =
+            request.action.as_mut().unwrap().action.as_mut()
+        else {
+            unreachable!()
+        };
+        action
+            .request_context
+            .as_mut()
+            .unwrap()
+            .custom_subagents
+            .retain(|agent| agent.name != "docs-writer");
+    }
+    complete(&registry, &provider, "clear-role-2", &[], cleared).await;
     let requests = provider.requests();
     let projected = contexts(&requests[1]);
     assert_eq!(projected.len(), 2);
     assert!(!projected[1].1.contains(WRITER));
     assert!(!projected[1].1.contains(REVIEWER));
+    assert!(
+        projected[1]
+            .1
+            .contains("<custom_subagent active=\"false\">"),
+        "missing inactive role state after {removal}"
+    );
+    assert!(projected[1]
+        .1
+        .contains("Previous custom subagent instructions no longer apply."));
     assert_eq!(
         requests[0].history,
         requests[1].history[..requests[0].history.len()]
