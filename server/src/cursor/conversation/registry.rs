@@ -32,6 +32,7 @@ pub(crate) struct ConversationDependencies {
 
 struct RegistryInner {
     background: super::background::BackgroundCompletions,
+    goals: crate::cursor::goals::GoalAdmissions,
     current: Mutex<HashMap<ConversationId, ActiveRun>>,
     pending: Mutex<HashMap<ConversationId, PendingMessages>>,
     changed: Notify,
@@ -55,6 +56,7 @@ impl ConversationRegistry {
         Self {
             inner: Arc::new(RegistryInner {
                 background: super::background::BackgroundCompletions::default(),
+                goals: Default::default(),
                 current: Mutex::new(HashMap::new()),
                 pending: Mutex::new(HashMap::new()),
                 changed: Notify::new(),
@@ -71,6 +73,23 @@ impl ConversationRegistry {
 
     pub(crate) fn dependencies(&self) -> &ConversationDependencies {
         &self.inner.dependencies
+    }
+
+    pub(crate) async fn claim_goal(
+        &self,
+        conversation: &str,
+    ) -> Option<crate::cursor::goals::GoalGuard> {
+        let guard = self.inner.goals.claim(conversation)?;
+        if self
+            .inner
+            .current
+            .lock()
+            .await
+            .contains_key(&ConversationId::new(conversation))
+        {
+            return None;
+        }
+        Some(guard)
     }
 
     pub(super) async fn admit_background(
@@ -97,17 +116,24 @@ impl ConversationRegistry {
         conversation_id: ConversationId,
         run_id: RunId,
         handle: RunHandle,
-    ) {
-        let previous = self.inner.current.lock().await.insert(
+        replace_existing: bool,
+    ) -> bool {
+        let mut current = self.inner.current.lock().await;
+        if !replace_existing && current.contains_key(&conversation_id) {
+            return false;
+        }
+        let previous = current.insert(
             conversation_id,
             ActiveRun {
                 run_id: run_id.clone(),
                 handle,
             },
         );
+        drop(current);
         if let Some(previous) = previous.filter(|previous| previous.run_id != run_id) {
             previous.handle.cancel();
         }
+        true
     }
 
     pub async fn deliver(

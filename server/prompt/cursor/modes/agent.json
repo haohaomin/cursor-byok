@@ -4,6 +4,6 @@
     "EditNotebook", "TodoWrite", "StrReplace", "Write", "Read", "ReadLints",
     "Glob", "AskQuestion", "Task", "GetMcpTools",
     "FetchMcpResource", "SwitchMode", "CallMcpTool", "SembleSearch",
-    "SembleFindRelated"
+    "SembleFindRelated", "CreateGoal", "UpdateGoal"
   ]
 }

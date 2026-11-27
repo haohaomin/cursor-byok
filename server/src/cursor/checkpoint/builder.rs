@@ -35,6 +35,7 @@ pub struct CheckpointBuilder {
     pub(super) roots: Option<RootFrontier>,
     pub(super) turn: Option<TurnFrontier>,
     pub(super) turns_initialized: bool,
+    pub(super) goals: crate::cursor::goals::GoalProjection,
 }
 
 impl CheckpointBuilder {
@@ -59,7 +60,24 @@ impl CheckpointBuilder {
             roots: None,
             turn: None,
             turns_initialized: false,
+            goals: Default::default(),
         }
+    }
+
+    pub(crate) fn seed_goals(&mut self, messages: &[CanonicalMessage]) {
+        self.goals.seed(messages);
+    }
+
+    pub(crate) fn record_goals(
+        &mut self,
+        messages: &[CanonicalMessage],
+    ) -> Result<Option<pb::GoalState>> {
+        self.goals.apply(&mut self.base.goal_state, messages)?;
+        Ok(self.base.goal_state.clone())
+    }
+
+    pub(crate) fn restore_goal(&mut self, goal: Option<pb::GoalState>) {
+        self.base.goal_state = goal;
     }
 
     pub fn configure(
@@ -159,6 +177,7 @@ impl CheckpointBuilder {
         pending_tool_calls: Vec<String>,
         presentation: &PendingSteps,
     ) -> Result<pb::ConversationStateStructure> {
+        self.record_goals(messages)?;
         self.record_background_subagents(presentation);
         let root_ids = self.project_roots(messages).await?;
         let turn_ids = self.project_turns(mode, presentation).await?;

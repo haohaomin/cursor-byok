@@ -2,7 +2,7 @@
 use super::*;
 use serde_json::{json, Value};
 
-fn todo_call(id: &str, arguments: &Value) -> Vec<ModelEvent> {
+pub(super) fn todo_call(id: &str, arguments: &Value) -> Vec<ModelEvent> {
     vec![
         ModelEvent::Start {
             model_call_id: format!("model-{id}"),
@@ -21,7 +21,7 @@ fn todo_call(id: &str, arguments: &Value) -> Vec<ModelEvent> {
     ]
 }
 
-fn finished() -> Vec<ModelEvent> {
+pub(super) fn finished() -> Vec<ModelEvent> {
     vec![
         ModelEvent::Start {
             model_call_id: "final".into(),
@@ -33,7 +33,7 @@ fn finished() -> Vec<ModelEvent> {
     ]
 }
 
-fn registry(
+pub(super) fn registry(
     store: cursor_server::store::Store,
     provider: &fake_provider::FakeProvider,
 ) -> TransportRegistry {

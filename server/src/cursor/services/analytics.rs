@@ -24,6 +24,7 @@ pub const BOOTSTRAP_STATSIG_PATH: &str = "/aiserver.v1.AnalyticsService/Bootstra
 const PINNED_AGENT_GATES: &[(&str, bool)] = &[
     ("nal_agent_retries", true),
     ("long_running_jobs", true),
+    ("agent_goal_continuation", true),
     ("agent_host_local_loop", false),
 ];
 const LOCAL_RULE: &str = "local_pinned";

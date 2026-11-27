@@ -104,6 +104,7 @@ async fn collection_publishes_a_distinct_terminal_card_before_requesting_approva
         .start_batch(
             &[call()],
             ToolBatchState {
+                goal_state: None,
                 completed: &HashSet::new(),
                 started: &HashSet::new(),
                 response_text: "",

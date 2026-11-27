@@ -778,6 +778,37 @@ fn spawn_run_request(
         // stale checkpoint or preparing a fresh model invocation.
         let mut request = request;
         let continuation = generation.prepared.lock().clone();
+        let automatic_goal = continuation.is_none()
+            && matches!(
+                request
+                    .action
+                    .as_ref()
+                    .and_then(|action| action.action.as_ref()),
+                Some(pb::conversation_action::Action::GoalContinuationAction(_))
+            );
+        let _goal_guard = if automatic_goal {
+            let guard = registry
+                .claim_goal(
+                    request
+                        .conversation_id
+                        .as_deref()
+                        .unwrap_or(handle.request_id()),
+                )
+                .await;
+            if guard.is_none() {
+                let _ = handle
+                    .command(TransportCommand::RunFinished {
+                        generation: generation.id,
+                        finish: RunFinish::Transport(TransportFinish::Acknowledged),
+                    })
+                    .await;
+                return;
+            }
+            guard
+        } else {
+            None
+        };
+
         let _completion_guard = if continuation.is_none() {
             match registry
                 .admit_background(handle.request_id(), &mut request)
@@ -806,6 +837,35 @@ fn spawn_run_request(
         } else {
             None
         };
+        if continuation.is_none() {
+            match crate::cursor::goals::prepare_action(&mut request, &dependencies.store).await {
+                Ok(None) => {}
+                result => {
+                    let finish = match result {
+                        Ok(Some(state)) => {
+                            let _ = handle.emit(&pb::AgentServerMessage {
+                                message: Some(
+                                    pb::agent_server_message::Message::ConversationCheckpointUpdate(
+                                        state,
+                                    ),
+                                ),
+                                ..Default::default()
+                            });
+                            TransportFinish::Acknowledged
+                        }
+                        Err(error) => TransportFinish::Failed(error),
+                        Ok(None) => unreachable!(),
+                    };
+                    let _ = handle
+                        .command(TransportCommand::RunFinished {
+                            generation: generation.id,
+                            finish: RunFinish::Transport(finish),
+                        })
+                        .await;
+                    return;
+                }
+            }
+        }
         let mut checkpoint = CheckpointBuilder::new(
             dependencies.store.clone(),
             blob_sync.clone(),
@@ -978,6 +1038,22 @@ fn spawn_run_request(
                 );
             }
         }
+        match dependencies
+            .store
+            .load_checkpoint_messages(prepared.base_checkpoint_id)
+            .await
+        {
+            Ok(messages) => checkpoint.seed_goals(&messages),
+            Err(error) => {
+                let _ = handle
+                    .command(TransportCommand::RunFinished {
+                        generation: generation.id,
+                        finish: RunFinish::Transport(TransportFinish::Failed(error)),
+                    })
+                    .await;
+                return;
+            }
+        }
         checkpoint.configure(
             prepared.model.model_id.clone(),
             prepared.model.context_window_tokens,
@@ -999,9 +1075,24 @@ fn spawn_run_request(
             *generation.run.lock() = None;
             return;
         }
-        registry
-            .activate(conversation_id.clone(), run_id.clone(), run_handle.clone())
-            .await;
+        if !registry
+            .activate(
+                conversation_id.clone(),
+                run_id.clone(),
+                run_handle.clone(),
+                !automatic_goal,
+            )
+            .await
+        {
+            run_handle.cancel();
+            let _ = handle
+                .command(TransportCommand::RunFinished {
+                    generation: generation.id,
+                    finish: RunFinish::Transport(TransportFinish::Acknowledged),
+                })
+                .await;
+            return;
+        }
         let cancellation = run_handle.cancellation();
         *generation.prepared.lock() = Some((prepared.clone(), context.clone()));
         let engine = RunEngine::new(dependencies.store.clone(), dependencies.provider.clone());

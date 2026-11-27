@@ -216,6 +216,8 @@ pub fn tool_placeholder(name: &str, call_id: &str) -> Result<pb::ToolCall> {
         "grep" => Tool::GrepToolCall(pb::GrepToolCall::default()),
         "read" => Tool::ReadToolCall(pb::ReadToolCall::default()),
         "todowrite" => Tool::UpdateTodosToolCall(pb::UpdateTodosToolCall::default()),
+        "creategoal" => Tool::CreateGoalToolCall(pb::CreateGoalToolCall::default()),
+        "updategoal" => Tool::UpdateGoalToolCall(pb::UpdateGoalToolCall::default()),
         "strreplace" | "editnotebook" | "write" => Tool::EditToolCall(pb::EditToolCall::default()),
         "readlints" => Tool::ReadLintsToolCall(pb::ReadLintsToolCall::default()),
         "callmcptool" | "semblesearch" | "semblefindrelated" => {
@@ -351,6 +353,20 @@ pub fn render_tool_call(call: &ToolCall, completed: bool) -> Result<pb::ToolCall
                     .get("include_line_numbers")
                     .and_then(Value::as_bool),
             })
+        }
+        Some(pb::tool_call::Tool::CreateGoalToolCall(tool)) => {
+            tool.args = Some(pb::CreateGoalArgs {
+                objective: string("objective"),
+            });
+        }
+        Some(pb::tool_call::Tool::UpdateGoalToolCall(tool)) => {
+            tool.args = Some(pb::UpdateGoalArgs {
+                status: match string("status").as_str() {
+                    "active" => pb::GoalStatus::Active as i32,
+                    "complete" => pb::GoalStatus::Complete as i32,
+                    _ => pb::GoalStatus::Unspecified as i32,
+                },
+            });
         }
         Some(pb::tool_call::Tool::UpdateTodosToolCall(tool)) => {
             tool.args = Some(pb::UpdateTodosArgs {

@@ -994,32 +994,37 @@ async fn injected_user_context_aborts_pending_tools_and_ignores_late_results() {
 
 #[tokio::test]
 async fn injected_user_context_detaches_subagents_without_cancelling_them() {
-    detached_task_result_case(false, false, false, false).await;
+    detached_task_result_case(false, false, false, false, false).await;
 }
 
 #[tokio::test]
 async fn detached_task_result_after_parent_ends_survives_idle_timeout() {
-    detached_task_result_case(true, false, false, false).await;
+    detached_task_result_case(true, false, false, false, false).await;
 }
 
 #[tokio::test]
 async fn cancelled_detached_task_does_not_restart_parent() {
-    detached_task_result_case(true, true, false, false).await;
+    detached_task_result_case(true, true, false, false, false).await;
 }
 
 #[tokio::test]
 async fn steer_preserves_task_and_aborts_read_in_the_same_round() {
-    detached_task_result_case(false, false, true, false).await;
+    detached_task_result_case(false, false, true, false, false).await;
 }
 
 #[tokio::test]
 async fn queued_user_message_continues_while_subagent_runs() {
-    detached_task_result_case(false, false, false, true).await;
+    detached_task_result_case(false, false, false, true, false).await;
 }
 
 #[tokio::test]
 async fn queued_user_message_keeps_the_later_subagent_result_after_parent_finishes() {
-    detached_task_result_case(true, false, false, true).await;
+    detached_task_result_case(true, false, false, true, false).await;
+}
+
+#[tokio::test]
+async fn detached_task_continuation_preserves_a_created_goal() {
+    detached_task_result_case(true, false, false, false, true).await;
 }
 
 async fn detached_task_result_case(
@@ -1027,6 +1032,7 @@ async fn detached_task_result_case(
     cancel: bool,
     mixed: bool,
     queued_user_message: bool,
+    create_goal: bool,
 ) {
     let (_directory, store) = fixtures::temp_store().await;
     let provider = fake_provider::FakeProvider::default();
@@ -1056,6 +1062,14 @@ async fn detached_task_result_case(
             ModelEvent::ToolCallEnd { index: 1 },
             ModelEvent::Done(FinishReason::ToolUse),
         ]);
+    }
+    let offset = usize::from(create_goal);
+    if create_goal {
+        provider.push(tool_response(
+            "create-goal",
+            "CreateGoal",
+            r#"{"objective":"Finish goal across detached work"}"#,
+        ));
     }
     provider.push(first_response);
     let release = provider.push_gated(text_response("continued while subagent runs"));
@@ -1109,7 +1123,7 @@ async fn detached_task_result_case(
     append_seqno += 1;
 
     let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(5);
-    while provider.requests().len() < 2 {
+    while provider.requests().len() < 2 + offset {
         assert!(
             tokio::time::Instant::now() < deadline,
             "root model did not restart while subagent remained active"
@@ -1271,7 +1285,7 @@ async fn detached_task_result_case(
     if cancel {
         assert_eq!(
             provider.requests().len(),
-            2,
+            2 + offset,
             "explicit stop must not schedule a continuation"
         );
         let history = store
@@ -1285,10 +1299,10 @@ async fn detached_task_result_case(
     }
     let requests = provider.requests();
     assert_eq!(
-        requests[1].history,
-        requests[2].history[..requests[1].history.len()]
+        requests[1 + offset].history,
+        requests[2 + offset].history[..requests[1 + offset].history.len()]
     );
-    assert_eq!(requests[1].prompt, requests[2].prompt);
+    assert_eq!(requests[1 + offset].prompt, requests[2 + offset].prompt);
     let saved = store
         .load_current_messages(&ConversationId::new("detach-subagent-conversation"))
         .await
@@ -1314,6 +1328,14 @@ async fn detached_task_result_case(
     let builder =
         cursor_server::cursor::checkpoint::CheckpointBuilder::new(store.clone(), sync, None, None);
     let cursor_state = checkpoint.as_ref().expect("final Cursor checkpoint");
+    if create_goal {
+        let goal = cursor_state
+            .goal_state
+            .as_ref()
+            .expect("detached Task continuation must retain the goal");
+        assert_eq!(goal.status, pb::GoalStatus::Active as i32);
+        assert_eq!(goal.objective, "Finish goal across detached work");
+    }
     assert!(
         !cursor_state.turns.is_empty(),
         "late reply lost its Cursor turn"
@@ -1380,7 +1402,7 @@ async fn detached_task_result_case(
         .find(|message| message.runtime_event_id == events[0].runtime_event_id)
         .expect("completion identity survived checkpoint hydration");
     assert_eq!(restored.content, events[0].content);
-    let history = serde_json::to_string(&provider.requests()[1].history).unwrap();
+    let history = serde_json::to_string(&provider.requests()[1 + offset].history).unwrap();
     assert_eq!(
         history.contains("Tool execution was interrupted by a newer user message."),
         mixed
@@ -1398,10 +1420,10 @@ async fn detached_task_result_case(
     }
     assert_eq!(
         provider.requests().len(),
-        3,
+        3 + offset,
         "late Task output must reach a model request"
     );
-    let final_history = serde_json::to_string(&provider.requests()[2].history).unwrap();
+    let final_history = serde_json::to_string(&provider.requests()[2 + offset].history).unwrap();
     assert_eq!(
         final_history.matches("DETACHED_TASK_RESULT_MARKER").count(),
         1

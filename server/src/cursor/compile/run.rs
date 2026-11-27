@@ -747,6 +747,7 @@ fn exec_context(
     });
     ExecContext {
         conversation_id: conversation_id.to_string(),
+        agent_session_id: request.agent_session_id.clone(),
         root_conversation_id: request
             .conversation_group_id
             .clone()

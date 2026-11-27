@@ -49,6 +49,7 @@ pub(crate) enum ExecStage {
 pub struct ExecContext {
     pub conversation_id: String,
     pub root_conversation_id: String,
+    pub agent_session_id: Option<String>,
     pub default_subagent_model: String,
     pub subagent_model: Option<SubagentModel>,
     pub allow_subagents: bool,
