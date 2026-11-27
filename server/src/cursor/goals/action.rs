@@ -113,6 +113,25 @@ pub(crate) async fn prepare_action(
     // compaction. Continue from its proven descendant, never rewind that work.
     if let Some(latest) = stored.as_ref() {
         if extends_history(store, latest, &state).await? {
+            if let Some(current) = latest.goal_state.as_ref() {
+                let incoming = goal;
+                goal = current.clone();
+                // Counters belong to the latest committed work. The client can
+                // still pause/resume, or edit the objective on this checkpoint.
+                goal.status = incoming.status;
+                if state.root_prompt_messages_json == latest.root_prompt_messages_json {
+                    goal.objective = incoming.objective;
+                }
+                let resumed_clock = incoming.last_accrued_at_ms > current.last_accrued_at_ms
+                    && incoming.active_duration_ms >= current.active_duration_ms;
+                if incoming.status != current.status || resumed_clock {
+                    goal.active_duration_ms = incoming.active_duration_ms;
+                    goal.last_accrued_at_ms = incoming.last_accrued_at_ms;
+                    if incoming.status == pb::GoalStatus::Active as i32 {
+                        goal.idle_continuations_without_tool_calls = 0;
+                    }
+                }
+            }
             state = latest.clone();
         }
     }

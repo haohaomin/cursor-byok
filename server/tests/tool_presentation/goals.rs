@@ -576,6 +576,41 @@ async fn delayed_goal_wakeup_keeps_later_user_work_and_compaction() {
     }
 }
 
+#[tokio::test]
+async fn delayed_goal_wakeup_uses_latest_progress_counters() {
+    let (_dir, store) = fixtures::temp_store().await;
+    let provider = fake_provider::FakeProvider::default();
+    provider.push(goal_call(
+        "create",
+        "CreateGoal",
+        json!({"objective":"Do not pause after progress"}),
+    ));
+    for _ in 0..3 {
+        provider.push(finished());
+    }
+    provider.push(todo_call("work", &json!({"merge":false,"todos":[]})));
+    provider.push(finished());
+    provider.push(finished());
+    let registry = registry(store.clone(), &provider);
+    let (_, mut old) = run_goal(&registry, "create", None, Some("Create goal")).await;
+    for i in 0..2 {
+        (_, old) = run_goal(&registry, &format!("idle-{i}"), Some(old), None).await;
+    }
+    assert_eq!(active(&old).idle_continuations_without_tool_calls, 2);
+    let (_, worked) = run_goal(
+        &registry,
+        "progress",
+        Some(old.clone()),
+        Some("Perform the next step"),
+    )
+    .await;
+    assert_eq!(active(&worked).idle_continuations_without_tool_calls, 0);
+    let (_, continued) = run_goal(&registry, "delayed-after-work", Some(old), None).await;
+    assert_eq!(active(&continued).continuation_count, 3);
+    assert_eq!(active(&continued).idle_continuations_without_tool_calls, 1);
+    assert_eq!(provider.requests().len(), 7);
+}
+
 async fn run_goal(
     registry: &TransportRegistry,
     id: &str,
