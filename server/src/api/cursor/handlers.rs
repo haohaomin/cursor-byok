@@ -3,6 +3,7 @@ use axum::{
     body::{to_bytes, Body, Bytes},
     extract::{DefaultBodyLimit, Extension, State},
     http::{header, HeaderMap, HeaderValue, Request, Response, StatusCode},
+    middleware::from_fn,
     routing::{get, post},
     Router,
 };
@@ -12,7 +13,7 @@ use crate::{
     api::cursor::{
         bidi,
         proxy::{self, CursorProxy},
-        run_sse,
+        request_body, run_sse,
     },
     cursor::{
         protocol::{
@@ -178,9 +179,17 @@ fn router_with_proxy(
         )
         .route("/auth/full_stripe_profile", get(account::stripe_profile))
         .route("/auth/stripe_profile", get(account::stripe_profile))
-        .merge(tab::router())
         .route_layer(DefaultBodyLimit::disable())
+        // Requests enter layers from bottom to top: bound wire bytes, decompress,
+        // then bound decoded bytes before any handler can parse or dispatch them.
+        .route_layer(from_fn(request_body::buffer))
         .route_layer(RequestDecompressionLayer::new())
+        .route_layer(from_fn(request_body::buffer))
+        .merge(
+            tab::router()
+                .route_layer(DefaultBodyLimit::disable())
+                .route_layer(RequestDecompressionLayer::new()),
+        )
         .fallback(proxy::forward)
         .method_not_allowed_fallback(proxy::forward)
         .layer(Extension(proxy))
