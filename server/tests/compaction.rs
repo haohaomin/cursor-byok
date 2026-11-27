@@ -327,8 +327,98 @@ async fn automatic_compaction_preflights_provider_input_and_records_rebuilt_toke
 }
 
 #[tokio::test]
+async fn compaction_setting_changed_after_start_allows_a_slow_summary() {
+    let (_directory, store) = fixtures::temp_store().await;
+    store
+        .set_compaction_settings(cursor_server::store::CompactionSettings {
+            auto_compaction_timeout_secs: 30,
+        })
+        .await
+        .unwrap();
+    let model = store
+        .create_model(&windowed_model("slow-compaction", Some(100_000)))
+        .await
+        .unwrap();
+    let provider = fake_provider::FakeProvider::default();
+    provider.push(text_response(&"x".repeat(2_000), 150_000, 1_000));
+    provider.push_error(cursor_server::Error::Provider(
+        "context_length_exceeded".into(),
+    ));
+    let summary_ready = provider.push_gated(text_response("slow durable summary", 2_000, 20));
+    provider.push(text_response("continued after slow compaction", 2_000, 20));
+    let registry = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(PromptAssets::embedded().unwrap()),
+    );
+    let first = run(
+        &registry,
+        "slow-first",
+        user_request(
+            "slow-conversation",
+            "slow-user-1",
+            "start",
+            &model.model_hash,
+            None,
+        ),
+    )
+    .await;
+    // Updating a running instance must affect its next compaction without restart.
+    store
+        .set_compaction_settings(cursor_server::store::CompactionSettings {
+            auto_compaction_timeout_secs: 600,
+        })
+        .await
+        .unwrap();
+    let release = async {
+        tokio::time::timeout(Duration::from_secs(5), async {
+            while provider.requests().len() < 3 {
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+        .await
+        .unwrap();
+        tokio::time::sleep(Duration::from_secs(31)).await;
+        summary_ready.notify_one();
+    };
+    let request = user_request(
+        "slow-conversation",
+        "slow-user-2",
+        "continue",
+        &model.model_hash,
+        first.checkpoints.last().cloned(),
+    );
+    let (second, ()) = tokio::join!(
+        run_with_timeout(&registry, "slow-second", request, Duration::from_secs(40)),
+        release,
+    );
+    assert!(
+        matches!(second.end_stream, EndStream::Success {}),
+        "{:?}",
+        second.end_stream
+    );
+    assert_eq!(second.summary_started, 1);
+    assert_eq!(second.summary_completed, 1);
+    assert_eq!(provider.requests().len(), 4);
+    let stored = store
+        .load_current_messages(&ConversationId::new("slow-conversation"))
+        .await
+        .unwrap();
+    let retained = serde_json::to_string(&stored).unwrap();
+    assert!(retained.contains("slow durable summary"));
+    assert!(retained.contains("continued after slow compaction"));
+    assert!(!retained.contains(&"x".repeat(2_000)));
+}
+
+#[tokio::test]
 async fn stalled_automatic_compaction_preserves_small_history() {
     let (_directory, store) = fixtures::temp_store().await;
+    store
+        .set_compaction_settings(cursor_server::store::CompactionSettings {
+            auto_compaction_timeout_secs: 30,
+        })
+        .await
+        .unwrap();
     let model = store
         .create_model(&windowed_model("stalled-compaction", Some(100_000)))
         .await
@@ -385,7 +475,7 @@ async fn stalled_automatic_compaction_preserves_small_history() {
     .await;
 
     assert!(
-        matches!(&second.end_stream, EndStream::Failure { error } if error.message.contains("timed out")),
+        matches!(&second.end_stream, EndStream::Failure { error } if error.message.contains("automatic compaction timed out after 30 seconds")),
         "{:?}",
         second.end_stream
     );

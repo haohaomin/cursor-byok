@@ -30,6 +30,8 @@
 
 **2026-11-26 本 fork PR #55：**二进制 BidiAppend 被拒绝已复现并修复，经 [PR #59](https://github.com/haohaomin/cursor-byok/pull/59) 合入；原 #55 已标记合并，Issue #54 已关闭。560 项服务端回归、Clippy、跨平台 CI 及 v1.2.8 发布核验通过。真实 Cursor UI/供应商待复测；压缩超时设置由 #56 单独评估，共用 HTTP 入口的大请求上限是独立待办，见 [验证记录](history/pull-requests/2026-11-26-pr55-binary-append.md)。
 
+**2026-11-27 本 fork PR #56：**已在 `codex/pr56-compaction-settings` 采用并补齐自动压缩时限设置，本地工作区 629 项、Clippy、前端构建及演示 UI 保存验证通过。默认 180 秒，支持 30–3600 秒；下一次自动压缩生效。尚未合入或发布，见 [验证记录](history/pull-requests/2026-11-27-pr56-compaction-timeout.md)。
+
 ## 1. 已发布的成果
 
 v1.2.8 新增二进制 BidiAppend 修复（[发布核验](history/releases.md#v128)）；v1.2.7 新增 DeepSeek 跨协议 reasoning 回放修复（[发布核验](history/releases.md#v127)）；v1.2.6 新增本地身份团队配置路由（[发布核验](history/releases.md#v126)）；v1.2.5 新增 Todo 完整列表与压缩恢复（[发布核验](history/releases.md#v125)）；v1.2.4 新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。

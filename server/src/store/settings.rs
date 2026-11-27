@@ -97,6 +97,13 @@ pub const DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 180;
 const MIN_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 30;
 const MAX_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 3600;
 
+fn normalize_auto_compaction_timeout_secs(value: u64) -> u64 {
+    value.clamp(
+        MIN_AUTO_COMPACTION_TIMEOUT_SECS,
+        MAX_AUTO_COMPACTION_TIMEOUT_SECS,
+    )
+}
+
 fn default_auto_compaction_timeout_secs() -> u64 {
     DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS
 }
@@ -424,19 +431,21 @@ impl Store {
         .bind(COMPACTION_SETTINGS_KEY)
         .fetch_optional(&self.pool)
         .await?;
-        value
-            .map(|value| serde_json::from_str(&value).map_err(Into::into))
-            .unwrap_or_else(|| Ok(CompactionSettings::default()))
+        let mut settings = match value {
+            Some(value) => serde_json::from_str::<CompactionSettings>(&value)?,
+            None => CompactionSettings::default(),
+        };
+        settings.auto_compaction_timeout_secs =
+            normalize_auto_compaction_timeout_secs(settings.auto_compaction_timeout_secs);
+        Ok(settings)
     }
 
     pub async fn set_compaction_settings(
         &self,
         mut settings: CompactionSettings,
     ) -> Result<CompactionSettings> {
-        settings.auto_compaction_timeout_secs = settings.auto_compaction_timeout_secs.clamp(
-            MIN_AUTO_COMPACTION_TIMEOUT_SECS,
-            MAX_AUTO_COMPACTION_TIMEOUT_SECS,
-        );
+        settings.auto_compaction_timeout_secs =
+            normalize_auto_compaction_timeout_secs(settings.auto_compaction_timeout_secs);
         let value_json = serde_json::to_string(&settings)?;
         let _write = self.writes.lock().await;
         sqlx::query("INSERT INTO service_settings(setting_key, value_json, updated_at_ms) VALUES (?, ?, ?) ON CONFLICT(setting_key) DO UPDATE SET value_json = excluded.value_json, updated_at_ms = excluded.updated_at_ms")

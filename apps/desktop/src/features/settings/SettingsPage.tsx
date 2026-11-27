@@ -172,6 +172,7 @@ export function SettingsPage() {
     setEditingCompaction(false);
   };
   const saveCompaction = async () => {
+    if (savingCompaction) return;
     const seconds = Number(compactionDraft);
     if (!Number.isInteger(seconds) || seconds < 30 || seconds > 3600) {
       message(t("自动压缩超时必须是 30 到 3600 之间的整数"));

@@ -43,8 +43,9 @@ export function CompactionSettingsCard({
           value={draft}
           inputMode="numeric"
           aria-label={t("自动压缩超时（秒）")}
+          disabled={saving}
           onChange={(event) => onDraftChange(event.target.value.replace(/[^0-9]/g, ""))}
-          onKeyDown={(event) => { if (event.key === "Enter") onSave(); }}
+          onKeyDown={(event) => { if (event.key === "Enter" && !saving) onSave(); }}
         /></div>
       </div> : <div className={styles.row}>
         <strong>{t("自动压缩超时（秒）")}</strong>

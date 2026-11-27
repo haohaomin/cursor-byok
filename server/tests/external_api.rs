@@ -81,6 +81,66 @@ async fn setup() -> (
 }
 
 #[tokio::test]
+async fn compaction_settings_round_trip_and_reject_invalid_types() {
+    let (router, _provider, store, _directory) = setup().await;
+    let path = "/__byok-api__/api/settings/compaction";
+    let (status, body) = send(router.clone(), "GET", path, None, json!({})).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(
+        serde_json::from_str::<Value>(&body).unwrap(),
+        json!({"auto_compaction_timeout_secs":180})
+    );
+    for (requested, expected) in [(600, 600), (0, 30), (7200, 3600)] {
+        let (status, body) = send(
+            router.clone(),
+            "PUT",
+            path,
+            None,
+            json!({"auto_compaction_timeout_secs":requested}),
+        )
+        .await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(
+            serde_json::from_str::<Value>(&body).unwrap(),
+            json!({"auto_compaction_timeout_secs":expected})
+        );
+        assert_eq!(
+            store
+                .compaction_settings()
+                .await
+                .unwrap()
+                .auto_compaction_timeout_secs,
+            expected
+        );
+        let (status, body) = send(router.clone(), "GET", path, None, json!({})).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(
+            serde_json::from_str::<Value>(&body).unwrap(),
+            json!({"auto_compaction_timeout_secs":expected})
+        );
+    }
+    for invalid in [json!(-1), json!(30.5), json!("600"), Value::Null] {
+        let (status, _) = send(
+            router.clone(),
+            "PUT",
+            path,
+            None,
+            json!({"auto_compaction_timeout_secs":invalid}),
+        )
+        .await;
+        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+        assert_eq!(
+            store
+                .compaction_settings()
+                .await
+                .unwrap()
+                .auto_compaction_timeout_secs,
+            3600
+        );
+    }
+}
+
+#[tokio::test]
 async fn management_settings_enable_the_external_route_without_restart() {
     let (router, _provider, _store, _directory) = setup().await;
     let (status, body) = send(

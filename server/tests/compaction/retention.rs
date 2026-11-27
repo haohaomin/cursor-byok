@@ -220,6 +220,12 @@ async fn stalled_large_summary_times_out_without_replacing_history() {
 
 async fn check_failed_summary(kind: &str) {
     let (_directory, store) = fixtures::temp_store().await;
+    store
+        .set_compaction_settings(cursor_server::store::CompactionSettings {
+            auto_compaction_timeout_secs: 30,
+        })
+        .await
+        .unwrap();
     let model = store
         .create_model(&windowed_model("retention-failure", Some(100_000)))
         .await
