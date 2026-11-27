@@ -4,11 +4,11 @@ use std::collections::HashSet;
 use super::*;
 use crate::run::compaction;
 
-/// Bound each provider call; cancellation remains active between batches.
-/// Used as the fallback when persisted compaction settings cannot be read;
-/// the configured deadline comes from `Store::compaction_settings`.
-const AUTO_COMPACTION_DEADLINE: Duration =
-    Duration::from_secs(crate::store::DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS);
+/// Even with a huge context window the halving loop must terminate: a batch
+/// that keeps hitting the output cap or the provider's input limit is retried
+/// at most this many times before the whole compaction gives up and preserves
+/// the original history.
+const MAX_COMPACTION_BATCH_RETRIES: u32 = 3;
 
 impl RunEngine {
     pub(super) async fn auto_compact(
@@ -49,8 +49,22 @@ impl RunEngine {
         }
         let mut batches = compaction::Batches::new(history, prepared.model.strip_images)
             .map_err(|error| RunOutcome::Failed(error.into()))?;
+        let compaction_settings = match self.store.compaction_settings().await {
+            Ok(settings) => settings,
+            Err(error) => {
+                tracing::warn!(
+                    %error,
+                    "failed to load compaction settings; using defaults"
+                );
+                crate::store::CompactionSettings::default()
+            }
+        };
+        let compaction_deadline =
+            Duration::from_secs(compaction_settings.auto_compaction_timeout_secs);
+        let output_cap = compaction_settings
+            .auto_compaction_output_tokens
+            .min(prepared.model.max_output_tokens.unwrap_or(u64::MAX));
         let mut model = prepared.model.clone();
-        model.max_output_tokens = Some(compaction::OUTPUT_TOKENS);
         model.reasoning.enabled = false;
         model.reasoning.effort = None;
         let prompt = crate::model::PromptSpec {
@@ -66,26 +80,29 @@ impl RunEngine {
         let mut compaction_usage = None;
         let mut last_call_index = None;
         let mut retry_history = None;
-        let mut summary_window = model
+        let mut batch_retries = 0u32;
+        let mut transcript_limit = None;
+        let summary_window = model
             .context_window_tokens
             .unwrap_or(compaction::DEFAULT_CONTEXT_WINDOW);
-        let compaction_deadline = match self.store.compaction_settings().await {
-            Ok(settings) => Duration::from_secs(settings.auto_compaction_timeout_secs),
-            Err(error) => {
-                tracing::warn!(
-                    %error,
-                    "failed to load compaction settings; using default deadline"
-                );
-                AUTO_COMPACTION_DEADLINE
-            }
-        };
         let summary_result = loop {
             if cancellation.is_cancelled() {
                 return Err(RunOutcome::Cancelled);
             }
+            let output_tokens =
+                compaction::output_tokens(&summary, &prompt, summary_window, output_cap);
+            if output_tokens == 0 {
+                break Err(RunFailure::Protocol("automatic compaction has no room for summary output; original history has been preserved".into()));
+            }
+            model.max_output_tokens = Some(output_tokens);
             let next = match retry_history.take() {
                 Some(history) => Ok(Some(history)),
-                None => batches.next(&summary, &prompt, Some(summary_window)),
+                None => batches.next(
+                    &summary,
+                    &prompt,
+                    compaction::context_budget(summary_window).saturating_sub(output_tokens),
+                    transcript_limit,
+                ),
             };
             let history = match next {
                 Ok(Some(history)) => history,
@@ -168,6 +185,7 @@ impl RunEngine {
                                 partial_reasoning: String::new(),
                                 usage: None,
                                 retryable: false,
+                                finish_reason: None,
                             }));
                         }
                     }
@@ -200,20 +218,24 @@ impl RunEngine {
                     continue;
                 }
             }
+            let truncated = matches!(&cycle, Err(failure) if failure.finish_reason == Some(crate::provider::FinishReason::Length));
             let failure = match cycle {
                 Err(failure) => failure.failure,
                 Ok(_) => RunFailure::Provider(
                     "automatic summary was truncated, empty, or requested tools".into(),
                 ),
             };
-            if compaction::is_context_overflow(&format!("{failure:?}"))
-                && summary_window > compaction::OUTPUT_TOKENS * 2
+            if (compaction::is_context_overflow(&format!("{failure:?}")) || truncated)
+                && batch_retries < MAX_COMPACTION_BATCH_RETRIES
             {
-                summary_window /= 2;
+                batch_retries += 1;
+                transcript_limit = Some(compaction::transcript_tokens(&history) / 2);
                 batches.rewind(history);
                 tracing::warn!(
-                    summary_window,
-                    "summary exceeded provider context; retrying smaller batch"
+                    transcript_limit,
+                    truncated,
+                    retry = batch_retries,
+                    "compaction batch exceeded provider context or its output cap; retrying smaller batch"
                 );
                 continue;
             }

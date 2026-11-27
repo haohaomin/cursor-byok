@@ -103,38 +103,20 @@ impl Batches {
         &mut self,
         summary: &str,
         prompt: &PromptSpec,
-        context_window: Option<u64>,
+        input_tokens: u64,
+        transcript_limit: Option<u64>,
     ) -> Result<Option<Vec<ProjectedMessage>>, String> {
         if self.messages.is_empty() {
             return Ok(None);
         }
-        let budget = super::context_budget(context_window.unwrap_or(DEFAULT_CONTEXT_WINDOW))
-            .saturating_sub(super::OUTPUT_TOKENS);
-        let mut history = Vec::new();
-        if !summary.is_empty() {
-            history.push(text_message(
-                "compaction:previous",
-                format!("Previous durable summary:\n{summary}"),
-            ));
-        }
-        // Include the instruction and previous summary in every budget calculation.
-        history.push(text_message("compaction:instruction", UPDATE.into()));
+        let mut history = summary_prefix(summary);
         let prefix_len = history.len();
-        let mut used = estimate_context_tokens(prompt, &history)
-            + non_ascii_bytes(&prompt.instructions)
-            + history
-                .iter()
-                .map(|message| match &message.content {
-                    ProjectedContent::Parts(parts) => parts
-                        .iter()
-                        .map(|part| match part {
-                            ContentPart::Text { text } => non_ascii_bytes(text),
-                            _ => 0,
-                        })
-                        .sum::<u64>(),
-                    _ => 0,
-                })
-                .sum::<u64>();
+        let mut used = prefix_tokens(prompt, &history);
+        let budget = used.saturating_add(
+            input_tokens
+                .saturating_sub(used)
+                .min(transcript_limit.unwrap_or(u64::MAX)),
+        );
         while let Some(source) = self.messages.front_mut() {
             let mut fragment = ProjectedMessage {
                 message_id: format!("compaction:transcript:{}", source.id),
@@ -206,6 +188,64 @@ impl Batches {
     }
 }
 
+/// Reserve the prompt and previous summary first; keep at least half the
+/// remaining window for transcript input, even when the configured cap is huge.
+pub(in crate::run) fn output_tokens(
+    summary: &str,
+    prompt: &PromptSpec,
+    window: u64,
+    cap: u64,
+) -> u64 {
+    let available = super::context_budget(window)
+        .saturating_sub(prefix_tokens(prompt, &summary_prefix(summary)));
+    cap.min(available / 2)
+}
+
+pub(in crate::run) fn transcript_tokens(history: &[ProjectedMessage]) -> u64 {
+    history
+        .iter()
+        .filter(|message| message.message_id.starts_with("compaction:transcript:"))
+        .map(|message| {
+            TOKENS_PER_MESSAGE_OVERHEAD
+                + match &message.content {
+                    ProjectedContent::Parts(parts) => parts.iter().map(part_tokens).sum::<u64>(),
+                    _ => unreachable!(),
+                }
+        })
+        .sum()
+}
+
+fn summary_prefix(summary: &str) -> Vec<ProjectedMessage> {
+    let mut history = Vec::new();
+    if !summary.is_empty() {
+        history.push(text_message(
+            "compaction:previous",
+            format!("Previous durable summary:\n{summary}"),
+        ));
+    }
+    // Include the instruction and previous summary in every budget calculation.
+    history.push(text_message("compaction:instruction", UPDATE.into()));
+    history
+}
+
+fn prefix_tokens(prompt: &PromptSpec, history: &[ProjectedMessage]) -> u64 {
+    estimate_context_tokens(prompt, history)
+        + non_ascii_bytes(&prompt.instructions)
+        + history
+            .iter()
+            .map(|message| match &message.content {
+                ProjectedContent::Parts(parts) => parts
+                    .iter()
+                    .map(|part| match part {
+                        ContentPart::Text { text } => non_ascii_bytes(text),
+                        _ => 0,
+                    })
+                    .sum::<u64>(),
+                _ => 0,
+            })
+            .sum::<u64>()
+}
+
 fn text_message(id: &str, text: String) -> ProjectedMessage {
     ProjectedMessage {
         message_id: id.into(),
@@ -245,6 +285,46 @@ fn part_tokens(part: &ContentPart) -> u64 {
 mod tests {
     use super::*;
     use crate::model::{ToolCallContent, ToolResultContent};
+
+    /// Small output cap so the tiny test windows still leave room for input.
+    const TEST_OUTPUT_TOKENS: u64 = 1_024;
+
+    #[test]
+    fn output_reserve_keeps_prompt_summary_and_transcript_within_the_window() {
+        let prompt = PromptSpec {
+            instructions: "Summarize all history".into(),
+            tools: Vec::new(),
+        };
+        for window in [4096, 8192, DEFAULT_CONTEXT_WINDOW, 100_000] {
+            for cap in [1024, 16_384, 65_536] {
+                let summary = "previous summary ".repeat(100);
+                let output = output_tokens(&summary, &prompt, window, cap);
+                assert!(output > 0 && output <= cap);
+                let input = super::super::context_budget(window) - output;
+                let mut batches = Batches::new(
+                    vec![text_message("source", "HISTORY".repeat(100_000))],
+                    false,
+                )
+                .unwrap();
+                let first = batches
+                    .next(&summary, &prompt, input, None)
+                    .unwrap()
+                    .unwrap();
+                assert!(
+                    estimate_context_tokens(&prompt, &first) + output
+                        <= super::super::context_budget(window)
+                );
+                let rejected_size = transcript_tokens(&first);
+                batches.rewind(first);
+                let retry = batches
+                    .next(&summary, &prompt, input, Some(rejected_size / 2))
+                    .unwrap()
+                    .unwrap();
+                assert!(transcript_tokens(&retry) <= rejected_size / 2);
+                assert_eq!(retry[0].message_id, "compaction:previous");
+            }
+        }
+    }
 
     #[test]
     fn bounded_batches_preserve_unicode_images_and_tool_transcript_in_order() {
@@ -302,7 +382,12 @@ mod tests {
         let mut tool_transcript = String::new();
         let mut count = 0;
         while let Some(batch) = batches
-            .next("PREVIOUS_PROGRESS", &prompt, Some(window))
+            .next(
+                "PREVIOUS_PROGRESS",
+                &prompt,
+                super::super::context_budget(window) - TEST_OUTPUT_TOKENS,
+                None,
+            )
             .unwrap()
         {
             count += 1;
@@ -310,12 +395,11 @@ mod tests {
             let wire = serde_json::to_string(&batch).unwrap();
             assert!(!wire.contains("PRIVATE_REASONING_MUST_NOT_LEAK"));
             assert!(
-                wire.chars().filter(|ch| !ch.is_ascii()).count() as u64
-                    + super::super::OUTPUT_TOKENS
+                wire.chars().filter(|ch| !ch.is_ascii()).count() as u64 + TEST_OUTPUT_TOKENS
                     <= super::super::context_budget(window)
             );
             assert!(
-                estimate_context_tokens(&prompt, &batch) + super::super::OUTPUT_TOKENS
+                estimate_context_tokens(&prompt, &batch) + TEST_OUTPUT_TOKENS
                     <= super::super::context_budget(window)
             );
             assert!(batch.iter().all(|message| message.role == Role::User));
@@ -357,13 +441,34 @@ mod tests {
             tools: Vec::new(),
         };
         let mut batches = Batches::new(vec![original], false).unwrap();
-        assert!(batches.next("", &prompt, Some(4_000)).is_err());
+        assert!(batches.next("", &prompt, 0, None).is_err());
         assert!(batches
-            .next(&"s".repeat(100_000), &prompt, Some(10_000))
+            .next(
+                &"s".repeat(100_000),
+                &prompt,
+                super::super::context_budget(10_000) - TEST_OUTPUT_TOKENS,
+                None
+            )
             .is_err());
-        let all = batches.next("", &prompt, None).unwrap().unwrap();
+        let all = batches
+            .next(
+                "",
+                &prompt,
+                super::super::context_budget(DEFAULT_CONTEXT_WINDOW) - TEST_OUTPUT_TOKENS,
+                None,
+            )
+            .unwrap()
+            .unwrap();
         assert!(serde_json::to_string(&all).unwrap().contains("KEEP_GOAL"));
-        assert!(batches.next("summary", &prompt, None).unwrap().is_none());
+        assert!(batches
+            .next(
+                "summary",
+                &prompt,
+                super::super::context_budget(DEFAULT_CONTEXT_WINDOW) - TEST_OUTPUT_TOKENS,
+                None
+            )
+            .unwrap()
+            .is_none());
     }
 
     #[test]
@@ -375,12 +480,28 @@ mod tests {
         };
         let mut batches =
             Batches::new(vec![text_message("source", original.clone())], false).unwrap();
-        let rejected = batches.next("", &prompt, None).unwrap().unwrap();
+        let rejected = batches
+            .next(
+                "",
+                &prompt,
+                super::super::context_budget(DEFAULT_CONTEXT_WINDOW) - TEST_OUTPUT_TOKENS,
+                None,
+            )
+            .unwrap()
+            .unwrap();
         assert!(serde_json::to_string(&rejected).unwrap().len() < original.len());
         batches.rewind(rejected);
         let mut restored = String::new();
         let mut count = 0;
-        while let Some(batch) = batches.next("progress", &prompt, Some(8_000)).unwrap() {
+        while let Some(batch) = batches
+            .next(
+                "progress",
+                &prompt,
+                super::super::context_budget(8_000) - TEST_OUTPUT_TOKENS,
+                None,
+            )
+            .unwrap()
+        {
             count += 1;
             assert!(count < 20);
             for message in batch
@@ -427,12 +548,25 @@ mod tests {
             tools: Vec::new(),
         };
         let mut batches = Batches::new(vec![goal, assistant], true).unwrap();
-        let batch = batches.next("", &prompt, Some(5_000)).unwrap().unwrap();
+        let batch = batches
+            .next(
+                "",
+                &prompt,
+                super::super::context_budget(5_000) - TEST_OUTPUT_TOKENS,
+                None,
+            )
+            .unwrap()
+            .unwrap();
         let wire = serde_json::to_string(&batch).unwrap();
         assert!(wire.contains("VISIBLE_GOAL") && wire.contains("VISIBLE_RESULT"));
         assert!(!wire.contains("PRIVATE_") && !wire.contains("image/png"));
         assert!(batches
-            .next("summary", &prompt, Some(5_000))
+            .next(
+                "summary",
+                &prompt,
+                super::super::context_budget(5_000) - TEST_OUTPUT_TOKENS,
+                None
+            )
             .unwrap()
             .is_none());
     }

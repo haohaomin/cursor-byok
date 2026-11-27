@@ -940,8 +940,10 @@ async fn one_run_can_auto_compact_again_after_more_tool_output() {
         .unwrap();
     let provider = fake_provider::FakeProvider::default();
     provider.push(tool_call_response("repeat-call-1"));
+    provider.push(text_events("first intermediate summary"));
     provider.push(text_events("first summary"));
     provider.push(tool_call_response("repeat-call-2"));
+    provider.push(text_events("second intermediate summary"));
     provider.push(text_events("second summary"));
     provider.push(text_events("done"));
     let assets = PromptAssets::load(
@@ -1072,12 +1074,23 @@ async fn one_run_can_auto_compact_again_after_more_tool_output() {
             )
         })
         .collect::<Vec<_>>();
-    assert_eq!(requests.len(), 5, "provider requests: {shapes:?}");
-    assert!(!requests[0].prompt.tools.is_empty());
-    assert!(requests[1].prompt.tools.is_empty());
-    assert!(!requests[2].prompt.tools.is_empty());
-    assert!(requests[3].prompt.tools.is_empty());
-    assert!(!requests[4].prompt.tools.is_empty());
+    assert_eq!(requests.len(), 7, "provider requests: {shapes:?}");
+    for (index, request) in requests.iter().enumerate() {
+        assert_eq!(request.prompt.tools.is_empty(), ![0, 3, 6].contains(&index));
+    }
+    // The larger default output reservation splits each oversized tool result
+    // across two summary calls, within each of the two compaction lifecycles.
+    for (index, summary) in [
+        (2, "first intermediate summary"),
+        (5, "second intermediate summary"),
+    ] {
+        assert!(serde_json::to_string(&requests[index].history)
+            .unwrap()
+            .contains(summary));
+    }
+    assert!(serde_json::to_string(&requests[6].history)
+        .unwrap()
+        .contains("second summary"));
 }
 
 #[tokio::test]

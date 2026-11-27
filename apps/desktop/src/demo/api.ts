@@ -105,7 +105,7 @@ let proxySettings: ProxySettings = {
   has_password: false,
 };
 let tabSettings: TabSettings = { mode: "public", address: "" };
-let compactionSettings: CompactionSettings = { auto_compaction_timeout_secs: 180 };
+let compactionSettings: CompactionSettings = { auto_compaction_timeout_secs: 180, auto_compaction_output_tokens: 16384 };
 let modelPricing: ModelTokenPricing[] = [{
   model_hash: "mock-gpt",
   input_per_million: 1.5,
@@ -200,8 +200,8 @@ export function installDemoApi() {
       return json(tabSettings);
     }
     if (path === "/settings/compaction" && method === "GET") return json(compactionSettings);
-    if (path === "/settings/compaction") {
-      compactionSettings = body as CompactionSettings;
+    if (path === "/settings/compaction" && method === "PATCH") {
+      compactionSettings = { ...compactionSettings, ...body as Partial<CompactionSettings> };
       return json(compactionSettings);
     }
     if (path === "/settings/model-pricing" && method === "GET") return json(modelPricing);

@@ -8,9 +8,10 @@ use axum::{
 use serde::{Deserialize, Serialize};
 
 use crate::store::{
-    CommitPromptLocale, CommitSettings, CompactionSettings, DesktopSettings, ExternalApiSettings,
-    ModelTokenPricing, PortSettings, ProxySettings, ProxySettingsInput, StatisticsStorage,
-    StatisticsStorageScope, TabSettings, TokenPricingSettings,
+    CommitPromptLocale, CommitSettings, CompactionSettings, CompactionSettingsUpdate,
+    DesktopSettings, ExternalApiSettings, ModelTokenPricing, PortSettings, ProxySettings,
+    ProxySettingsInput, StatisticsStorage, StatisticsStorageScope, TabSettings,
+    TokenPricingSettings,
 };
 
 use super::{ControlService, ObservabilitySettings};
@@ -102,7 +103,7 @@ pub async fn get_compaction(
 
 pub async fn update_compaction(
     State(service): State<ControlService>,
-    Json(settings): Json<CompactionSettings>,
+    Json(settings): Json<CompactionSettingsUpdate>,
 ) -> Result<Json<CompactionSettings>> {
     Ok(Json(service.set_compaction_settings(settings).await?))
 }

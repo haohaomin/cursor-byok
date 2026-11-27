@@ -211,7 +211,7 @@ pub fn api_router(service: ControlService) -> Router {
         )
         .route(
             "/__byok-api__/api/settings/compaction",
-            get(settings::get_compaction).put(settings::update_compaction),
+            get(settings::get_compaction).patch(settings::update_compaction),
         )
         .route(
             "/__byok-api__/api/settings/desktop",
