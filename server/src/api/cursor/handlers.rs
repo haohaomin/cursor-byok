@@ -3,6 +3,7 @@ use axum::{
     body::{to_bytes, Body, Bytes},
     extract::{DefaultBodyLimit, Extension, State},
     http::{header, HeaderMap, HeaderValue, Request, Response, StatusCode},
+    middleware::from_fn,
     routing::{get, post},
     Router,
 };
@@ -12,7 +13,7 @@ use crate::{
     api::cursor::{
         bidi,
         proxy::{self, CursorProxy},
-        run_sse,
+        request_body, run_sse,
     },
     cursor::{
         protocol::{
@@ -52,7 +53,6 @@ fn router_with_proxy(
 ) -> Router {
     let free_entitlements = FreeEntitlementCache::default();
     Router::new()
-        .route("/__byok-api__/healthz", get(health))
         .route("/agent.v1.AgentService/RunSSE", post(run_sse_handler))
         .route("/aiserver.v1.BidiService/BidiAppend", post(bidi_handler))
         .route(
@@ -106,10 +106,6 @@ fn router_with_proxy(
         .route(
             "/aiserver.v1.AiService/WriteGitCommitMessage",
             post(commit_message::write_git_commit_message),
-        )
-        .route(
-            "/aiserver.v1.NetworkService/IsConnected",
-            post(is_connected),
         )
         .route(
             "/agent.v1.AgentService/GetDefaultModelForCli",
@@ -178,9 +174,23 @@ fn router_with_proxy(
         )
         .route("/auth/full_stripe_profile", get(account::stripe_profile))
         .route("/auth/stripe_profile", get(account::stripe_profile))
-        .merge(tab::router())
         .route_layer(DefaultBodyLimit::disable())
+        // Requests enter layers from bottom to top: bound wire bytes, decompress,
+        // then bound decoded bytes before any handler can parse or dispatch them.
+        .route_layer(from_fn(request_body::buffer))
         .route_layer(RequestDecompressionLayer::new())
+        .route_layer(from_fn(request_body::buffer))
+        // Probes ignore request bodies and must answer even if an upload stalls.
+        .route("/__byok-api__/healthz", get(health))
+        .route(
+            "/aiserver.v1.NetworkService/IsConnected",
+            post(is_connected),
+        )
+        .merge(
+            tab::router()
+                .route_layer(DefaultBodyLimit::disable())
+                .route_layer(RequestDecompressionLayer::new()),
+        )
         .fallback(proxy::forward)
         .method_not_allowed_fallback(proxy::forward)
         .layer(Extension(proxy))

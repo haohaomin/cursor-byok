@@ -13,6 +13,8 @@
 
 ## Issue 调查与验收
 
+- [2026-11-27 · Cursor HTTP 请求体与解压大小限制](issues/2026-11-27-cursor-request-body-limit.md)
+
 - [2026-11-24 · Issue #444：自动压缩保留早期任务与失败保护](issues/2026-11-24-issue444-compaction-retention.md)
 
 - [2026-11-24 · Issue #102：Responses 工具 ID 历史回放复测](issues/2026-11-24-issue102-check.md)

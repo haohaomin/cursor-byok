@@ -28,6 +28,7 @@ eventsource-stream = "0.2"
 futures-util = "0.3"
 hex = "0.4"
 hudsucker = { version = "0.25", features = ["http2"] }
+http-body-util = "0.1"
 image = { version = "0.25", default-features = false, features = ["gif", "jpeg", "png", "webp"] }
 include_dir = "0.7"
 json5 = "0.4"
@@ -64,7 +65,6 @@ prost-build = "0.13"
 protoc-bin-vendored = "3"
 
 [dev-dependencies]
-http-body-util = "0.1"
 tempfile = "3"
 tokio-rustls = "0.26"
 tower = { version = "0.5", features = ["util"] }
