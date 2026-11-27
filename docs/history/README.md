@@ -13,6 +13,7 @@
 
 ## Issue 调查与验收
 
+- [2026-11-27 · Issue #244：当前子代理通知接收、去重与语义修复](issues/2026-11-27-issue244-notifications-fix.md)
 - [2026-11-27 · Issue #244 / PR #245：旧编排补丁与当前客户端对照](issues/2026-11-27-issue244-orchestration-check.md)
 
 - [2026-11-27 · Issue #327：目标模式与自动续跑协议](issues/2026-11-27-issue327-goal-mode.md)
