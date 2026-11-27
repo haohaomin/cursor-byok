@@ -8,6 +8,10 @@
 
 [#245](https://github.com/leookun/cursor-byok/pull/245) 固定 head `a29f7190b2cd` 已完成源码审查，**不采用原补丁**：create-agent 只发转后台控制请求，Projects 提示依赖未提供的 send_message，旧 Proto 声明未接线；当前 Cursor 已无旧 AgentMode=6。现有 Task 的两项协议探针和 59 项相关回归通过，未修改生产代码，未新发版；现代 Await、项目协调器通信与 Agent Store 仍待实现及真实验收。[逐项范围与证据](history/issues/2026-11-27-issue244-orchestration-check.md)。
 
+## 2026-11-27 本 fork PR #66
+
+[#66](https://github.com/haohaomin/cursor-byok/pull/66) 已合入 main（`568999b`），最终 head `8d9cec7`；修复当前 Cursor 新子代理通知拒绝、record-only 误唤醒、消息去重与批次顺序，并保留用户操作所有权。25 项通知、671 项工作区回归、Clippy 和最终跨平台 CI 通过。v1.2.14 已发布，20 项资产、7 份签名和三个更新清单核验通过；Intel Mac 首次 npm 下载超时，失败任务重试后通过。Codex 首版无 findings，最终小修订经独立静态复核；Sourcery 配额跳过。完整 #244 及真实 Cursor 仍未验收。[记录](history/issues/2026-11-27-issue244-notifications-fix.md)。
+
 ## 2026-11-27 本 fork PR #65
 
 [#65](https://github.com/haohaomin/cursor-byok/pull/65) 已合入 main：补齐目标工具、状态保存和客户端续跑动作，处理暂停/恢复/清除、并发与延迟通知。最终 head `2229484`、合并 `c7e532e`；664 项工作区回归、Clippy、最终 PR 与主线跨平台 CI 通过，v1.2.13 已发布并完成 20 项资产、7 份签名及三个更新清单核验。Codex 初审的旧计数覆盖问题已复现并补齐；Sourcery 因额度跳过。真实 Cursor/供应商尚未验收，Issue #327 保持部分完成。[完整记录](history/issues/2026-11-27-issue327-goal-mode.md)。

@@ -104,5 +104,60 @@
     "reason": "user-driven reparented / needs-attention updates must not take over or notify the user from the parent",
     "log_sha256": "035b569bd24da0d06bdb4309af5b38b36f84f24df250886983aa3dbd7f90ab01",
     "result": "1 failed before expanding the context rule; revised 25-test notification suite passed"
+  },
+  "integration": {
+    "pr": "https://github.com/haohaomin/cursor-byok/pull/66",
+    "tested_head": "8d9cec7a0e873256cec478ae2af18daef07a34c0",
+    "merge_commit": "568999bd2c6c6512e52b41d10da26ae2609d9441",
+    "merged_at": "2026-11-27T14:08:11Z",
+    "merge_tree_matches_tested_head": true,
+    "pr_ci": {
+      "id": 46011504848,
+      "conclusion": "success"
+    },
+    "branch_ci": {
+      "id": 46011496673,
+      "conclusion": "success"
+    },
+    "main_ci": {
+      "id": 46013181417,
+      "conclusion": "success"
+    },
+    "reviews": {
+      "codex": {
+        "head": "b833e0e323f5dc577dc87e3040e077d833340280",
+        "completed": true,
+        "findings": false
+      },
+      "final_delta_independent_review": {
+        "head": "8d9cec7a0e873256cec478ae2af18daef07a34c0",
+        "blocking_findings": false,
+        "scope": "Production one-line user ownership condition and expanded reason coverage; checked native ACe 3088185 / ICe 3088102."
+      },
+      "sourcery": "SKIPPED: weekly quota exhausted; not counted as a pass"
+    },
+    "temporary_branch_cleanup": "codex/worker-notifications deleted locally and remotely after merge"
+  },
+  "release_attempt_1": {
+    "run_id": 46014606958,
+    "version": "1.2.14",
+    "release_commit": "c3c3cd2a5eaabcfbe150fb00783a3a513ad38fa7",
+    "failed_job": 140558511791,
+    "failed_step": "Install frontend dependencies (npm ci)",
+    "error": "npm network read ETIMEDOUT; exit 196",
+    "log_sha256": "8c2eeefea2eaa484f9be733fb9746bd69e960e5bd220b98fc795dea27d95ccd6",
+    "status": "failed; three platform builds succeeded, final publication skipped; draft retained"
+  },
+  "release_retry": {
+    "run_id": 46014606958,
+    "attempt": 2,
+    "kind": "rerun failed jobs only",
+    "reason": "confirmed transient npm dependency download ETIMEDOUT on Intel macOS",
+    "same_tag": true,
+    "same_release_commit": true,
+    "prior_public_latest": "v1.2.13",
+    "status": "success",
+    "published_at": "2026-11-27T14:41:20Z",
+    "evidence": "../2026-11-27-v1.2.14-release-evidence.json"
   }
 }

@@ -44,10 +44,12 @@ Cursor BackgroundTaskCompletionAction
 
 七项定向回归覆盖四类通知、完成后的独立投递、重复正文/时间、重试/重建去重、record-only、混合重组批次、客户端消息顺序、用户所有权与父 Run 活跃时投递。测试比较模型请求的结构前缀与提示稳定性，而非仅检查是否返回成功。
 
-最终通知整套 **25 通过**；工作区 **671 通过、0 失败、14 忽略**；Clippy `--workspace --all-targets -- -D warnings`、格式和 diff 检查通过。候选已完成本地验证，等待 PR/主线 CI 与合入发布。所有测试使用临时数据库与 FakeProvider，没有操作正式代理、Cursor 安装文件或用户会话。
+最终通知整套 **25 通过**；工作区 **671 通过、0 失败、14 忽略**；Clippy `--workspace --all-targets -- -D warnings`、格式和 diff 检查通过。[PR #66](https://github.com/haohaomin/cursor-byok/pull/66) 已合入 main（`568999b`），与测试提交 `8d9cec7` 的文件树完全一致；最终分支、PR 与主线跨平台 CI 全部通过。[v1.2.14](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.14) 已发布为 Latest，20 项资产、7 份签名及三个更新清单实际下载核验通过。Intel Mac 首次 npm 下载超时，失败任务重试后通过；标签及源码未改动。见 [发布证据](../2026-11-27-v1.2.14-release-evidence.json)。所有测试使用临时数据库与 FakeProvider，没有操作正式代理、Cursor 安装文件或用户会话。
 
 剩余边界：
 
 - 这是通知接收与模型投递修复；不新增 SendToAgent、现代 Await、项目协调器或 Agent Store 功能。
 - `record_only` 本轮只落实“不唤醒模型”的语义；原生 `recordSubagentRunCompletion`、`subagent_state` 指针和 Shell/语音状态同步不在本补丁中，不能称为完整原生状态同步支持。
 - 新通知在真实 Cursor 的生成、网络投递、原生卡片与真实供应商行为仍待验收；已有 #155 完成一半的结论不变，不测 20 分钟任务。
+
+审查：Codex 对首版 `b833e0e` 无 findings；最终用户所有权的一行修订及扩展回归由独立静态审查确认符合原生 `ACe` 优先级。Sourcery 因周配额跳过，不计为通过。

@@ -598,3 +598,22 @@
 - 未安装新包到用户机器。真实 Cursor 自动通知、原生目标界面与真实供应商仍待验收，Issue #327 保持部分完成；#155 范围不变，不做 20 分钟验收。
 
 [修复与审查记录](issues/2026-11-27-issue327-goal-mode.md)；[结构化发布证据](2026-11-27-v1.2.13-release-evidence.json)。
+
+
+<a id="v1214"></a>
+
+## v1.2.14 发布验证记录
+
+来源日期：2026-11-27。[PR #66](https://github.com/haohaomin/cursor-byok/pull/66) 修复新版 Cursor 的子代理消息、等待用户、转交及项目消息通知接收，区分完成与消息，保留用户操作所有权，并补齐去重、批次顺序及 record-only 不唤醒。
+
+- 最终测试 head：`8d9cec7a0e873256cec478ae2af18daef07a34c0`；合并：`568999bd2c6c6512e52b41d10da26ae2609d9441`，文件树一致。
+- [最终 PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/46011504848)、[主线 CI](https://github.com/haohaomin/cursor-byok/actions/runs/46013181417) 全部通过。
+- [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/46014606958) 首次 Intel Mac 在 npm 依赖下载遇到 ETIMEDOUT，未进入应用编译；其他三个平台成功。仅重跑失败任务后第二次全部成功，没有移动标签或更改源码。
+- 发布提交 `c3c3cd2a5eaabcfbe150fb00783a3a513ad38fa7` 仅更新五处版本文件为 1.2.14，标签指向该主线提交。
+- [v1.2.14](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.14) 已公开为 Latest，draft=false、prerelease=false；中文修复说明已写入并读回确认，保留自动变更列表。
+- OCI 临时环境实际下载 20 项资产，GitHub 大小及 SHA-256 一致；沿用现有 updater 公钥，7 份 Minisign 签名全部有效。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、标签 URL、签名及旧版校验和/大小一致。
+- 25 项通知回归、671 项工作区测试通过，0 失败、14 忽略；Clippy 与格式通过。Codex 首版无 findings；最终两行源码/回归调整经独立静态复核；Sourcery 周额度跳过。
+- 未安装新包到用户机器；真实 Cursor 自动通知、原生卡片和真实供应商仍待验收。现代 Await、完整 Projects 与 Agent Store/原生通知状态同步未完成，#244 保持部分完成；#155 范围不变，不做 20 分钟验收。
+
+[修复与边界](issues/2026-11-27-issue244-notifications-fix.md)；[结构化发布证据](2026-11-27-v1.2.14-release-evidence.json)。
