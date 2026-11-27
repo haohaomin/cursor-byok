@@ -57,4 +57,8 @@ AgentRunRequest.subagent_type_name          # 选中的角色名称
 
 ## PR 审查补充
 
-[本 fork PR #64](https://github.com/haohaomin/cursor-byok/pull/64)，初版 head `49fffc6780fdccdba9bc6d06555d53eb10d0e640`。Codex 指出清空角色时仅省略正文不能撤销历史中的旧指令；新增断言在初版失败，现已补充明确的启用/未启用状态，覆盖三种清除方式。最终回归、合并与发布待补齐。Sourcery 因每周额度用完跳过，没有记为审查通过。
+[本 fork PR #64](https://github.com/haohaomin/cursor-byok/pull/64)，初版 head `49fffc6780fdccdba9bc6d06555d53eb10d0e640`。Codex 指出清空角色时仅省略正文不能撤销历史中的旧指令；新增断言在初版失败，现已补充明确的启用/未启用状态，覆盖三种清除方式，对应审查线程已解决。Sourcery 因每周额度用完跳过，没有记为审查通过；不将初版 Codex 审查描述为最终补丁的独立复审。
+
+最终 head `ce5d9e41701db6a51b0aac878c01e03a18cc2c68`：工作区 **650 通过、0 失败、14 忽略**，Clippy 与格式检查通过；[PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45984797911) 和 [分支 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45984789724) 四组检查均成功。2026-11-27 已合入 main，合并提交 `d84223518ffbbf49e7deeb55e22952bc8207e082` 与测试 head 文件树一致。临时分支已清理；已随 v1.2.12 发布并完成全部资产、签名和更新清单核验。
+
+[主线 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45986011706) 与 [发布流程](https://github.com/haohaomin/cursor-byok/actions/runs/45987451810) 成功。发布提交 `3972b49b1431293f075030c0e787239be3f50d89` 仅更新五处版本文件；[v1.2.12](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.12) 为公开 Latest，中文说明已补齐。实际下载的 20 项资产、7 个签名和 3 份更新清单核验通过；[结构化证据](../2026-11-27-v1.2.12-release-evidence.json)已存档，临时下载和传输目录已清理。未安装新包，也未扩大真实客户端验收结论。

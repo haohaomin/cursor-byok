@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-27 本 fork PR #64
+
+[#64](https://github.com/haohaomin/cursor-byok/pull/64) 已合入 main：选中自定义子代理的角色正文投影，角色清除时明确撤销旧指令。最终 head `ce5d9e4`、合并 `d842235`；650 项工作区回归、Clippy 和跨平台 CI 通过，已随 v1.2.12 发布并完成全部资产、签名和更新清单核验。Codex 初审意见已补齐；Sourcery 因额度跳过。真实 Cursor/模型与 #251 的提示词编辑面板仍待处理。[完整记录](history/issues/2026-11-27-issue251-custom-subagent-role.md)。
+
 ## 2026-11-27 本 fork PR #63
 
 [#63](https://github.com/haohaomin/cursor-byok/pull/63) 已合入 main 并随 v1.2.11 发布：限制 Cursor 请求体和 HTTP 解压大小，保留探针及流式传输。最终 head `60dbe97`、合并 `845a3ac`；645 项回归、Clippy、跨平台 CI、发布资产及签名核验通过。初版审查的两个建议已补齐，最终 Sourcery 复审跳过；真实 Cursor 超限 UI 待验收。[完整记录](history/issues/2026-11-27-cursor-request-body-limit.md)。

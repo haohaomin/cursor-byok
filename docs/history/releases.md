@@ -562,3 +562,21 @@
 [修复与审查记录](issues/2026-11-27-cursor-request-body-limit.md)；[结构化发布证据](2026-11-27-v1.2.11-release-evidence.json)。
 
 核验证据已取回仓库；OCI 下载/构建目录和本机 SSH 传输暂存目录已清理，已合并的修复分支已删除。
+
+<a id="v1212"></a>
+
+## v1.2.12 发布验证记录
+
+来源日期：2026-11-27。经 [PR #64](https://github.com/haohaomin/cursor-byok/pull/64) 修复选中自定义子代理的角色正文未传给模型；更新角色时追加上下文，清空提示、删除定义或取消选择时明确停用旧指令。
+
+- 最终测试 head：`ce5d9e41701db6a51b0aac878c01e03a18cc2c68`；合并：`d84223518ffbbf49e7deeb55e22952bc8207e082`，树内容一致。
+- [主线 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45986011706) 与 [自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45987451810) 全部成功，包含四个平台和最终发布。
+- 发布提交：`3972b49b1431293f075030c0e787239be3f50d89`，仅更新五处版本文件，均为 1.2.12；标签指向该主线提交。
+- [v1.2.12](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.12) 已公开为 Latest，draft=false、prerelease=false；中文发布说明已补齐并读回核对，原作者和自动变更列表保留。
+- OCI 临时目录实际下载全部 20 项资产，大小及 GitHub SHA-256 一致；7 份 Minisign 签名使用未变更的 updater 公钥验证通过。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、标签 URL、签名及旧版大小/校验和一致。
+- 最终工作区 650 通过、0 失败、14 忽略；Clippy、格式及跨平台 CI 通过。五项新增行为测试覆盖角色隔离、更新、重试、清除、blob、检查点恢复和自动压缩。
+- Codex 初审的清空角色意见已补齐；Sourcery 额度耗尽而跳过。真实 Cursor/模型角色执行仍待验收，#251 的提示词编辑面板未实现，整个 Issue 保持部分完成。
+- 未安装到用户机器；验收证据已取回，OCI 下载/构建目录、本机传输暂存目录和已合并分支均已清理。
+
+[修复与审查记录](issues/2026-11-27-issue251-custom-subagent-role.md)；[结构化发布证据](2026-11-27-v1.2.12-release-evidence.json)。
