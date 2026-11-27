@@ -543,3 +543,22 @@
 - 未安装新包；真实 Cursor/原 GLM 网关仍待验收，#155 状态未扩大，不做 20 分钟验收。
 
 [修复记录](pull-requests/2026-11-27-pr61-compaction-output-cap.md)；[结构化资产、签名与清单证据](2026-11-27-v1.2.10-release-evidence.json)。
+
+<a id="v1211"></a>
+
+## v1.2.11 发布验证记录
+
+来源日期：2026-11-27。经 [PR #63](https://github.com/haohaomin/cursor-byok/pull/63) 限制 Cursor 请求体及 HTTP 解压膨胀，压缩前后各限 64 MiB；保留健康探针立即响应和 Tab/文件上传流式转发。
+
+- 最终测试 head：`60dbe97756cf7a3ca8ae71c7bee3de84e7f4fbe2`；合并：`845a3ac18be7a27e4a67b815c7d8d10a89dce50d`，树内容一致。
+- [main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45976277134) 全部成功；[自动发布](https://github.com/haohaomin/cursor-byok/actions/runs/45977506023) 四平台及最终发布成功。
+- 发布提交：`e43a39a6ae9fd61b001dc0e15ec42028dbd658e6`，仅更新五处版本号，均为 1.2.11；标签与 main 发布提交一致。
+- [v1.2.11](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.11) 已公开为 Latest，draft=false、prerelease=false，中文发布说明已补齐。
+- OCI 临时目录实际下载全部 20 项资产，大小与 GitHub SHA-256 一致；7 份 Minisign 签名使用未变更的 updater 公钥验证通过。
+- `latest.json`、`portable-latest.json`、`update.json` 的版本、平台、标签 URL、签名与旧版大小/校验和一致。
+- 本地工作区 645 通过、0 失败、14 忽略；Clippy、格式、最终跨平台 CI 通过。新增十项回归，包含大历史/PNG 到达模型和本地上游双向流式传输。
+- 未安装到用户机器；真实 Cursor 超限 UI 尚未验收，#155 状态不变，不做 20 分钟验收。
+
+[修复与审查记录](issues/2026-11-27-cursor-request-body-limit.md)；[结构化发布证据](2026-11-27-v1.2.11-release-evidence.json)。
+
+核验证据已取回仓库；OCI 下载/构建目录和本机 SSH 传输暂存目录已清理，已合并的修复分支已删除。

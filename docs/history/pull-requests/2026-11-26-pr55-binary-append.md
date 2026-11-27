@@ -44,3 +44,7 @@ Sourcery 检查通过，但提出了两项意见，逐项判断如下：
 ## 发布
 
 修复已随 [v1.2.8](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.8) 发布。主线 CI、四平台发布、20 项资产哈希/大小、7 个签名和三个更新清单均通过，[发布核验](../releases.md#v128)。本轮未安装新包到用户机器。
+
+## 后续：HTTP 大请求上限
+
+2026-11-27，本报告独立记录的共用读取/解压入口缺口已通过 [PR #63](https://github.com/haohaomin/cursor-byok/pull/63) 修复并随 v1.2.11 发布，覆盖大小边界、大历史和 PNG、探针以及流式转发；见 [复现与验证](../issues/2026-11-27-cursor-request-body-limit.md)。原 #54 的真实 Cursor UI 验收边界仍保留。

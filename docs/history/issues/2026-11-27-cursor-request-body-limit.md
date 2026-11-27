@@ -1,6 +1,6 @@
 # Cursor HTTP 请求体与解压大小限制
 
-状态：PR #63 候选修复；初版 643 项工作区回归通过，审查后补齐无正文探针分组和真实流式上游测试，最终回归进行中。
+状态：PR #63 已合入 main；最终工作区 645 项回归、Clippy 和跨平台 CI 通过，v1.2.11 已发布并完成资产、签名和更新清单核验。真实 Cursor 超限 UI 尚未验收。
 
 ## 来源与复现
 
@@ -17,7 +17,7 @@ Cursor 路由关闭了 Axum 默认限制，处理函数使用 `to_bytes(body, us
 | 小于 1 MiB 的 gzip 解压为 64 MiB + 1 | 全量解压后 protobuf 解析失败，HTTP 400 | 在解析前拒绝 |
 | 普通 body 为 64 MiB / 64 MiB + 1 | 初轮探针测试均返回 200，未存在读取上限 | 最终边界测试改在消费正文的 Bidi 入口执行；前者到达 protobuf 解析层，后者返回大小错误 |
 
-同期两项控制测试通过：原有压缩错误分类与 Tab/未知路径流式分派。测试使用临时 SQLite 与受控输入，没有向生产服务发送大请求。
+同期两项控制测试通过：原有压缩错误分类与 Tab/未知路径流式分派。测试使用临时 SQLite，大小载荷在进程内 router 验证，不调用真实模型；流式测试显式选择本地上游。
 
 ## 执行路径与范围
 
@@ -58,8 +58,9 @@ server/
 - 新增大内容回归：1 项通过，内部覆盖四组二进制/十六进制、bare/Connect envelope、identity/gzip 组合。真实编码的 PNG 大于 3 MiB，历史文字大于 4 MiB；历史通过有效 checkpoint Blob 恢复，模型输入逐字节比较，没有截断、丢图或重复调用。
 - 原 `connect_wire`：7 项通过，包括二进制 gzip 请求、KV 确认和完整 checkpoint 输出。
 - 大内容测试使用 fake provider，并显式给测试模型足够上下文，避免把 HTTP 大小验收与模型 token 限制混淆；它不代表真实供应商接受如此长的上下文。
-- 初版全量工作区 `cargo test --locked --workspace --all-targets`：643 通过、0 失败、14 忽略（原有 Deno/模型环境测试）；`cargo clippy --locked --workspace --all-targets -- -D warnings`、格式和差异检查通过。macOS 构建继续使用本机既有 SQLx 宏动态库参数，未改变仓库配置。
-- 初版 `6624f53` 已完成跨平台 CI；Codex 代码审查未发现问题。Sourcery 的两个建议已处理，最终 CI 待记录。
+- 最终提交 `60dbe97` 的全量工作区 `cargo test --locked --workspace --all-targets`：645 通过、0 失败、14 忽略（原有 Deno/模型环境测试）；`cargo clippy --locked --workspace --all-targets -- -D warnings`、格式和差异检查通过。macOS 构建继续使用本机既有 SQLx 宏动态库参数，未改变仓库配置。
+- 最终提交的 [PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45975007662)、[分支 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45974998200) 及 [main CI](https://github.com/haohaomin/cursor-byok/actions/runs/45976277134) 均成功。
+- Codex 代码审查覆盖初版 `6624f53`，没有发现问题；Sourcery 初版提出的两个建议已处理并以新回归验证。最终提交的 Sourcery 复审被跳过，不记作复审通过。
 
 真实 Cursor 对超限错误的 UI 呈现尚未验收；本轮不扩大 #155 的验收范围，不测试 20 分钟任务。透明流式转发、上游响应大小与并发总内存不属于这个已确认入口缺口的修复范围。
 
@@ -71,4 +72,8 @@ server/
 
 ## 合入与发布
 
-待记录。
+- [PR #63](https://github.com/haohaomin/cursor-byok/pull/63) 于 2026-11-27 合并；最终测试 head `60dbe97756cf7a3ca8ae71c7bee3de84e7f4fbe2`，合并提交 `845a3ac18be7a27e4a67b815c7d8d10a89dce50d`，两者树内容一致。
+- 主线 CI 已通过；[自动发布流程](https://github.com/haohaomin/cursor-byok/actions/runs/45977506023) 已创建 `v1.2.11` 标签，指向 `e43a39a6ae9fd61b001dc0e15ec42028dbd658e6`。该提交仅更新五处版本号，四个平台及最终发布均成功；[v1.2.11](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.11) 已公开为 Latest，draft=false、prerelease=false。
+- 已合并的本地和远端 `codex/cursor-request-body-limit` 分支已删除。
+
+- 发布后实际下载 20 项资产，大小/SHA-256 全部匹配；7 份签名使用未变更的公钥验证有效，三个更新清单的版本、平台集合、URL、签名及旧版哈希/大小全部正确。[结构化证据](../2026-11-27-v1.2.11-release-evidence.json)。中文发布说明已补齐，未安装新包到用户机器。

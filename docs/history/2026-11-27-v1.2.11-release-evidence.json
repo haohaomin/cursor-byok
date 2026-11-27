@@ -1,0 +1,183 @@
+{
+  "version": "1.2.11",
+  "repository": "haohaomin/cursor-byok",
+  "release_url": "https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.11",
+  "release_commit": "e43a39a6ae9fd61b001dc0e15ec42028dbd658e6",
+  "source_commit": "845a3ac18be7a27e4a67b815c7d8d10a89dce50d",
+  "release_run": "https://github.com/haohaomin/cursor-byok/actions/runs/45977506023",
+  "ci_run": "https://github.com/haohaomin/cursor-byok/actions/runs/45976277134",
+  "published_at": "2026-11-27T10:10:42Z",
+  "verified_at": "2026-11-27T10:13:38+00:00",
+  "draft": false,
+  "prerelease": false,
+  "latest": true,
+  "updater_public_key_sha256": "a4e4479f2f264e2aa24e384b67e9adb0b57efa5225f1f76cad0be0249a28ce15",
+  "signature_verifier": "minisign-verify 0.2.5 (Rust crate locked in Cargo.lock)",
+  "assets": [
+    {
+      "name": "cursor-byok-1.2.11-linux-amd64.tar.gz",
+      "size": 31406354,
+      "sha256": "73634c946e4fe992faa5862689f99640c97f732a6f64c9f100cae98eeb0dbda7",
+      "github_digest_verified": true
+    },
+    {
+      "name": "cursor-byok-1.2.11-macos-amd64.tar.gz",
+      "size": 30180709,
+      "sha256": "1409da6bf2a7620e1796df9a48f0b996219f1b71da11bedc9c34a41e3e567321",
+      "github_digest_verified": true
+    },
+    {
+      "name": "cursor-byok-1.2.11-macos-arm64.tar.gz",
+      "size": 29189043,
+      "sha256": "c9762b9c29a9109d6f28a40f80a0fb120884dd614f608be621b8158a77150d1e",
+      "github_digest_verified": true
+    },
+    {
+      "name": "cursor-byok-1.2.11-windows-amd64.zip",
+      "size": 28198140,
+      "sha256": "6306359d7c48c0d80f164ecb6d82c333a47ea2e5a0d6cdb7d7b990dcf4e411d0",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "cursor-byok-1.2.11-windows-amd64.zip.sig",
+      "size": 428,
+      "sha256": "f985e9685f253fe842ed7012f7f4a2ffde43a9ae80b9e6074c4914615ee26490",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK-1.2.11-1.x86_64.rpm",
+      "size": 31948586,
+      "sha256": "b20e8f3c708e7fe3fa02ee4eae1e9f3aa63acb2269712e8e6c49d80ee73eda7f",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK-1.2.11-1.x86_64.rpm.sig",
+      "size": 424,
+      "sha256": "5fe9f3b29837af7a31fa433d183e1981ac707466d6e95c9f8df3860c5b0547bd",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_aarch64.app.tar.gz",
+      "size": 29189043,
+      "sha256": "c9762b9c29a9109d6f28a40f80a0fb120884dd614f608be621b8158a77150d1e",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_aarch64.app.tar.gz.sig",
+      "size": 412,
+      "sha256": "a0d4b0d56294e2145e6425039a955ad84a50f7d748dffa2c8a4cc22ad51359d9",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_amd64.AppImage",
+      "size": 109660664,
+      "sha256": "eaa6e8d2c8541f4a1adcb58e9fa074065b37b5b1130d4ee648cb8d46be12d651",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_amd64.AppImage.sig",
+      "size": 424,
+      "sha256": "f21ebd5d31d4a81950e89b25b19b23ed531c5978af18df0b484a063cda5b21ed",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_amd64.deb",
+      "size": 31950056,
+      "sha256": "7ca4e1fce11266d6ecffbe0f792f4481b1c9e1357218a0b10509e7f72dca1094",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_amd64.deb.sig",
+      "size": 420,
+      "sha256": "a9037e9e7df8624cf8337b4797e8427ad7b53ce7591daf953f1590aacdfa7f02",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_x64-setup.exe",
+      "size": 21330520,
+      "sha256": "23d7162d703d4505a646dccb9f5219002774d6e30bc4a90a507c7b617899fa11",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_x64-setup.exe.sig",
+      "size": 424,
+      "sha256": "f5771eb5d8eafb28fa4ff3ea111292ca18f2222331bb619576aa96d627c26e2e",
+      "github_digest_verified": true
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_x64.app.tar.gz",
+      "size": 30180709,
+      "sha256": "1409da6bf2a7620e1796df9a48f0b996219f1b71da11bedc9c34a41e3e567321",
+      "github_digest_verified": true,
+      "signature": "valid"
+    },
+    {
+      "name": "Cursor.BYOK_1.2.11_x64.app.tar.gz.sig",
+      "size": 412,
+      "sha256": "5024702d75a04569d8bb02e6719656137af874623201d0ae497fe775bbf1b782",
+      "github_digest_verified": true
+    },
+    {
+      "name": "latest.json",
+      "size": 6074,
+      "sha256": "c6992866cd4c4afdb7246e56b5f0a4f1b9c1fc7cea29615bfd2014b3c48c9e77",
+      "github_digest_verified": true
+    },
+    {
+      "name": "portable-latest.json",
+      "size": 724,
+      "sha256": "1b1015551ce4bdb8eff4374b65e68a1b897d7edc473b2d54c0868e457e60292f",
+      "github_digest_verified": true
+    },
+    {
+      "name": "update.json",
+      "size": 1218,
+      "sha256": "47dc60f6f9e7c1beede42b695fe3be513efdd652ff90a35c3c43f69bd9391873",
+      "github_digest_verified": true
+    }
+  ],
+  "manifests": {
+    "latest.json": {
+      "version": "1.2.11",
+      "platforms": [
+        "darwin-aarch64",
+        "darwin-aarch64-app",
+        "darwin-x86_64",
+        "darwin-x86_64-app",
+        "linux-x86_64",
+        "linux-x86_64-appimage",
+        "linux-x86_64-deb",
+        "linux-x86_64-rpm",
+        "windows-x86_64",
+        "windows-x86_64-nsis"
+      ],
+      "all_urls_point_to_tag": true
+    },
+    "portable-latest.json": {
+      "version": "1.2.11",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "all_urls_point_to_tag": true
+    },
+    "update.json": {
+      "version": "1.2.11",
+      "platforms": [
+        "linux-amd64",
+        "macos-amd64",
+        "macos-arm64",
+        "windows-amd64"
+      ],
+      "all_urls_point_to_tag": true,
+      "checksums_and_sizes_match": true
+    }
+  },
+  "verification": "Downloaded all 20 assets; checked GitHub sizes/digests; verified all seven signatures with the unchanged updater public key; checked all three manifest versions, platform sets, tag URLs, signature strings and legacy checksums/sizes. No package was installed.",
+  "verification_host": "Oracle Linux 9.8 ARM64 via SSH"
+}

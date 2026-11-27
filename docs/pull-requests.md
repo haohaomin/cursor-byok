@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-27 本 fork PR #63
+
+[#63](https://github.com/haohaomin/cursor-byok/pull/63) 已合入 main 并随 v1.2.11 发布：限制 Cursor 请求体和 HTTP 解压大小，保留探针及流式传输。最终 head `60dbe97`、合并 `845a3ac`；645 项回归、Clippy、跨平台 CI、发布资产及签名核验通过。初版审查的两个建议已补齐，最终 Sourcery 复审跳过；真实 Cursor 超限 UI 待验收。[完整记录](history/issues/2026-11-27-cursor-request-body-limit.md)。
+
 ## 2026-11-27 本 fork PR #61
 
 [#61](https://github.com/haohaomin/cursor-byok/pull/61)，head `f41c4966ff71215a6ebe502412504f32c160b99c`：摘要输出上限可配置，截断时有限重试。经 [PR #62](https://github.com/haohaomin/cursor-byok/pull/62) 合入 main，原 #61 已标记合并。补齐模型上限、输入预算、跨批次重试、并发设置和 UI 保存问题；635 项回归及最终跨平台 CI 通过，v1.2.10 已发布核验；详见 [验证记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md)。真实 Cursor/原网关未验收。

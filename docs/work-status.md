@@ -1,10 +1,10 @@
 # 工作状态
 
-更新：2026-11-27；v1.2.10 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
+更新：2026-11-27；v1.2.11 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
 **2026-11-13 进展：**#150/#417 的逐模型 Token 定价已通过 [PR #39](https://github.com/haohaomin/cursor-byok/pull/39) 合入 `main`（合并提交 `e53e97e`）；原 #35 是合入已先落地的 #34 分支，未直接进入主线，已由 #39 在当前主线基线上重新集成。设置页按 `model_hash` 保存输入、输出、缓存读取和缓存写入单价；首页总计与按模型明细按覆盖价计算，未配置覆盖时使用全局价格。当前主线联合回归为 293 个服务端单测通过、0 失败、14 忽略，桌面检查、Clippy 和生产构建通过。插件模型暂使用全局价格，真实供应商和发布版本仍待验收，见 [定价验证记录](history/issues/2026-11-13-issue150-model-pricing.md)。
 
-**当前结论：2026-11-27 已将 PR #13、#43–#49、#52、#53、#57、#59、#60 和 #62 合入 main。最新公开版本为 v1.2.10，包含此前合并、PR #50 的 HTTP/2、PR #51 的自动压缩、PR #52 的 Todo、PR #53 的团队配置、PR #57 的 DeepSeek 跨协议 reasoning 及 PR #59 的二进制 BidiAppend 修复，以及 PR #60 的自动压缩时限设置和 PR #62 的摘要输出上限与有限重试。真实 OAuth 账号、Semble 批准/拒绝、DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收；Windows Cursor UI 的 CA 初始化与接管已通过。**
+**当前结论：2026-11-27 已将 PR #13、#43–#49、#52、#53、#57、#59、#60、#62 和 #63 合入 main。最新公开版本为 v1.2.11，包含此前合并、PR #50 的 HTTP/2、PR #51 的自动压缩、PR #52 的 Todo、PR #53 的团队配置、PR #57 的 DeepSeek 跨协议 reasoning 及 PR #59 的二进制 BidiAppend 修复，以及 PR #60 的自动压缩时限设置、PR #62 的摘要输出上限与有限重试、PR #63 的 HTTP 请求体和解压大小限制。真实 OAuth 账号、Semble 批准/拒绝、DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收；Windows Cursor UI 的 CA 初始化与接管已通过。**
 
 **2026-11-13 进展：**上游 PR #433 已按当前 Rust/Tauri 架构选择性重实现：非 Tab 的 Cursor host 请求进入本地路由，CONNECT 隧道保持原始 authority；硬编码云端 400/404 短路和 `custom-protocol` feature 未采用。定向代理测试、Clippy、桌面检查和工作区回归通过，真实代理网络与 Cursor UI 待验，见[验证记录](history/pull-requests/2026-11-13-pr433-proxy-routing.md)。**
 
@@ -34,9 +34,11 @@
 
 **2026-11-27 本 fork PR #61：**已通过 PR #62 合入 main，原 #61 标记合并；摘要输出设置、模型/上下文预算及每批有限重试已补齐。635 项回归、最终跨平台 CI 通过，v1.2.10 已发布并完成 20 项资产、7 份签名和三个更新清单核验。见 [验证记录](history/pull-requests/2026-11-27-pr61-compaction-output-cap.md)。
 
+**2026-11-27 HTTP 大请求限制：**经 PR #63 合入并随 v1.2.11 发布；压缩前后各限 64 MiB，健康检查立即返回，Tab/文件上传保持流式传输。最终 645 项回归、Clippy、跨平台 CI、20 项资产/7 份签名/三个更新清单核验通过，真实 Cursor 超限 UI 待验；[验证记录](history/issues/2026-11-27-cursor-request-body-limit.md)。
+
 ## 1. 已发布的成果
 
-v1.2.10 新增摘要输出上限及每批有限重试（[发布核验](history/releases.md#v1210)）；v1.2.9 新增自动压缩时限设置及本地管理接口边界（[发布核验](history/releases.md#v129)）；v1.2.8 新增二进制 BidiAppend 修复（[发布核验](history/releases.md#v128)）；v1.2.7 新增 DeepSeek 跨协议 reasoning 回放修复（[发布核验](history/releases.md#v127)）；v1.2.6 新增本地身份团队配置路由（[发布核验](history/releases.md#v126)）；v1.2.5 新增 Todo 完整列表与压缩恢复（[发布核验](history/releases.md#v125)）；v1.2.4 新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
+v1.2.11 新增 HTTP 请求体与解压大小限制（[发布核验](history/releases.md#v1211)）；v1.2.10 新增摘要输出上限及每批有限重试（[发布核验](history/releases.md#v1210)）；v1.2.9 新增自动压缩时限设置及本地管理接口边界（[发布核验](history/releases.md#v129)）；v1.2.8 新增二进制 BidiAppend 修复（[发布核验](history/releases.md#v128)）；v1.2.7 新增 DeepSeek 跨协议 reasoning 回放修复（[发布核验](history/releases.md#v127)）；v1.2.6 新增本地身份团队配置路由（[发布核验](history/releases.md#v126)）；v1.2.5 新增 Todo 完整列表与压缩恢复（[发布核验](history/releases.md#v125)）；v1.2.4 新增自动压缩修复（[发布核验](history/releases.md#v124)）；v1.2.3 新增 HTTP/2 代理修复（[发布核验](history/releases.md#v123)）；v1.2.1 已涵盖 v1.1.0 之后的模型备份、批量添加、逐模型定价、Windows 用户级 CA、上下文和终端修复，见 [发布与资产核验](history/releases.md#v121)。发布没有扩大真实账号、客户端审批等未完成场景的验收范围。
 
 | 工作 | 已完成部分 | 保留的边界 |
 | --- | --- | --- |
