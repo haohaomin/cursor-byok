@@ -165,3 +165,106 @@ async fn truncated_summary_retries_smaller_input_with_unknown_or_small_window() 
         assert!(!retained.contains("UNCOMMITTED_TRUNCATED_SUMMARY"));
     }
 }
+
+#[tokio::test]
+async fn successful_batch_restores_retries_for_a_later_truncated_batch() {
+    let (_directory, store) = fixtures::temp_store().await;
+    let model = store
+        .create_model(&windowed_model("later-retry", Some(100_000)))
+        .await
+        .unwrap();
+    let provider = fake_provider::FakeProvider::default();
+    let original = format!("COMPLETED_TASK {}", "0123456789".repeat(40_000));
+    provider.push(text_response(&original, 150_000, 100_000));
+    let mut truncated = text_response("UNCOMMITTED_TRUNCATION", 100, 16_384);
+    *truncated.last_mut().unwrap() = ModelEvent::Done(FinishReason::Length);
+    for _ in 0..3 {
+        provider.push(truncated.clone());
+    }
+    provider.push(text_response("FIRST_CONFIRMED_SUMMARY", 100, 20));
+    provider.push(truncated);
+    for _ in 0..128 {
+        provider.push(text_response("COMPLETE_DURABLE_SUMMARY", 100, 20));
+    }
+    let assets =
+        PromptAssets::load(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("prompt/cursor"))
+            .unwrap();
+    let registry = TransportRegistry::new(
+        store.clone(),
+        Arc::new(provider.clone()),
+        PromptCompiler::new(assets),
+    );
+    let first = run(
+        &registry,
+        "later-first",
+        user_request(
+            "later-cap-retry",
+            "u1",
+            "ORIGINAL_GOAL",
+            &model.model_hash,
+            None,
+        ),
+    )
+    .await;
+    let second = run(
+        &registry,
+        "later-second",
+        user_request(
+            "later-cap-retry",
+            "u2",
+            "CURRENT_REQUEST",
+            &model.model_hash,
+            first.checkpoints.last().cloned(),
+        ),
+    )
+    .await;
+    assert!(
+        matches!(second.end_stream, EndStream::Success {}),
+        "{:?}",
+        second.end_stream
+    );
+    assert_eq!(second.summary_completed, 1);
+    let requests = provider.requests();
+    let summaries = requests
+        .iter()
+        .filter(|request| request.prompt.tools.is_empty())
+        .collect::<Vec<_>>();
+    assert!(summaries.len() > 6);
+    for request in &summaries[4..=5] {
+        assert!(serde_json::to_string(&request.history)
+            .unwrap()
+            .contains("FIRST_CONFIRMED_SUMMARY"));
+    }
+    let mut restored = String::new();
+    for (index, request) in summaries.iter().enumerate() {
+        if [0, 1, 2, 4].contains(&index) {
+            continue;
+        }
+        for message in &request.history {
+            if !message.message_id.starts_with("compaction:transcript:") {
+                continue;
+            }
+            let ProjectedContent::Parts(parts) = &message.content else {
+                panic!("transcript parts")
+            };
+            if matches!(&parts[0], ContentPart::Text { text } if text.starts_with("Historical message Assistant"))
+            {
+                for part in &parts[1..] {
+                    if let ContentPart::Text { text } = part {
+                        restored.push_str(text);
+                    }
+                }
+            }
+        }
+    }
+    assert_eq!(restored, original);
+    let retained = serde_json::to_string(
+        &store
+            .load_current_messages(&ConversationId::new("later-cap-retry"))
+            .await
+            .unwrap(),
+    )
+    .unwrap();
+    assert!(retained.contains("COMPLETE_DURABLE_SUMMARY") && retained.contains("CURRENT_REQUEST"));
+    assert!(!retained.contains("UNCOMMITTED_TRUNCATION"));
+}

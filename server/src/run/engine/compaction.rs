@@ -215,6 +215,7 @@ impl RunEngine {
                     && !cycle.text.trim().is_empty()
                 {
                     summary = cycle.text.trim().to_string();
+                    batch_retries = 0;
                     continue;
                 }
             }

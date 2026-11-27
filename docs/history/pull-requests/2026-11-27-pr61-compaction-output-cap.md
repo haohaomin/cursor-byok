@@ -8,7 +8,7 @@
 
 自动压缩此前固定给摘要 4096 个输出 token。摘要或供应商隐藏思考耗尽额度时，摘要失败且原历史保留，下一轮可能再次遇到相同问题。现在可在设置页设为 1024–65536，默认 16384；压缩调用还会取配置的模型输出上限与可用上下文约束后的较小值。因此设置 16384 不保证每次请求都使用 16384。
 
-输出截断或供应商拒绝上下文过大时，缩小实际历史片段重试。整个自动压缩过程最多三次此类重试；缩小后的限额用于后续批次。摘要只在所有片段成功、重建上下文验证通过后替换历史；拒绝、超时、取消、空摘要或重试耗尽时，不把部分摘要写入正式历史。普通模型回复和手动压缩的重试规则不在本项范围内。
+输出截断或供应商拒绝上下文过大时，缩小实际历史片段重试。每批最多三次此类重试，成功一批后恢复该批次的重试额度；缩小后的输入限额用于后续批次。摘要只在所有片段成功、重建上下文验证通过后替换历史；拒绝、超时、取消、空摘要或重试耗尽时，不把部分摘要写入正式历史。普通模型回复和手动压缩的重试规则不在本项范围内。
 
 ```text
 apps/desktop/src/features/settings/CompactionSettingsCard.tsx  # 两项数值与保存期间禁用
@@ -18,7 +18,7 @@ server/src/control/                                          # 本地管理接�
                      ↓
 server/src/store/settings/compaction.rs                       # 独立设置行、事务、读写范围约束
                      ↓ 每次自动压缩开始时读取一次
-server/src/run/engine/compaction.rs                           # 单次压缩生命周期、最多三次重试
+server/src/run/engine/compaction.rs                           # 单次压缩生命周期、每批最多三次重试
                      ↓
 server/src/run/compaction/batches.rs                          # 提示/摘要/输出预留，按顺序切分历史
                      ↓ provider 返回 Stop 且完整
@@ -54,6 +54,12 @@ server/src/run/engine/compaction.rs                           # 重建检查点�
 - macOS Tauri debug/no-bundle 构建与工作区 Clippy 通过，使用本机既有 SQLx 动态库参数 `--config 'profile.dev.package.sqlx-macros.strip="none"'`，未修改发布构建配置。
 - 首次全量测试发现工具轮次夹具仍假定单批摘要；按新默认预留改为两批后，定向用例通过，验证同一个 Run 可在更多工具输出后再次完成自动压缩。
 
-最终 `cargo test --locked --workspace --all-targets`：634 通过、0 失败、14 忽略；同一工作区的 Clippy 与格式检查通过。忽略项需要外部环境，不视为验收。跨平台 CI 与合并发布结果在完成后补充。
+首轮 `cargo test --locked --workspace --all-targets`：634 通过、0 失败、14 忽略；同一工作区的 Clippy 与格式检查通过。忽略项需要外部环境，不视为验收。跨平台 CI 与合并发布结果在完成后补充。
 
 这些是确定性 provider、数据库和演示 UI 验证，不是原作者 GLM 网关或真实 Cursor 长会话验收；本轮不运行 20 分钟任务，不改变 #155 的部分完成状态。
+
+## 合并前云端审查
+
+集成 head `8e93cf2cc9e0090fda7c91fb2028b019d951b241` 的 [PR CI](https://github.com/haohaomin/cursor-byok/actions/runs/45963408881) 和 [分支 CI](https://github.com/haohaomin/cursor-byok/actions/runs/45963333377) 均通过。Sourcery 因额度用尽跳过，不记为通过。
+
+Codex 指出该版本把三次重试额度用于整个压缩过程：前一批第三次重试成功后，后续批次的首次截断就直接失败。该场景新增回归在修复前失败，修复后通过；将计数器在每批成功后归零，已经缩小的历史输入限额继续沿用，失败批次仍不能无限重试。验证完整 400K 字符答案在成功批次中逐字覆盖、已有摘要带入后续重试，截断内容不落库。最终提交与复验结果在完成后补充。
