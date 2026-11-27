@@ -159,6 +159,7 @@ export interface TabSettings {
 
 export interface CompactionSettings {
   auto_compaction_timeout_secs: number;
+  auto_compaction_output_tokens: number;
 }
 
 export interface DesktopSettings {

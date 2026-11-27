@@ -23,7 +23,6 @@ use crate::{
 /// there was room. A proportional reserve absorbs that drift and scales with
 /// the model: a 200K window keeps 20K free and a 1M window keeps 100K.
 const CONTEXT_RESERVE_DIVISOR: u64 = 10;
-pub(super) const OUTPUT_TOKENS: u64 = 4_096;
 pub(super) const INSTRUCTIONS: &str = "Summarize the conversation for the next model turn. Preserve goals, constraints, decisions, files, commands, errors, results, and unfinished work. Do not call tools. Return only the concise durable summary.";
 
 pub(super) fn instructions() -> crate::Result<String> {

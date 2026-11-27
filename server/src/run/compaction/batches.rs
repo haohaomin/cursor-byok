@@ -104,12 +104,13 @@ impl Batches {
         summary: &str,
         prompt: &PromptSpec,
         context_window: Option<u64>,
+        output_tokens: u64,
     ) -> Result<Option<Vec<ProjectedMessage>>, String> {
         if self.messages.is_empty() {
             return Ok(None);
         }
         let budget = super::context_budget(context_window.unwrap_or(DEFAULT_CONTEXT_WINDOW))
-            .saturating_sub(super::OUTPUT_TOKENS);
+            .saturating_sub(output_tokens);
         let mut history = Vec::new();
         if !summary.is_empty() {
             history.push(text_message(
@@ -246,6 +247,9 @@ mod tests {
     use super::*;
     use crate::model::{ToolCallContent, ToolResultContent};
 
+    /// Small output cap so the tiny test windows still leave room for input.
+    const TEST_OUTPUT_TOKENS: u64 = 1_024;
+
     #[test]
     fn bounded_batches_preserve_unicode_images_and_tool_transcript_in_order() {
         let text = "已完成任务🙂\n不要重跑\n".repeat(2_000);
@@ -302,7 +306,12 @@ mod tests {
         let mut tool_transcript = String::new();
         let mut count = 0;
         while let Some(batch) = batches
-            .next("PREVIOUS_PROGRESS", &prompt, Some(window))
+            .next(
+                "PREVIOUS_PROGRESS",
+                &prompt,
+                Some(window),
+                TEST_OUTPUT_TOKENS,
+            )
             .unwrap()
         {
             count += 1;
@@ -310,12 +319,11 @@ mod tests {
             let wire = serde_json::to_string(&batch).unwrap();
             assert!(!wire.contains("PRIVATE_REASONING_MUST_NOT_LEAK"));
             assert!(
-                wire.chars().filter(|ch| !ch.is_ascii()).count() as u64
-                    + super::super::OUTPUT_TOKENS
+                wire.chars().filter(|ch| !ch.is_ascii()).count() as u64 + TEST_OUTPUT_TOKENS
                     <= super::super::context_budget(window)
             );
             assert!(
-                estimate_context_tokens(&prompt, &batch) + super::super::OUTPUT_TOKENS
+                estimate_context_tokens(&prompt, &batch) + TEST_OUTPUT_TOKENS
                     <= super::super::context_budget(window)
             );
             assert!(batch.iter().all(|message| message.role == Role::User));
@@ -357,13 +365,26 @@ mod tests {
             tools: Vec::new(),
         };
         let mut batches = Batches::new(vec![original], false).unwrap();
-        assert!(batches.next("", &prompt, Some(4_000)).is_err());
         assert!(batches
-            .next(&"s".repeat(100_000), &prompt, Some(10_000))
+            .next("", &prompt, Some(1_000), TEST_OUTPUT_TOKENS)
             .is_err());
-        let all = batches.next("", &prompt, None).unwrap().unwrap();
+        assert!(batches
+            .next(
+                &"s".repeat(100_000),
+                &prompt,
+                Some(10_000),
+                TEST_OUTPUT_TOKENS
+            )
+            .is_err());
+        let all = batches
+            .next("", &prompt, None, TEST_OUTPUT_TOKENS)
+            .unwrap()
+            .unwrap();
         assert!(serde_json::to_string(&all).unwrap().contains("KEEP_GOAL"));
-        assert!(batches.next("summary", &prompt, None).unwrap().is_none());
+        assert!(batches
+            .next("summary", &prompt, None, TEST_OUTPUT_TOKENS)
+            .unwrap()
+            .is_none());
     }
 
     #[test]
@@ -375,12 +396,18 @@ mod tests {
         };
         let mut batches =
             Batches::new(vec![text_message("source", original.clone())], false).unwrap();
-        let rejected = batches.next("", &prompt, None).unwrap().unwrap();
+        let rejected = batches
+            .next("", &prompt, None, TEST_OUTPUT_TOKENS)
+            .unwrap()
+            .unwrap();
         assert!(serde_json::to_string(&rejected).unwrap().len() < original.len());
         batches.rewind(rejected);
         let mut restored = String::new();
         let mut count = 0;
-        while let Some(batch) = batches.next("progress", &prompt, Some(8_000)).unwrap() {
+        while let Some(batch) = batches
+            .next("progress", &prompt, Some(8_000), TEST_OUTPUT_TOKENS)
+            .unwrap()
+        {
             count += 1;
             assert!(count < 20);
             for message in batch
@@ -427,12 +454,15 @@ mod tests {
             tools: Vec::new(),
         };
         let mut batches = Batches::new(vec![goal, assistant], true).unwrap();
-        let batch = batches.next("", &prompt, Some(5_000)).unwrap().unwrap();
+        let batch = batches
+            .next("", &prompt, Some(5_000), TEST_OUTPUT_TOKENS)
+            .unwrap()
+            .unwrap();
         let wire = serde_json::to_string(&batch).unwrap();
         assert!(wire.contains("VISIBLE_GOAL") && wire.contains("VISIBLE_RESULT"));
         assert!(!wire.contains("PRIVATE_") && !wire.contains("image/png"));
         assert!(batches
-            .next("summary", &prompt, Some(5_000))
+            .next("summary", &prompt, Some(5_000), TEST_OUTPUT_TOKENS)
             .unwrap()
             .is_none());
     }

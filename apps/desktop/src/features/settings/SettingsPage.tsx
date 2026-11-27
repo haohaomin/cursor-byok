@@ -4,7 +4,7 @@ import { PageContent } from "../../shell/layout/PageContent";
 import { LegacyModelImport } from "../models/LegacyModelImport";
 import { AppLifecycleSettingsCard } from "./AppLifecycleSettingsCard";
 import { CommitSettingsCard } from "./CommitSettingsCard";
-import { CompactionSettingsCard } from "./CompactionSettingsCard";
+import { CompactionSettingsCard, type CompactionDraft } from "./CompactionSettingsCard";
 import { ExternalApiSettingsCard } from "./ExternalApiSettingsCard";
 import { PricingSettingsCard } from "./PricingSettingsCard";
 import { ProxySettingsCard } from "./ProxySettingsCard";
@@ -20,6 +20,13 @@ import { useMessage } from "../../shared/ui/message";
 import { appStore, useAppStore } from "../../shared/store/appStore";
 import { themeOptions } from "../../shared/theme/theme";
 import styles from "./SettingsPage.module.scss";
+
+function compactionDraftOf(settings: CompactionSettings): CompactionDraft {
+  return {
+    timeoutSecs: String(settings.auto_compaction_timeout_secs),
+    outputTokens: String(settings.auto_compaction_output_tokens),
+  };
+}
 
 export function SettingsPage() {
   const { detailed, ports, theme } = useAppStore();
@@ -42,7 +49,7 @@ export function SettingsPage() {
   const [editingTab, setEditingTab] = useState(false);
   const [savingTab, setSavingTab] = useState(false);
   const [compaction, setCompaction] = useState<CompactionSettings | null>(null);
-  const [compactionDraft, setCompactionDraft] = useState("");
+  const [compactionDraft, setCompactionDraft] = useState<CompactionDraft>({ timeoutSecs: "", outputTokens: "" });
   const [editingCompaction, setEditingCompaction] = useState(false);
   const [savingCompaction, setSavingCompaction] = useState(false);
   useEffect(() => {
@@ -58,7 +65,7 @@ export function SettingsPage() {
     }).catch(report);
     void api.compactionSettings().then((next) => {
       setCompaction(next);
-      setCompactionDraft(String(next.auto_compaction_timeout_secs));
+      setCompactionDraft(compactionDraftOf(next));
     }).catch(report);
   }, [message]);
   useEffect(() => {
@@ -164,24 +171,29 @@ export function SettingsPage() {
   };
   const editCompaction = () => {
     if (!compaction) return;
-    setCompactionDraft(String(compaction.auto_compaction_timeout_secs));
+    setCompactionDraft(compactionDraftOf(compaction));
     setEditingCompaction(true);
   };
   const cancelCompactionEdit = () => {
-    if (compaction) setCompactionDraft(String(compaction.auto_compaction_timeout_secs));
+    if (compaction) setCompactionDraft(compactionDraftOf(compaction));
     setEditingCompaction(false);
   };
   const saveCompaction = async () => {
-    const seconds = Number(compactionDraft);
+    const seconds = Number(compactionDraft.timeoutSecs);
     if (!Number.isInteger(seconds) || seconds < 30 || seconds > 3600) {
       message(t("自动压缩超时必须是 30 到 3600 之间的整数"));
       return;
     }
+    const outputTokens = Number(compactionDraft.outputTokens);
+    if (!Number.isInteger(outputTokens) || outputTokens < 1024 || outputTokens > 65536) {
+      message(t("自动压缩摘要输出上限必须是 1024 到 65536 之间的整数"));
+      return;
+    }
     try {
       setSavingCompaction(true);
-      const saved = await api.setCompactionSettings({ auto_compaction_timeout_secs: seconds });
+      const saved = await api.setCompactionSettings({ auto_compaction_timeout_secs: seconds, auto_compaction_output_tokens: outputTokens });
       setCompaction(saved);
-      setCompactionDraft(String(saved.auto_compaction_timeout_secs));
+      setCompactionDraft(compactionDraftOf(saved));
       setEditingCompaction(false);
       message(t("自动压缩设置已保存"));
     } catch (cause) {

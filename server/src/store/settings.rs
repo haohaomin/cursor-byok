@@ -92,25 +92,40 @@ pub struct TabSettings {
 }
 
 /// Tuning for automatic context compaction. BYOK providers may stream large
-/// summaries slowly, so the per-batch provider-call deadline is configurable.
+/// summaries slowly and may bill hidden thinking tokens against the output
+/// budget, so both the per-batch deadline and the summary output cap are
+/// configurable.
 pub const DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 180;
 const MIN_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 30;
 const MAX_AUTO_COMPACTION_TIMEOUT_SECS: u64 = 3600;
+/// Enough for a summary plus provider-side reasoning. Several BYOK gateways
+/// enable thinking by default and count it against the same output limit, so
+/// the old 4K cap truncated summaries before they were finished.
+pub const DEFAULT_AUTO_COMPACTION_OUTPUT_TOKENS: u64 = 16_384;
+pub const MIN_AUTO_COMPACTION_OUTPUT_TOKENS: u64 = 1_024;
+pub const MAX_AUTO_COMPACTION_OUTPUT_TOKENS: u64 = 65_536;
 
 fn default_auto_compaction_timeout_secs() -> u64 {
     DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS
+}
+
+fn default_auto_compaction_output_tokens() -> u64 {
+    DEFAULT_AUTO_COMPACTION_OUTPUT_TOKENS
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
 pub struct CompactionSettings {
     #[serde(default = "default_auto_compaction_timeout_secs")]
     pub auto_compaction_timeout_secs: u64,
+    #[serde(default = "default_auto_compaction_output_tokens")]
+    pub auto_compaction_output_tokens: u64,
 }
 
 impl Default for CompactionSettings {
     fn default() -> Self {
         Self {
             auto_compaction_timeout_secs: DEFAULT_AUTO_COMPACTION_TIMEOUT_SECS,
+            auto_compaction_output_tokens: DEFAULT_AUTO_COMPACTION_OUTPUT_TOKENS,
         }
     }
 }
@@ -437,6 +452,10 @@ impl Store {
             MIN_AUTO_COMPACTION_TIMEOUT_SECS,
             MAX_AUTO_COMPACTION_TIMEOUT_SECS,
         );
+        settings.auto_compaction_output_tokens = settings.auto_compaction_output_tokens.clamp(
+            MIN_AUTO_COMPACTION_OUTPUT_TOKENS,
+            MAX_AUTO_COMPACTION_OUTPUT_TOKENS,
+        );
         let value_json = serde_json::to_string(&settings)?;
         let _write = self.writes.lock().await;
         sqlx::query("INSERT INTO service_settings(setting_key, value_json, updated_at_ms) VALUES (?, ?, ?) ON CONFLICT(setting_key) DO UPDATE SET value_json = excluded.value_json, updated_at_ms = excluded.updated_at_ms")
@@ -639,10 +658,12 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::{
-        read_proxy_settings, CommitPromptLocale, CommitSettings, ExternalApiSettings,
-        ModelTokenPricing, ProxyMode, ProxySettingsInput, ProxySettingsSecret, Store,
-        TokenPricingSettings, DEFAULT_COMMIT_PROMPT_EN_US, DEFAULT_COMMIT_PROMPT_ZH_CN,
-        PROXY_SETTINGS_KEY,
+        read_proxy_settings, CommitPromptLocale, CommitSettings, CompactionSettings,
+        ExternalApiSettings, ModelTokenPricing, ProxyMode, ProxySettingsInput, ProxySettingsSecret,
+        Store, TokenPricingSettings, DEFAULT_AUTO_COMPACTION_OUTPUT_TOKENS,
+        DEFAULT_COMMIT_PROMPT_EN_US, DEFAULT_COMMIT_PROMPT_ZH_CN,
+        MAX_AUTO_COMPACTION_OUTPUT_TOKENS, MAX_AUTO_COMPACTION_TIMEOUT_SECS,
+        MIN_AUTO_COMPACTION_OUTPUT_TOKENS, MIN_AUTO_COMPACTION_TIMEOUT_SECS, PROXY_SETTINGS_KEY,
     };
 
     /// The `outbound_proxy` row exactly as builds before the `system` -> `default`
@@ -875,5 +896,56 @@ mod tests {
                 .unwrap(),
             settings
         );
+    }
+
+    #[test]
+    fn legacy_compaction_rows_backfill_the_output_cap() {
+        let legacy: CompactionSettings =
+            serde_json::from_str(r#"{"auto_compaction_timeout_secs":600}"#).unwrap();
+        assert_eq!(legacy.auto_compaction_timeout_secs, 600);
+        assert_eq!(
+            legacy.auto_compaction_output_tokens,
+            DEFAULT_AUTO_COMPACTION_OUTPUT_TOKENS
+        );
+    }
+
+    #[tokio::test]
+    async fn compaction_settings_clamp_timeout_and_output_cap() {
+        let directory = tempfile::tempdir().unwrap();
+        let url = format!("sqlite://{}", directory.path().join("test.db").display());
+        let store = Store::connect(&url).await.unwrap();
+
+        let saved = store
+            .set_compaction_settings(CompactionSettings {
+                auto_compaction_timeout_secs: 5,
+                auto_compaction_output_tokens: 99,
+            })
+            .await
+            .unwrap();
+        assert_eq!(
+            saved.auto_compaction_timeout_secs,
+            MIN_AUTO_COMPACTION_TIMEOUT_SECS
+        );
+        assert_eq!(
+            saved.auto_compaction_output_tokens,
+            MIN_AUTO_COMPACTION_OUTPUT_TOKENS
+        );
+
+        let saved = store
+            .set_compaction_settings(CompactionSettings {
+                auto_compaction_timeout_secs: 99_999,
+                auto_compaction_output_tokens: 999_999,
+            })
+            .await
+            .unwrap();
+        assert_eq!(
+            saved.auto_compaction_timeout_secs,
+            MAX_AUTO_COMPACTION_TIMEOUT_SECS
+        );
+        assert_eq!(
+            saved.auto_compaction_output_tokens,
+            MAX_AUTO_COMPACTION_OUTPUT_TOKENS
+        );
+        assert_eq!(store.compaction_settings().await.unwrap(), saved);
     }
 }
