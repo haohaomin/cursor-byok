@@ -28,7 +28,7 @@ pub(crate) async fn prepare_action(
     let checkpoint_id = store
         .ensure_conversation(&ConversationId::new(conversation_id))
         .await?;
-    let stored = store
+    let mut stored = store
         .cursor_checkpoint(checkpoint_id)
         .await?
         .map(|bytes| pb::ConversationStateStructure::decode(bytes.as_slice()))
@@ -59,6 +59,10 @@ pub(crate) async fn prepare_action(
         return Ok(None);
     }
     let mut state = request.conversation_state.clone().unwrap_or_default();
+    crate::cursor::checkpoint::subagents::refresh(store, checkpoint_id, &mut state).await?;
+    if let Some(latest) = stored.as_mut() {
+        crate::cursor::checkpoint::subagents::refresh(store, checkpoint_id, latest).await?;
+    }
     let Some(mut goal) = state.goal_state.clone() else {
         // Cursor's Clear action removes the optional goal field entirely.
         if let Some(mut latest) = stored {
@@ -66,8 +70,7 @@ pub(crate) async fn prepare_action(
                 owns(goal, conversation_id, request.agent_session_id.as_deref())
             }) {
                 latest.goal_state = None;
-                store
-                    .save_cursor_checkpoint(checkpoint_id, &latest.encode_to_vec())
+                crate::cursor::checkpoint::subagents::save(store, checkpoint_id, &mut latest)
                     .await?;
             }
             return Ok(Some(latest));
@@ -143,9 +146,7 @@ pub(crate) async fn prepare_action(
         }
         accrue(&mut goal, now_ms(), false);
         state.goal_state = Some(goal);
-        store
-            .save_cursor_checkpoint(checkpoint_id, &state.encode_to_vec())
-            .await?;
+        crate::cursor::checkpoint::subagents::save(store, checkpoint_id, &mut state).await?;
         return Ok(Some(state));
     }
     goal.continuation_count = goal.continuation_count.saturating_add(1);

@@ -1,0 +1,102 @@
+{
+  "checked_at": "2026-11-27T15:14:45.403705+00:00",
+  "base_commit": "cc069e8959a3b9a8b32dd5fd86d0dff957b68238",
+  "cursor_version": "3.31.15",
+  "evidence_type": "static shipped JavaScript plus isolated synthetic protobuf tests; no live Cursor execution",
+  "rea_inventory_evidence": "ev_a485fa596bb60a5bf97cc88b22f0197ca1c4331db3c49acfa96d3cc6ff31806b",
+  "artifacts": [
+    {
+      "path": "extensions/cursor-local-agent-runtime/dist/main.js",
+      "sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "bytes": 5277933,
+      "anchors": [
+        {
+          "anchor": "function afe",
+          "character_offset": 2662572,
+          "excerpt": "function afe(e){if(e.kind===Q.aZc.SUBAGENT&&e.reason!==$.U6.TASK_PROGRESS&&e.reason!==$.U6.WORKER_MESSAGE)return sfe(e.toolCallId)}function lfe(e){const{completion:t,existingRun:n,persistedSubagentState:r,omitDetail:o=!1}=e,s=afe(t);if(void 0===s)return;if(void 0!==n&&ife(n.status)&&void 0!==t.completedAtMs&&void 0!==n.completedTimestampMs&&t.completedAtMs<n.completedTimestampMs)return;const i=sfe(t.subagentId)??sfe(t.taskId),a=void 0!==r?.environment&&r.environment!==$.dU.UNSPECIFIED?r.environment:void 0,l=void 0!==n?.environment&&n.environment!==$.dU.UNSPECIFIED?n.environment:void 0,c=t.reason!==$.U6.UNSPECIFIED?t.reason:n?.completionReason,u=t.status!==Q.uHL.UNSPECIFIED?function(e){switch(e){case Q.uHL.SUCCESS:return Q.lq6.SUCCESS;case Q.uHL.ERROR:return Q.lq6.ERROR;case Q.uHL.ABORTED:return Q.lq6.ABORTED;case Q.uHL.UNSPECIFIED:return Q.lq6.UNSPECIFIED;default:return e}}(t.status):n?.status??Q.lq6.UNSPECIFIED;return new Q.ayE({parentToolCallId:s,subagentId:i,environment:a??l??$.dU.UNSPECIFIED,status:u,title:sfe(t.title)??n?.title,detail:o?void 0:sfe(t.detail)??n?.detail,transcriptPath:sfe(r?.cloudSubagent?.transcriptPath)??n?.transcriptPath,outputPath:sfe(t.outputPath)??n?.outputPath,completedTimestampMs:t.completedAtMs??n?.completedTimestampMs??BigInt(Date.now()),completionRe",
+          "excerpt_sha256": "8ab8c49ca5e57ddb6c6d38140ca91e70549358ae4021be9393b621816b74721d"
+        },
+        {
+          "anchor": "function lfe",
+          "character_offset": 2662703,
+          "excerpt": "function lfe(e){const{completion:t,existingRun:n,persistedSubagentState:r,omitDetail:o=!1}=e,s=afe(t);if(void 0===s)return;if(void 0!==n&&ife(n.status)&&void 0!==t.completedAtMs&&void 0!==n.completedTimestampMs&&t.completedAtMs<n.completedTimestampMs)return;const i=sfe(t.subagentId)??sfe(t.taskId),a=void 0!==r?.environment&&r.environment!==$.dU.UNSPECIFIED?r.environment:void 0,l=void 0!==n?.environment&&n.environment!==$.dU.UNSPECIFIED?n.environment:void 0,c=t.reason!==$.U6.UNSPECIFIED?t.reason:n?.completionReason,u=t.status!==Q.uHL.UNSPECIFIED?function(e){switch(e){case Q.uHL.SUCCESS:return Q.lq6.SUCCESS;case Q.uHL.ERROR:return Q.lq6.ERROR;case Q.uHL.ABORTED:return Q.lq6.ABORTED;case Q.uHL.UNSPECIFIED:return Q.lq6.UNSPECIFIED;default:return e}}(t.status):n?.status??Q.lq6.UNSPECIFIED;return new Q.ayE({parentToolCallId:s,subagentId:i,environment:a??l??$.dU.UNSPECIFIED,status:u,title:sfe(t.title)??n?.title,detail:o?void 0:sfe(t.detail)??n?.detail,transcriptPath:sfe(r?.cloudSubagent?.transcriptPath)??n?.transcriptPath,outputPath:sfe(t.outputPath)??n?.outputPath,completedTimestampMs:t.completedAtMs??n?.completedTimestampMs??BigInt(Date.now()),completionReason:c})}const cfe=new Set([\"self\",\"user\"].map((e=>AN.resolve(QQ,e,\"preferences.md\"))));function ufe(e){if(\"user\"!==e.role)return;c",
+          "excerpt_sha256": "75f780fa4d53ac4722a83ebcbef188ad7ac36e2f27332836d131c750d5dffe8e"
+        }
+      ]
+    },
+    {
+      "path": "extensions/cursor-agent-host/dist/2567.js",
+      "sha256": "91d91694a3e46833812abdc495b797cabea3a587b4e6f010945879c246c08bbd",
+      "bytes": 3276059,
+      "anchors": [
+        {
+          "anchor": "function dP",
+          "character_offset": 1129435,
+          "excerpt": "function dP(e){if(e.kind===Na.aZc.SUBAGENT&&e.reason!==La.U6.TASK_PROGRESS&&e.reason!==La.U6.WORKER_MESSAGE)return lP(e.toolCallId)}function uP(e,t){return Object.hasOwn(e,t)?e[t]:void 0}function hP(e){const{completion:t,existingRun:n,persistedSubagentState:o,omitDetail:r=!1}=e,s=dP(t);if(void 0===s)return;if(void 0!==n&&cP(n.status)&&void 0!==t.completedAtMs&&void 0!==n.completedTimestampMs&&t.completedAtMs<n.completedTimestampMs)return;const a=lP(t.subagentId)??lP(t.taskId),i=void 0!==o?.environment&&o.environment!==La.dU.UNSPECIFIED?o.environment:void 0,l=void 0!==n?.environment&&n.environment!==La.dU.UNSPECIFIED?n.environment:void 0,c=t.reason!==La.U6.UNSPECIFIED?t.reason:n?.completionReason,d=t.status!==Na.uHL.UNSPECIFIED?function(e){switch(e){case Na.uHL.SUCCESS:return Na.lq6.SUCCESS;case Na.uHL.ERROR:return Na.lq6.ERROR;case Na.uHL.ABORTED:return Na.lq6.ABORTED;case Na.uHL.UNSPECIFIED:return Na.lq6.UNSPECIFIED;default:return e}}(t.status):n?.status??Na.lq6.UNSPECIFIED;return new Na.ayE({parentToolCallId:s,subagentId:a,environment:i??l??La.dU.UNSPECIFIED,status:d,title:lP(t.title)??n?.title,detail:r?void 0:lP(t.detail)??n?.detail,transcriptPath:lP(o?.cloudSubagent?.transcriptPath)??n?.transcriptPath,outputPath:lP(t.outputPath)??n?.outputPath,completedTimestampMs:t.completed",
+          "excerpt_sha256": "bda6082a7a3d5973a49fa4099335973f0acc3c86529cf06b1377eabbdda6d12a"
+        },
+        {
+          "anchor": "function hP",
+          "character_offset": 1129622,
+          "excerpt": "function hP(e){const{completion:t,existingRun:n,persistedSubagentState:o,omitDetail:r=!1}=e,s=dP(t);if(void 0===s)return;if(void 0!==n&&cP(n.status)&&void 0!==t.completedAtMs&&void 0!==n.completedTimestampMs&&t.completedAtMs<n.completedTimestampMs)return;const a=lP(t.subagentId)??lP(t.taskId),i=void 0!==o?.environment&&o.environment!==La.dU.UNSPECIFIED?o.environment:void 0,l=void 0!==n?.environment&&n.environment!==La.dU.UNSPECIFIED?n.environment:void 0,c=t.reason!==La.U6.UNSPECIFIED?t.reason:n?.completionReason,d=t.status!==Na.uHL.UNSPECIFIED?function(e){switch(e){case Na.uHL.SUCCESS:return Na.lq6.SUCCESS;case Na.uHL.ERROR:return Na.lq6.ERROR;case Na.uHL.ABORTED:return Na.lq6.ABORTED;case Na.uHL.UNSPECIFIED:return Na.lq6.UNSPECIFIED;default:return e}}(t.status):n?.status??Na.lq6.UNSPECIFIED;return new Na.ayE({parentToolCallId:s,subagentId:a,environment:i??l??La.dU.UNSPECIFIED,status:d,title:lP(t.title)??n?.title,detail:r?void 0:lP(t.detail)??n?.detail,transcriptPath:lP(o?.cloudSubagent?.transcriptPath)??n?.transcriptPath,outputPath:lP(t.outputPath)??n?.outputPath,completedTimestampMs:t.completedAtMs??n?.completedTimestampMs??BigInt(Date.now()),completionReason:c})}function pP(e,t,n={}){const o=[];for(const r of t){const t=dP(r);if(void 0===t)continue;const s=lP(r.subagentId)??lP",
+          "excerpt_sha256": "589289d6b00a29ce162b598b79905aaac74c0eacad97425429e5f55d7cc60040"
+        },
+        {
+          "anchor": "function mP",
+          "character_offset": 1131197,
+          "excerpt": "function mP(e){const{persisted:t,replacement:n,omitDetail:o=!1}=e,r=[];for(const[e,s]of Object.entries(t.subagentRunsByParentToolCallId)){if(!cP(s.status))continue;const t=uP(n.subagentRunsByParentToolCallId,e);if(void 0!==t&&cP(t.status)&&(s.completedTimestampMs??BigInt(0))<=(t.completedTimestampMs??BigInt(0)))continue;const a=s.clone();o&&(a.detail=void 0),n.subagentRunsByParentToolCallId[e]=a,r.push(e)}return r}const fP=new Set([\"self\",\"user\"].map((e=>hi.resolve(Fl.f,e,\"preferences.md\"))));function gP(e){if(\"user\"!==e.role)return;const t=e.content;return\"string\"==typeof t?t:Array.isArray(t)?t.filter((e=>null!==e&&\"object\"==typeof e&&\"type\"in e&&\"text\"===e.type&&\"text\"in e&&\"string\"==typeof e.text)).map((e=>e.text)).join(\"\"):void 0}const vP=[\"system_notification\",\"agent_notification\",\"task_notification\",\"side_chat_boundary\"],yP=/<(?:(\\/)\\s*([A-Za-z_][\\w:.-]*)\\s*>|([A-Za-z_][\\w:.-]*)(?:\\s[^<>]*?)?(\\/)?>)/g;function wP(e){const t=gP(e);if(void 0===t||0===t.length)return!1;const n=[];for(const e of t.matchAll(yP)){const[,t,o,r,s]=e;if(void 0===t||void 0===o){if(void 0!==r){if(0===n.length&&vP.includes(r))return!0;void 0===s&&n.push(r)}}else n[n.length-1]===o&&n.pop()}return!1}const bP=\"agent_message\",kP=new Set([\"goal\",bP]),TP=/\\ssource=\"([^\"]*)\"/;function SP(e){const t=gP(e);if(v",
+          "excerpt_sha256": "a8855b8233e5eb3f537431fca840f9f36a21f1baa96d23b9404a3af148c28d89"
+        }
+      ]
+    }
+  ],
+  "baseline_logs": [
+    {
+      "file": "/tmp/cursor-byok-subagent-state-red.log",
+      "sha256": "ad0cb90d063e1a5a714038d885062a6b08061eac371ebf86e6119edcaed1e516",
+      "summaries": [
+        "  left: 2",
+        " right: 3",
+        "test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 25 filtered out; finished in 2.22s"
+      ]
+    },
+    {
+      "file": "/tmp/cursor-byok-subagent-state-history.log",
+      "sha256": "1ad976ab2834b8547fa849ec22f07d187eedf3835ce3baec34416cd1cbf08f4d",
+      "summaries": [
+        "  left: 2",
+        " right: 3",
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 30 filtered out; finished in 8.46s"
+      ]
+    }
+  ],
+  "limitations": [
+    "No real Cursor notification, UI or provider acceptance",
+    "No implementation of subagent_state field 14, modern Await, Projects or Agent Store",
+    "Issue #155 remains partial; no 20-minute test"
+  ],
+  "verified_at": "2026-11-27T19:36:44.034043+00:00",
+  "validation": {
+    "conversation_delivery_passed": 33,
+    "workspace_passed": 687,
+    "workspace_failed": 0,
+    "workspace_ignored": 14,
+    "clippy": "workspace all-targets -D warnings passed",
+    "fmt": "passed",
+    "independent_static_review": "all reported findings fixed; no remaining blockers",
+    "logs": [
+      {
+        "file": "/tmp/cursor-byok-subagent-state-workspace-final.log",
+        "sha256": "f1f3ea519f9e868d69f2e588cba8bda1847899e22b512dade0c3751a58b5822a"
+      },
+      {
+        "file": "/tmp/cursor-byok-subagent-state-clippy.log",
+        "sha256": "17f840ce5aa0bb09082fac778f73c48af9e80f75c77c2aa4d079936e6be719a0"
+      },
+      {
+        "file": "/tmp/cursor-byok-subagent-state-finalization.log",
+        "sha256": "207ff4d6d360ed04975ab32ef01860ff9dc2b3c949cc07b93ee2f8d31999db42"
+      }
+    ]
+  }
+}

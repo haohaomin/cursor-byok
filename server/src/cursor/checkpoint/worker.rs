@@ -1,5 +1,4 @@
 //! Serializes checkpoint jobs and completes commit barriers.
-use prost::Message;
 use tokio::sync::{mpsc, oneshot};
 
 use crate::{
@@ -108,12 +107,10 @@ impl CheckpointWorker {
                     } => {
                         let checkpoint = async {
                             let messages = store.load_checkpoint_messages(checkpoint_id).await?;
-                            let state = builder
+                            let mut state = builder
                                 .compacted(&messages, mode, &summary, &presentation)
                                 .await?;
-                            store
-                                .save_cursor_checkpoint(checkpoint_id, &state.encode_to_vec())
-                                .await?;
+                            super::subagents::save(&store, checkpoint_id, &mut state).await?;
                             Ok(state)
                         }
                         .await;
@@ -156,10 +153,8 @@ async fn publish_settled(
     presentation: &PendingSteps,
 ) -> Result<()> {
     let messages = store.load_checkpoint_messages(checkpoint_id).await?;
-    let checkpoint = builder.settled(&messages, mode, presentation).await?;
-    store
-        .save_cursor_checkpoint(checkpoint_id, &checkpoint.encode_to_vec())
-        .await?;
+    let mut checkpoint = builder.settled(&messages, mode, presentation).await?;
+    super::subagents::save(store, checkpoint_id, &mut checkpoint).await?;
     builder.publish(handle, &checkpoint).await
 }
 
@@ -177,7 +172,7 @@ async fn publish_started(
         .await?
         .ok_or_else(|| Error::Store(format!("checkpoint tool round not found: {round_id}")))?;
     let messages = store.load_checkpoint_messages(stable_checkpoint_id).await?;
-    let checkpoint = builder
+    let mut checkpoint = builder
         .staged_tool_round(
             &messages,
             mode,
@@ -187,6 +182,7 @@ async fn publish_started(
             presentation,
         )
         .await?;
+    super::subagents::refresh(store, stable_checkpoint_id, &mut checkpoint).await?;
     builder.publish(handle, &checkpoint).await
 }
 
@@ -202,14 +198,13 @@ async fn build_final(
         .split_last()
         .ok_or_else(|| Error::Store("final checkpoint contains no assistant".into()))?;
     let started_at_ms = crate::cursor::tools::runtime::now_ms();
-    let staged = builder
+    let mut staged = builder
         .staged_final(stable, mode, assistant, started_at_ms, presentation)
         .await?;
-    let settled = builder
+    let mut settled = builder
         .settled(&messages, mode, &PendingSteps::default())
         .await?;
-    store
-        .save_cursor_checkpoint(checkpoint_id, &settled.encode_to_vec())
-        .await?;
+    super::subagents::save(store, checkpoint_id, &mut settled).await?;
+    super::subagents::preserve_recorded(&mut staged, &settled);
     Ok(FinalCheckpoints { staged, settled })
 }

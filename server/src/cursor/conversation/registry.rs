@@ -15,6 +15,10 @@ use crate::{
 
 use super::{CompiledMessages, MessageDelivery, PendingMessages, TransportCommand};
 
+#[cfg(test)]
+#[path = "registry_tests.rs"]
+mod tests;
+
 #[derive(Clone)]
 pub struct ConversationRegistry {
     inner: Arc<RegistryInner>,
@@ -97,10 +101,49 @@ impl ConversationRegistry {
         request_id: &str,
         request: &mut crate::cursor::protocol::proto::agent::v1::AgentRunRequest,
     ) -> crate::Result<super::background::Admission> {
+        crate::cursor::checkpoint::subagents::record(
+            &self.inner.dependencies.store,
+            request_id,
+            request,
+        )
+        .await?;
         self.inner
             .background
             .admit(&self.inner.dependencies.store, request_id, request)
             .await
+    }
+
+    pub(super) async fn publish_idle_checkpoint(
+        &self,
+        handle: &TransportHandle,
+        conversation_id: &str,
+    ) -> crate::Result<()> {
+        use crate::cursor::protocol::proto::agent::v1 as pb;
+        use prost::Message;
+        let current = self.inner.current.lock().await;
+        let id = ConversationId::new(conversation_id);
+        // Hold activation until the synchronous emit completes. A status-only
+        // transport must never overwrite a live Run's streaming presentation.
+        if current.contains_key(&id) {
+            return Ok(());
+        }
+        let store = &self.inner.dependencies.store;
+        if let Some(conversation) = store.conversation(&id).await? {
+            if let Some(bytes) = store
+                .cursor_checkpoint(conversation.current_checkpoint_id)
+                .await?
+            {
+                handle.emit(&pb::AgentServerMessage {
+                    message: Some(
+                        pb::agent_server_message::Message::ConversationCheckpointUpdate(
+                            pb::ConversationStateStructure::decode(bytes.as_slice())?,
+                        ),
+                    ),
+                    ..Default::default()
+                })?;
+            }
+        }
+        Ok(())
     }
 
     pub(crate) fn bind_transport(
@@ -210,15 +253,58 @@ impl ConversationRegistry {
         result
     }
 
-    pub(crate) async fn release(&self, conversation_id: &ConversationId, run_id: &RunId) {
+    pub(crate) async fn release(
+        &self,
+        conversation_id: &ConversationId,
+        run_id: &RunId,
+        handle: &TransportHandle,
+        finish: &mut super::RunFinish,
+    ) -> crate::Result<()> {
         let mut current = self.inner.current.lock().await;
         if current
             .get(conversation_id)
             .is_some_and(|run| &run.run_id == run_id)
         {
+            // A record-only notification can arrive after the final payload was
+            // built. Refresh before releasing ownership; a later side transport
+            // can only publish once this synchronous emit has completed.
+            let refreshed = async {
+                let mut interrupted = handle.latest_checkpoint();
+                let state = match finish {
+                    super::RunFinish::TurnCompleted(state) => Some(state.as_mut()),
+                    super::RunFinish::Transport(_) => interrupted.as_mut(),
+                };
+                if let Some(state) = state {
+                    let store = &self.inner.dependencies.store;
+                    if let Some(conversation) = store.conversation(conversation_id).await? {
+                        let before = state.subagent_runs_by_parent_tool_call_id.clone();
+                        crate::cursor::checkpoint::subagents::refresh(
+                            store,
+                            conversation.current_checkpoint_id,
+                            state,
+                        )
+                        .await?;
+                        if before != state.subagent_runs_by_parent_tool_call_id {
+                            use crate::cursor::protocol::proto::agent::v1 as pb;
+                            handle.emit(&pb::AgentServerMessage {
+                                message: Some(
+                                    pb::agent_server_message::Message::ConversationCheckpointUpdate(
+                                        state.clone(),
+                                    ),
+                                ),
+                                ..Default::default()
+                            })?;
+                        }
+                    }
+                }
+                Ok(())
+            }
+            .await;
             current.remove(conversation_id);
             self.inner.changed.notify_waiters();
+            return refreshed;
         }
+        Ok(())
     }
 
     pub(crate) async fn wait_until_idle(&self, conversation_id: &ConversationId) {
