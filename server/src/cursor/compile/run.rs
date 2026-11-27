@@ -21,7 +21,7 @@ use crate::{
     Error, Result,
 };
 
-use super::{break_messages, context, insert_messages, model};
+use super::{break_messages, context, insert_messages, model, subagents};
 
 struct ActionProjection {
     mode: i32,
@@ -212,12 +212,19 @@ pub(crate) async fn prepare(
         .into_iter()
         .map(|model| (model.model_hash, model.display_name))
         .collect();
-    let subagent_models = model::subagent_model_context(request, &local_model_names);
+    let subagent_context = [
+        model::subagent_model_context(request, &local_model_names),
+        subagents::instructions(request.subagent_type_name.as_deref(), &request_context),
+    ]
+    .into_iter()
+    .filter(|section| !section.is_empty())
+    .collect::<Vec<_>>()
+    .join("\n\n");
     let mut projected_user_context = if input_id.is_some() && !compacting && !background_completion
     {
         break_messages::compile_request_context(
             "identity",
-            &subagent_models,
+            &subagent_context,
             &request_context,
             base_messages.as_deref().unwrap_or_default(),
         )?
@@ -262,7 +269,7 @@ pub(crate) async fn prepare(
                 }),
                 None => break_messages::compile_request_context(
                     event_id,
-                    &subagent_models,
+                    &subagent_context,
                     &request_context,
                     base_messages.as_deref().unwrap_or_default(),
                 )?,
@@ -292,7 +299,7 @@ pub(crate) async fn prepare(
     let resume_context = if explicit_resume && !compacting && !background_completion {
         Some(break_messages::compile_resume_messages(
             request_id,
-            &subagent_models,
+            &subagent_context,
             &request_context,
             base_messages.as_deref().unwrap_or_default(),
             pending_tool_round.is_some(),

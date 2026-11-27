@@ -690,7 +690,7 @@ fn prost_value(value: &prost_types::Value) -> Value {
     }
 }
 
-fn xml(value: &str) -> String {
+pub(super) fn xml(value: &str) -> String {
     value
         .replace('&', "&amp;")
         .replace('"', "&quot;")
@@ -712,7 +712,7 @@ pub(super) fn neutralize_prompt_body(value: &str) -> String {
         let tags = concat!(
             "agent_skill|agent_skills|agent_transcripts|approved_plan|attached_files|available_skills|",
             "code|command|commit_attribution_message|conversation_summary|current_file_contents|",
-            "current_plan|definition_path|delegation|delegation_examples|description|external_links|",
+            "current_plan|custom_subagent|definition_path|delegation|delegation_examples|description|external_links|",
             "file|frontmatter|git_status|glob|globs|hooks_additional_context|input_schema|",
             "linter_errors|making_code_changes|mcp_embedded_descriptors|mcp_file_system|",
             "mcp_file_system_server|mcp_file_system_servers|mcp_meta_tool_server|",

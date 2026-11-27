@@ -1,4 +1,6 @@
 //! Exercises subagent admission through the Cursor HTTP and transport boundary.
+#[path = "subagent_admission/custom_roles.rs"]
+mod custom_roles;
 #[path = "support/fake_provider.rs"]
 mod fake_provider;
 #[path = "support/fixtures.rs"]
