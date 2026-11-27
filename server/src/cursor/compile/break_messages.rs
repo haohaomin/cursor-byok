@@ -228,7 +228,7 @@ async fn compile_with_timestamp(
 
 pub(super) fn compile_request_context(
     event_id: &str,
-    subagent_models: &str,
+    subagent_context: &str,
     request_context: &pb::RequestContext,
     history: &[CanonicalMessage],
 ) -> Result<Option<CanonicalMessage>> {
@@ -240,7 +240,7 @@ pub(super) fn compile_request_context(
     )?;
     let text = [
         context::compile_context(request_context, &time.today),
-        subagent_models.to_string(),
+        subagent_context.to_string(),
     ]
     .into_iter()
     .filter(|section| !section.is_empty())
@@ -262,14 +262,14 @@ const RESUME_PROMPT: &str = "<resume>\nContinue the unfinished task from the cur
 
 pub(super) fn compile_resume_messages(
     event_id: &str,
-    subagent_models: &str,
+    subagent_context: &str,
     request_context: &pb::RequestContext,
     history: &[CanonicalMessage],
     has_pending_tool_round: bool,
 ) -> Result<Vec<CanonicalMessage>> {
     let mut messages = compile_request_context(
         &format!("resume:{event_id}"),
-        subagent_models,
+        subagent_context,
         request_context,
         history,
     )?
