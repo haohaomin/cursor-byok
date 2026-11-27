@@ -13,6 +13,8 @@
 
 ## Issue 调查与验收
 
+- [2026-11-27 · Issue #244 / PR #245：旧编排补丁与当前客户端对照](issues/2026-11-27-issue244-orchestration-check.md)
+
 - [2026-11-27 · Issue #327：目标模式与自动续跑协议](issues/2026-11-27-issue327-goal-mode.md)
 - [2026-11-27 · Issue #251：自定义子代理角色传递与明确停用](issues/2026-11-27-issue251-custom-subagent-role.md)
 - [2026-11-27 · Cursor HTTP 请求体与解压大小限制](issues/2026-11-27-cursor-request-body-limit.md)

@@ -40,6 +40,8 @@ PR #13、#43–#49 已于 2026-11-19 合入 main，并随 v1.2.1 发布。其中
 
 ## 尚未解决的重点
 
+- [#244](https://github.com/leookun/cursor-byok/issues/244)：现有 Task 已支持新建/恢复后台参数；旧编排 [PR #245](https://github.com/leookun/cursor-byok/pull/245) 有创建与用户通信断点，且旧 Projects 模式已不适用于现客户端，不采用原补丁。现代 Await、项目协调器通信及 Agent Store 联动仍待实现和实机验收，见 [审查记录](history/issues/2026-11-27-issue244-orchestration-check.md)。
+
 - [#504](https://github.com/leookun/cursor-byok/issues/504)：已独立复现并修复活动 Run 中重复用户消息导致工具被中断的缺口，按消息 ID 在排队前去重。六项协议对照覆盖真实新消息、历史恢复和 Write 内容；原作者的全部症状仍缺请求样本，不能整体标为解决。[源码修复与验证边界](history/issues/2026-10-27-issue504-input-redelivery-fix.md)，已随 v1.1.0 发布。
 - [#155](https://github.com/leookun/cursor-byok/issues/155)：保持“完成一半”。普通后台短任务自动续答已通过；真实审批等待、压缩期间完成、最终补丁的输出通知等边界仍待验收。20 分钟测试按维护者本轮范围排除。[验收记录](history/issues/2026-10-19-issue155-acceptance.md)
 - [#505](https://github.com/leookun/cursor-byok/issues/505)：多个 reasoning signature。源码已改为按顺序保留 checkpoint 中的多个 signature，并合并模型流中的重复 replay state；465 项服务端全目标测试通过。真实 Cursor、原作者网关和签名样本仍待验收，不能标记为彻底解决。[修复与验证边界](history/issues/2026-11-06-issue505-fix.md)

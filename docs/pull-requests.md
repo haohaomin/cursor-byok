@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-27 上游 PR #245
+
+[#245](https://github.com/leookun/cursor-byok/pull/245) 固定 head `a29f7190b2cd` 已完成源码审查，**不采用原补丁**：create-agent 只发转后台控制请求，Projects 提示依赖未提供的 send_message，旧 Proto 声明未接线；当前 Cursor 已无旧 AgentMode=6。现有 Task 的两项协议探针和 59 项相关回归通过，未修改生产代码，未新发版；现代 Await、项目协调器通信与 Agent Store 仍待实现及真实验收。[逐项范围与证据](history/issues/2026-11-27-issue244-orchestration-check.md)。
+
 ## 2026-11-27 本 fork PR #65
 
 [#65](https://github.com/haohaomin/cursor-byok/pull/65) 已合入 main：补齐目标工具、状态保存和客户端续跑动作，处理暂停/恢复/清除、并发与延迟通知。最终 head `2229484`、合并 `c7e532e`；664 项工作区回归、Clippy、最终 PR 与主线跨平台 CI 通过，v1.2.13 已发布并完成 20 项资产、7 份签名及三个更新清单核验。Codex 初审的旧计数覆盖问题已复现并补齐；Sourcery 因额度跳过。真实 Cursor/供应商尚未验收，Issue #327 保持部分完成。[完整记录](history/issues/2026-11-27-issue327-goal-mode.md)。
@@ -210,7 +214,7 @@
 | [#360](https://github.com/leookun/cursor-byok/pull/360) | Grok/Codex OAuth 与账号池旧实现 | D | 41；+7565/-369 | 未见 | 冲突 28 | 高：旧订阅模块、前端及两项迁移；当前已有内置 Grok/Codex 插件。 **下一步：**不直接合并；需求映射到当前插件体系。 |
 | [#312](https://github.com/leookun/cursor-byok/pull/312) | Windows/macOS 发布签名旧构建 | D | 5；+127/-7 | 未见 | 冲突 5 | 高：Wails/Taskfile 方案与现有 Tauri Actions 发布流程不匹配。 **下一步：**不直接合并；沿用现有独立签名与更新源。 |
 | [#293](https://github.com/leookun/cursor-byok/pull/293) | Shell 审批恢复等待 | D | 4；+484/-1 | 未见 | 冲突 3 | 旧 Go internal/backend 路径已退出当前架构。 **下一步：**仅提取测试场景，检查现有 Rust 审批恢复。 |
-| [#245](https://github.com/leookun/cursor-byok/pull/245) | 编排工具、Projects 与协议同步 | D | 26；+2872/-212 | 未见 | 冲突 18 | 旧 Go 后端及旧 prompt/proto 路径；变更面较广。 **下一步：**按当前 protocols/cursor 和 Rust 功能逐项比较。 |
+| [#245](https://github.com/leookun/cursor-byok/pull/245) | 编排工具、Projects 与协议同步 | D | 26；+2872/-212 | 无 head 检查 | 不采用原补丁；旧冲突数不作现版依据 | 已审查：创建请求未发送、项目用户通信工具缺失、Proto 仅孤立声明；当前客户端已移除旧模式 6。现有 Task 与受控回归通过，现代项目编排仍未完成；[记录](history/issues/2026-11-27-issue244-orchestration-check.md)。 |
 | [#237](https://github.com/leookun/cursor-byok/pull/237) | 会话标题生成和持久化 | D（Rust 独立实现） | 原 PR：9；+331/-9 | 原 PR 未见；本地 563 项测试通过 | 不直接移植旧 Go 路径 | 补齐本地 NameTab 和早到元数据保存；新增 9 项回归，数据库升级和公共路由已验证，真实 Cursor UI 待验收。见[记录](history/pull-requests/2026-11-06-pr237-conversation-title.md)。 |
 | [#229](https://github.com/leookun/cursor-byok/pull/229) | 提示词结构标签注入防护 | D | 3；+166/-8 | 未见 | 冲突 2 | 安全意图值得保留，但补丁落在旧 Go prompt 编译器。 **下一步：**把攻击样例迁入当前提示词测试后评估，勿复活旧模块。 |
 | [#227](https://github.com/leookun/cursor-byok/pull/227) | Shell 前台超时和错误报告 | D | 5；+14/-10 | 未见 | 冲突 5 | 旧 Go forwarder/model/mitm 路径。 **下一步：**按当前工具运行时验证超时和错误传播。 |
