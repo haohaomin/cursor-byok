@@ -262,7 +262,21 @@
   "publication": {
     "pr": 68,
     "url": "https://github.com/haohaomin/cursor-byok/pull/68",
-    "status": "pushed; final cloud CI and review pending; not merged or released"
+    "status": "merged and published; all release artifacts verified; real Cursor UI not tested",
+    "tested_head": "84e9b5dadb2889ea8db7887bbc95114c694c2a38",
+    "merge_commit": "46affbcfe27337526844ba8338a96365bb800f25",
+    "merge_tree_matches_tested_head": true,
+    "branch_ci": 46121747275,
+    "pr_ci": 46121750464,
+    "main_ci": 46122566920,
+    "release_run": 46123259857,
+    "release_commit": "e1bab1f216f5ac540eec58d0b2975bec0cd00842",
+    "version": "1.2.16",
+    "release_evidence": "../2026-11-28-v1.2.16-release-evidence.json",
+    "review_thread_resolved": true,
+    "sourcery": "skipped due to quota, not a pass",
+    "source_branch_deleted": true,
+    "release_notes": "Chinese summary prepended to generated changelog; exact API readback verified"
   },
   "pre_review_verification": {
     "source_commit": "bce146667b757546c8159eec2fea6fa83c91ebd5",

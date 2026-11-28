@@ -1,6 +1,6 @@
 # Issue 清单
 
-更新：2026-11-27；最新公开版本为 v1.2.14，修复新版子代理通知接收、去重和顺序；[发布与核验](history/releases.md#v1214)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
+更新：2026-11-28；最新公开版本为 v1.2.16，补齐现代 Await 并包含此前子代理通知与状态修复；[发布与核验](history/releases.md#v1216)。上游元数据以 [2026-10-27 快照](history/issues/2026-10-27.snapshot.json) 为准，当时开放 104 项；保留首次收集的 100 项和后续 6 项，关闭或无法访问不等于本地已解决。
 
 - **先看进度**：[已做好与未完成工作](work-status.md)。
 - **看安装包包含什么**：[维护状态](maintenance-status.md)。
@@ -68,7 +68,7 @@
 | ☐（协议未复现） | [#337](https://github.com/leookun/cursor-byok/issues/337) beta10还存在的一些问题 bug | B | 当前队列/Task 协议与思考参数 HTTP 对照通过；客户端待验 | 新增四项回归；23 项中断/队列测试及两协议共 10 次实际 loopback HTTP 请求通过。未改生产逻辑，未证明 Cursor 标签或父子参数继承正确，见[复查记录](history/issues/2026-10-27-issue337-check.md)。 |
 | ☐ | [#311](https://github.com/leookun/cursor-byok/issues/311) 不会自动切换 便宜的模型来搜索文件吗 | C | 需求待评估 | 先明确用户选择与自动选择便宜子模型的规则，再评估策略。 |
 | ◐ | [#251](https://github.com/leookun/cursor-byok/issues/251) 支持在 Cursor-byok 中配置自定义系统提示词面板（prompt override）以及自定义subagent无法使用 | A / C | 角色漏传修复已由 PR #64 合入并随 v1.2.12 发布；编辑面板待评估 | 角色投影、明确停用及前缀/恢复/压缩的五项定向测试、650 项工作区回归和跨平台 CI 通过；真实 Cursor/模型未验收，编辑面板未实现。[记录](history/issues/2026-11-27-issue251-custom-subagent-role.md)。 |
-| ◐（通知与状态修复已发布） | [#244](https://github.com/leookun/cursor-byok/issues/244) [Feature] Orchestration 工具（create-agent/AWAIT）、Projects 模式、按 Cursor 3.14.7 重同步 prompt/proto | C | Task 覆盖新建/恢复后台参数；现已修复新类型通知拒绝和误唤醒，完整项目编排待实现 | 不采用旧 #245 补丁；通知修复经 PR #66 合入并随 v1.2.14 发布。状态保存与旧检查点覆盖修复经 PR #67 合入并随 v1.2.15 发布；688 项回归、跨平台 CI 及资产核验通过，真实 Cursor 未验收。[状态修复](history/issues/2026-11-27-issue244-subagent-state-fix.md)。现代 Await 三个分支经 707 项回归与 Clippy 验证，已提交 PR #68，最终云端 CI/审查/合入待完成，真实 Cursor 未验收；[候选记录](history/issues/2026-11-28-issue244-await-fix.md)。项目协调器和 Agent Store 仍未完成。[通知修复](history/issues/2026-11-27-issue244-notifications-fix.md)；[旧补丁审查](history/issues/2026-11-27-issue244-orchestration-check.md)。 |
+| ◐（通知、状态和 Await 已发布） | [#244](https://github.com/leookun/cursor-byok/issues/244) [Feature] Orchestration 工具（create-agent/AWAIT）、Projects 模式、按 Cursor 3.14.7 重同步 prompt/proto | C | Task 覆盖新建/恢复后台参数；现已修复新类型通知拒绝和误唤醒，完整项目编排待实现 | 不采用旧 #245 补丁；通知修复经 PR #66 合入并随 v1.2.14 发布。状态保存与旧检查点覆盖修复经 PR #67 合入并随 v1.2.15 发布；688 项回归、跨平台 CI 及资产核验通过，真实 Cursor 未验收。[状态修复](history/issues/2026-11-27-issue244-subagent-state-fix.md)。现代 Await 三个分支经 707 项回归、Clippy 和跨平台 CI 验证，PR #68 已合入，v1.2.16 已发布并完成资产核验，真实 Cursor 未验收；[修复记录](history/issues/2026-11-28-issue244-await-fix.md)。项目协调器和 Agent Store 仍未完成。[通知修复](history/issues/2026-11-27-issue244-notifications-fix.md)；[旧补丁审查](history/issues/2026-11-27-issue244-orchestration-check.md)。 |
 | ☐ | [#346](https://github.com/leookun/cursor-byok/issues/346) The thinking Effort of the child proxy should comply with the configuration. | D | 待补信息 | 与 #449/#118 归组；补主/子模型配置及实际请求参数。 |
 | ☐ | [#118](https://github.com/leookun/cursor-byok/issues/118) 子代理的模型未遵守用户配置，经常选的是fast | D | 待补信息 | 与 #449/#346 归组，补子模型配置及实际 fast 参数。 |
 

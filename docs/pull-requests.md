@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-28 个人维护 PR #68
+
+[PR #68](https://github.com/haohaomin/cursor-byok/pull/68) 补齐现代 Await：等待已有 Shell、子代理或仅计时，支持取消、断流及正确的原生错误卡片。PR #68 已合入 main（`46affbc`）；最终提交 `84e9b5d` 的分支、PR 与主线 CI 全部通过。v1.2.16 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。707 项工作区回归、Clippy 与格式检查通过；Codex 的卡片校验问题已修复并解决审查，Sourcery 配额跳过；真实 Cursor/完整 #244 待验收。[记录](history/issues/2026-11-28-issue244-await-fix.md)。
+
 ## 2026-11-28 个人维护 PR #67
 
 [PR #67](https://github.com/haohaomin/cursor-byok/pull/67) 修复子代理完成/待操作状态保存、旧历史分支覆盖及父任务正常结束、取消、失败时的状态补发。PR #67 已合入 main（`a8037b0`），最终提交 `dbbede7` 的分支、PR 与主线 CI 全部通过；v1.2.15 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。34 项通知、688 项工作区回归和 Clippy 通过；自动审查提出的跨项目消息误改本地运行问题已修复并经独立复核，Sourcery 配额跳过。[验证与边界](history/issues/2026-11-27-issue244-subagent-state-fix.md)。

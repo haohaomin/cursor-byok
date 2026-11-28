@@ -1,6 +1,6 @@
 # 维护状态与上游问题处理
 
-更新：2026-11-28；v1.2.15 发布及资产核验已完成。维护者：haohaomin。
+更新：2026-11-28；v1.2.16 发布及资产核验已完成。维护者：haohaomin。
 
 原仓库 [leookun/cursor-byok](https://github.com/leookun/cursor-byok) 已归档。这个 fork 继续收集原仓库的问题和候选补丁，复现后修复，并保留原作者与贡献者署名。它不是 Cursor 官方项目，也不是原作者指定的继任仓库。
 
@@ -8,7 +8,7 @@
 - 反馈：[本仓库 Issues](https://github.com/haohaomin/cursor-byok/issues)。请附原 Issue/PR 编号、操作系统、Cursor/BYOK 版本、模型协议、复现步骤和脱敏错误。
 - 贡献：[本仓库 Pull Requests](https://github.com/haohaomin/cursor-byok/pulls)。
 
-源码与安装包分别标记。v1.2.15 修复子代理完成/待操作状态保存、旧检查点覆盖和父任务结束补发；具体内容与资产核验见 [发布记录](history/releases.md#v1215)；未复现、部分通过或缺少原环境的条目不会标记为彻底解决。
+源码与安装包分别标记。v1.2.16 补齐现代 Await 等待已有 Shell、子代理和纯等待，以及取消、断流与原生错误卡片；包含此前子代理状态修复，具体内容与资产核验见 [发布记录](history/releases.md#v1216)；未复现、部分通过或缺少原环境的条目不会标记为彻底解决。
 
 PR #13、#43–#49 已于 2026-11-19 合入 main，并随 v1.2.1 发布。其中包括 Windows 用户级 CA、模型备份、批量添加模型、上下文上限与终端文件提示。Windows 普通用户下，有效 CA 的安装、生产 Ready 状态、系统信任 HTTPS、错误主机名拒绝及移除后拒绝连接均已实测通过；临时信任和私钥等已清理。BYOK 安装包的 CA 初始化和 Cursor 接管 UI 已通过；真实 Agent 验收尚未完成：提交与 provider 存活未可靠确认，账号 401 和空日志不足以定位根因（2026-11-24 更正），见 [CA 记录](history/issues/2026-11-23-windows-ca-valid-check.md) 与 [Agent 记录](history/issues/2026-11-23-windows-cursor-agent-acceptance.md)。
 
@@ -40,7 +40,7 @@ PR #13、#43–#49 已于 2026-11-19 合入 main，并随 v1.2.1 发布。其中
 
 ## 尚未解决的重点
 
-- [#244](https://github.com/leookun/cursor-byok/issues/244)：现有 Task 已支持新建/恢复后台参数；旧 [PR #245](https://github.com/leookun/cursor-byok/pull/245) 不采用。新类型通知接收、去重与 record-only 不唤醒已通过 PR #66 合入并随 v1.2.14 发布核验；运行状态保存与覆盖保护通过 PR #67 合入并随 v1.2.15 发布核验（688 项回归）；[状态修复](history/issues/2026-11-27-issue244-subagent-state-fix.md)。现代 Await、项目协调器及 Agent Store 联动仍待实现和实机验收。见 [通知修复与边界](history/issues/2026-11-27-issue244-notifications-fix.md)、[旧补丁审查](history/issues/2026-11-27-issue244-orchestration-check.md)。
+- [#244](https://github.com/leookun/cursor-byok/issues/244)：现有 Task 已支持新建/恢复后台参数；旧 [PR #245](https://github.com/leookun/cursor-byok/pull/245) 不采用。新类型通知接收、去重与 record-only 不唤醒已通过 PR #66 合入并随 v1.2.14 发布核验；运行状态保存与覆盖保护通过 PR #67 合入并随 v1.2.15 发布核验（688 项回归）；[状态修复](history/issues/2026-11-27-issue244-subagent-state-fix.md)。现代 Await 已由 PR #68 合入并随 v1.2.16 发布核验（707 项回归），[实现与边界](history/issues/2026-11-28-issue244-await-fix.md)。项目协调器及 Agent Store 联动仍待实现，真实 Cursor 尚未验收。见 [通知修复与边界](history/issues/2026-11-27-issue244-notifications-fix.md)、[旧补丁审查](history/issues/2026-11-27-issue244-orchestration-check.md)。
 
 - [#504](https://github.com/leookun/cursor-byok/issues/504)：已独立复现并修复活动 Run 中重复用户消息导致工具被中断的缺口，按消息 ID 在排队前去重。六项协议对照覆盖真实新消息、历史恢复和 Write 内容；原作者的全部症状仍缺请求样本，不能整体标为解决。[源码修复与验证边界](history/issues/2026-10-27-issue504-input-redelivery-fix.md)，已随 v1.1.0 发布。
 - [#155](https://github.com/leookun/cursor-byok/issues/155)：保持“完成一半”。普通后台短任务自动续答已通过；真实审批等待、压缩期间完成、最终补丁的输出通知等边界仍待验收。20 分钟测试按维护者本轮范围排除。[验收记录](history/issues/2026-10-19-issue155-acceptance.md)
