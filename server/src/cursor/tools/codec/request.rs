@@ -208,6 +208,7 @@ pub(super) fn edit_write_request(
     id: u32,
     call: &ToolCall,
     write: &EditWrite,
+    plan_mode: bool,
 ) -> Result<pb::AgentServerMessage> {
     Ok(server_message(
         id,
@@ -219,6 +220,7 @@ pub(super) fn edit_write_request(
             return_file_content_after_write: false,
             file_bytes: Vec::new(),
             encoding_hint: None,
+            plan_mode,
         }),
         Some(true),
     ))

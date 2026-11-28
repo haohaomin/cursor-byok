@@ -8597,6 +8597,7 @@ message WriteArgs {
   bool return_file_content_after_write = 4;
   bytes file_bytes = 5;
   optional string encoding_hint = 6;
+  bool plan_mode = 7;
 }
 
 // Copied from: local:agent.v1.WriteBinaryFileRequest (var: sCf)

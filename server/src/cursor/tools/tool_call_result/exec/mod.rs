@@ -5,7 +5,7 @@ mod render;
 
 use crate::{
     cursor::{protocol::proto::agent::v1 as pb, tools::codec as interaction},
-    model::ToolResult,
+    model::{ToolCall, ToolResult},
     Error, Result,
 };
 
@@ -143,8 +143,11 @@ fn image_mime_type(data: &[u8]) -> Option<&'static str> {
     }
 }
 
-pub(crate) fn edit_failure(pending: PendingExec, error: String) -> Result<ToolCompletion> {
-    let call = &pending.call;
+pub(crate) fn edit_failure(
+    call: &ToolCall,
+    started_at_ms: u64,
+    error: String,
+) -> Result<ToolCompletion> {
     let mut rendered = interaction::render_tool_call(call, false)?;
     let Some(pb::tool_call::Tool::EditToolCall(mut tool)) = rendered.tool.take() else {
         return Err(Error::Protocol(format!(
@@ -155,7 +158,7 @@ pub(crate) fn edit_failure(pending: PendingExec, error: String) -> Result<ToolCo
     tool.result = Some(edit::failure(edit::path(call)?, error.clone()));
     Ok(ToolCompletion::new(
         call,
-        pending.started_at_ms,
+        started_at_ms,
         ToolResult {
             call_id: call.call_id.clone(),
             content: error,

@@ -10,7 +10,7 @@ Proceed with your work as per usual. You may use synchronous or asynchronous sub
 
 
 <system_reminder>
-Plan mode is active. The user indicated that they do not want you to execute yet -- you MUST NOT make any edits, run any non-readonly tools (including changing configs or making commits), or otherwise make any changes to the system. This supersedes any other instructions you have received (for example, to make edits). Instead, you should:
+Plan mode is active. Research and develop the plan; do not implement it until the user confirms. You may create or edit planning documents using Write and StrReplace: Markdown files (.md, .markdown, .mdown, .mkd, .mkdn, .mdx), and project canvases at .cursor/projects/<project>/canvases/<name>.canvas.tsx. Do not edit implementation files, change configuration, make commits, or run other commands that modify the system. Instead, you should:
 
 1. Answer the user's query comprehensively by searching to gather information
 
@@ -22,7 +22,7 @@ Plan mode is active. The user indicated that they do not want you to execute yet
 
 5. If you have determined that you will need to ask questions, you should ask them IMMEDIATELY at the start of the conversation. Prefer a small pre-read beforehand only if ≤5 files (~20s) will likely answer them.
 
-6. When you're done researching, present your plan by calling the CreatePlan tool, which will prompt the user to confirm the plan. Do NOT make any file changes or run any tools that modify the system state in any way until the user has confirmed the plan.
+6. When creating a new plan, call CreatePlan to present it for confirmation. Every CreatePlan call creates a new file. To revise an existing plan, read its file and edit that same file with StrReplace or Write, including its YAML frontmatter todos when needed. Use the existing plan's path from the conversation or tool result; do not call CreatePlan again to update it. Wait for confirmation before implementing the plan.
 
 7. The plan should be concise, specific and actionable. Cite specific file paths and essential snippets of code. When mentioning files, use markdown links with the full file path (for example, `[backend/src/foo.ts
 ](backend/src/foo.ts)`).

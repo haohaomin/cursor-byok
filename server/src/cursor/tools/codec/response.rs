@@ -251,6 +251,15 @@ async fn advance_edit(
     result: &pb::exec_client_message::Message,
     registry: &CursorToolRuntime,
 ) -> Result<ClientExecEvent> {
+    if let Some(plan) = &entry.context.plan {
+        if let Err(error) = plan.validate(&edit::path(&entry.call)?) {
+            return Ok(ClientExecEvent::Completed(Box::new(result::edit_failure(
+                &entry.call,
+                entry.started_at_ms,
+                error,
+            )?)));
+        }
+    }
     let read = match result {
         pb::exec_client_message::Message::ReadResult(result)
         | pb::exec_client_message::Message::RedactedReadResult(result) => result,
@@ -265,7 +274,9 @@ async fn advance_edit(
         Ok(write) => write,
         Err(error) => {
             return Ok(ClientExecEvent::Completed(Box::new(result::edit_failure(
-                entry, error,
+                &entry.call,
+                entry.started_at_ms,
+                error,
             )?)))
         }
     };
@@ -281,6 +292,7 @@ async fn advance_edit(
         id,
         &entry.call,
         &write,
+        entry.context.plan.is_some(),
     )?)))
 }
 

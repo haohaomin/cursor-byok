@@ -16,6 +16,7 @@ mod schedule;
 pub(crate) mod semble;
 pub(crate) mod send_message;
 pub(crate) mod stream;
+mod text;
 mod tool_call_dispatch;
 pub(crate) mod tool_call_result;
 

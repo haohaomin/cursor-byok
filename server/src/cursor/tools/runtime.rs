@@ -50,6 +50,7 @@ pub(crate) enum ExecStage {
 
 #[derive(Clone, Debug, Default)]
 pub struct ExecContext {
+    pub plan: Option<PlanEdits>,
     pub project_root: bool,
     pub conversation_id: String,
     pub root_conversation_id: String,
@@ -63,6 +64,8 @@ pub struct ExecContext {
     pub admin_command_denylist: Vec<String>,
     pub mcp_routes: HashMap<(String, String), McpRoute>,
 }
+
+pub use super::edit::plan::PlanEdits;
 
 #[derive(Clone, Debug)]
 pub struct McpRoute {
