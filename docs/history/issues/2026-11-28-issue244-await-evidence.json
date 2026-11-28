@@ -225,19 +225,43 @@
     "final_static_review": "All three reported issues fixed; no new blocking issues in the scoped native-contract comparison. No live client execution."
   },
   "local_verification": {
-    "await_unit_tests": {
-      "passed": 13,
+    "source_commit": "bce146667b757546c8159eec2fea6fa83c91ebd5",
+    "await_unit_tests": 13,
+    "await_integration_tests": 5,
+    "transport_scenarios": [
+      "shell polling -> completion",
+      "subagent -> transcript read -> completion",
+      "pure sleep -> completion",
+      "new user message -> interrupted wait -> model continuation"
+    ],
+    "prefix_tests": 13,
+    "workspace": {
+      "passed": 706,
       "failed": 0,
-      "log": "/tmp/cursor-byok-issue244-await-unit-reviewed.log"
+      "ignored": 14
     },
-    "transport_prefix_before_parser_delta": {
-      "await_tests": 5,
-      "prefix_tests": 13,
-      "note": "includes Shell/Subagent/sleep plus user interruption; final full workspace suite rerunning after parser fixes"
-    },
-    "full_workspace": "running after final parser fixes",
-    "clippy": "running after final parser fixes",
+    "clippy": "workspace all-targets -D warnings passed",
+    "format": "passed",
     "cursor_ui": "not tested",
-    "real_provider": "not tested"
+    "real_provider": "not tested",
+    "logs": [
+      {
+        "path": "/tmp/cursor-byok-issue244-await-workspace-release.log",
+        "sha256": "264246bc34fb9679ebc6f4f56d418de8ed62c5227b7c880051baaa28c4a47fc4"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-clippy-release.log",
+        "sha256": "8b79ff52beb30fb89b9e441d178c02fb9e7a7540347f7a25a28ea0e3e1554f54"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-unit-reviewed.log",
+        "sha256": "334532e14fd3f67487025848ea48dd3df3eb72852ea15bedc9e8992c1ce72a28"
+      }
+    ]
+  },
+  "publication": {
+    "pr": 68,
+    "url": "https://github.com/haohaomin/cursor-byok/pull/68",
+    "status": "pushed; final cloud CI and review pending; not merged or released"
   }
 }
