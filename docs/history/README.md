@@ -13,6 +13,8 @@
 
 ## Issue 调查与验收
 
+- [2026-11-28 · Issue #139：编辑已有计划文件](issues/2026-11-28-issue139-plan-fix.md)
+
 - [2026-11-27 · Issue #244：当前子代理通知接收、去重与语义修复](issues/2026-11-27-issue244-notifications-fix.md)
 - [2026-11-27 · Issue #244 / PR #245：旧编排补丁与当前客户端对照](issues/2026-11-27-issue244-orchestration-check.md)
 

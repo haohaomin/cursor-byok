@@ -305,7 +305,13 @@ fn create_plan_output(value: &pb::CreatePlanResult) -> Result<(String, bool)> {
         .as_ref()
         .ok_or_else(|| missing("create plan"))?
     {
-        R::Success(_) => Ok((format!("plan created: {}", value.plan_uri), false)),
+        R::Success(_) => Ok((
+            format!(
+                "plan created: {}\nTo revise this plan, read and edit this same file with StrReplace or Write, including its YAML frontmatter todos when needed. Do not call CreatePlan again to update it: each call creates a new file.",
+                value.plan_uri
+            ),
+            false,
+        )),
         R::Error(value) => Ok((value.error.clone(), true)),
     }
 }

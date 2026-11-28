@@ -1224,6 +1224,7 @@ dependencies = [
  "json5",
  "parking_lot",
  "pem",
+ "percent-encoding",
  "prost",
  "prost-build",
  "prost-types",
@@ -1252,6 +1253,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "typed-path",
  "url",
  "uuid",
  "windows-registry",
@@ -7602,6 +7604,12 @@ dependencies = [
  "sha1 0.11.0",
  "thiserror 2.0.20",
 ]
+
+[[package]]
+name = "typed-path"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ce898823d8cd0f028662d2f349694b1af0a5cc9be83f1d213a00d3147445e1e"
 
 [[package]]
 name = "typeid"

@@ -1,6 +1,7 @@
 //! Compiles an AgentRunRequest into a PreparedRun.
 use std::collections::BTreeMap;
 
+use prost::Message;
 use uuid::Uuid;
 
 use crate::{
@@ -11,7 +12,7 @@ use crate::{
         protocol::proto::agent::v1 as pb,
         services::blob_sync::BlobSynchronizer,
         services::context_sync::RequestContextSynchronizer,
-        tools::runtime::{ExecContext, SubagentModel},
+        tools::runtime::{ExecContext, PlanEdits, SubagentModel},
     },
     model::{
         CanonicalMessage, ContentPart, ConversationId, MessageContent, Origin, PreparedRun,
@@ -144,6 +145,25 @@ pub(crate) async fn prepare(
         context::merge_local_rules(&mut request_context, rules_dir);
     }
     let request_context = request_context;
+    // With no client checkpoint, canonical history comes from the local head.
+    // Its mode must come from the same head, rather than silently becoming Agent.
+    let local_head = if request.conversation_state.is_none() {
+        store
+            .conversation(&conversation_id)
+            .await?
+            .map(|conversation| conversation.current_checkpoint_id)
+    } else {
+        None
+    };
+    let local_mode = match local_head {
+        Some(head) => store
+            .cursor_checkpoint(head)
+            .await?
+            .map(|bytes| pb::ConversationStateStructure::decode(bytes.as_slice()))
+            .transpose()?
+            .and_then(|state| state.mode),
+        None => None,
+    };
     let ActionProjection {
         mode: mut mode_number,
         mut turn_user,
@@ -154,7 +174,7 @@ pub(crate) async fn prepare(
         compacting,
         background_completion,
         explicit_resume,
-    } = action(request)?;
+    } = action(request, local_mode)?;
     let project_root =
         crate::cursor::projects::is_root(request, &conversation_id, store, blob_sync).await?;
     if project_root && mode_number == pb::AgentMode::Multitask as i32 {
@@ -204,7 +224,11 @@ pub(crate) async fn prepare(
             });
             store.import_checkpoint(&conversation_id, messages).await?
         }
-        Some(_) | None => store.ensure_conversation(&conversation_id).await?,
+        Some(_) => store.ensure_conversation(&conversation_id).await?,
+        None => match local_head {
+            Some(head) => head,
+            None => store.ensure_conversation(&conversation_id).await?,
+        },
     };
     let base_checkpoint_id = match input_id.as_deref() {
         Some(input_id) => {
@@ -417,6 +441,8 @@ pub(crate) async fn prepare(
         &subagent_model_overrides,
     );
     exec.project_root = project_root;
+    exec.plan = (mode_number == pb::AgentMode::Plan as i32)
+        .then(|| PlanEdits::new(request_context.env.as_ref()));
     Ok((
         PreparedRun {
             run_id,
@@ -524,11 +550,12 @@ fn decode_pending_tool_round(
     }
 }
 
-fn action(request: &pb::AgentRunRequest) -> Result<ActionProjection> {
+fn action(request: &pb::AgentRunRequest, local_mode: Option<i32>) -> Result<ActionProjection> {
     let conversation_mode = request
         .conversation_state
         .as_ref()
-        .and_then(|state| state.mode);
+        .and_then(|state| state.mode)
+        .or(local_mode);
     let mode = conversation_mode.unwrap_or(pb::AgentMode::Agent as i32);
     let Some(action) = request
         .action
@@ -760,6 +787,7 @@ fn exec_context(
         crate::model::SubagentModelOverride::Disabled => SubagentModel::Disabled,
     });
     ExecContext {
+        plan: None,
         project_root: false,
         conversation_id: conversation_id.to_string(),
         agent_session_id: request.agent_session_id.clone(),

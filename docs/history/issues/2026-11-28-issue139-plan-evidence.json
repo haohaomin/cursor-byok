@@ -1,0 +1,521 @@
+{
+  "target": "Cursor 3.31.15",
+  "inventory_reused": "ev_a485fa596bb60a5bf97cc88b22f0197ca1c4331db3c49acfa96d3cc6ff31806b",
+  "scope": "Read-only static examination of fixed shipped runtime/Agent Host/workbench. No application/bootstrap, accounts, network, Cargo, or repository edits. Offsets are Unicode character offsets, not bytes.",
+  "coverage_limits": [
+    "Existing REA inventory is partial: Agent Host parse OOM at 1024 MiB, alias/node/unknown limits and 12156 unselected; not a complete call graph.",
+    "Full default and Composer generators examined; minimal harness, feature excluded/allowed tool sets, custom toolsets or remote service behavior can differ.",
+    "Actual UI/user mode, approvals, local-vs-remote execution, OS ACLs, symlinks and client application of field7 are not exercised. No claim of real-world reproduction."
+  ],
+  "artifacts": {
+    "R": {
+      "path": "/Applications/Cursor.app/Contents/Resources/app/extensions/cursor-local-agent-runtime/dist/main.js",
+      "sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "bytes": 5277933,
+      "unicode_characters": 5276454
+    },
+    "H": {
+      "path": "/Applications/Cursor.app/Contents/Resources/app/extensions/cursor-agent-host/dist/main.js",
+      "sha256": "c7170dacc639cfd42a671527fb40175594096f6db53c2a96fe738b85f7121528",
+      "bytes": 6875499,
+      "unicode_characters": 6734338
+    },
+    "W": {
+      "path": "/Applications/Cursor.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js",
+      "sha256": "79a1c7cc4fc3b14df093b18829ab88c1ee955e60ea49bb7984dbaf488f033713",
+      "bytes": 39951704,
+      "unicode_characters": 39951678
+    }
+  },
+  "observations": [
+    {
+      "id": "factory",
+      "source": "R",
+      "character_offset": 3570244,
+      "summary": "CreatePlan v2 factory, invoked only by full tool generators when mode=PLAN.",
+      "excerpt": "Cqe=(e,t,n,r,o)=>{const s=o?.planModePromptCitation,i=o?.modelInfo,a=o?.enableCodeLineage,l=!1===r?void 0:o?.askQuestionToolName??\"AskQuestion\",c=!0===o?.useNewPlanModePrompts,u=o?.requestContext,d=o?.featureFlags,p=u?.e"
+    },
+    {
+      "id": "new_file_description",
+      "source": "R",
+      "character_offset": 3572492,
+      "summary": "Description expressly says each call creates a new file; edits use file editing tools; repeated CreatePlan is not an update.",
+      "excerpt": "g=\"UPDATING THE PLAN:\\n- This tool creates a NEW plan file each time it is called\\n- The plan file URI will be returned in the tool result\\n- To update an existing plan, read and edit the plan file directly using your file editing tools\\n- Do NOT call this tool again to update an existing plan\",v=i?.isComposer15??!1,y="
+    },
+    {
+      "id": "factory_parameters",
+      "source": "R",
+      "character_offset": 3572406,
+      "summary": "Public input is name?/overview?/plan/todos?; no target URI parameter.",
+      "excerpt": "f=VH.Ikc({name:kqe.optional(),overview:Tqe.optional(),plan:Sqe,todos:Eqe.optional()}),g=\"UPDATING THE PLAN:\\n- This tool creates a NEW plan file "
+    },
+    {
+      "id": "backend_random_name",
+      "source": "R",
+      "character_offset": 3571144,
+      "summary": "artifactsFolder route generates a random suffix, writes a fresh plans/<slug>_<id>.plan.md through Write executor; it does not select existing plan.",
+      "excerpt": "const d=(0,tD.randomUUID)().slice(0,8),p=function(e){const t=e.toLowerCase().trim().replace(/[<>:\"/\\\\|?*]/g,\"_\").replace(/\\s+/g,\"_\").replace(/[^a-z0-9_]+/g,\"_\").replace(/_+/g,\"_\").replace(/^_|_$/g,\"\");return t.length>0?t:\"plan\"}(u),h=`${p}_${d}`,m=l.join(c,`${h}.plan.md`),f=fqe(r,i,t),g=n.get(NK.Ln)"
+    },
+    {
+      "id": "interaction_route",
+      "source": "R",
+      "character_offset": 3583112,
+      "summary": "IDE route sends args and toolCallId to listener.query and consumes returned CreatePlanResult.",
+      "excerpt": "case:\"createPlanRequestQuery\",value:new Qe.vR({args:n,toolCallId:r})}}));if(\"createPlanRequestResponse\"!==o.result.case||!o.result.value)throw new Error(`Unexpected response for create plan query: ${o"
+    },
+    {
+      "id": "returned_uri_instructions",
+      "source": "R",
+      "character_offset": 3584180,
+      "summary": "Returned URI is exposed for direct file edits; CreatePlan must not be used to update that URI.",
+      "excerpt": "To update this plan, use your file editing tools directly on this file. The provided to-dos have been added to the file as well in the frontmatter, and should be edited there. Do NOT call create_plan again to update the plan.\"})]})))}switch(r?.case){case\"succe"
+    },
+    {
+      "id": "default_edit_generator",
+      "source": "R",
+      "character_offset": 3962850,
+      "summary": "Full default generator selects StrReplace+Write for anthropic/google/xai/zai/unknown and non-GPT5 openai/cursor; GPT5 family selects ApplyPatch.",
+      "excerpt": "function nZe(e){const t=[],n=()=>F$e(e.resourceAccessor,e.fileOperationLockManager,e.stateHandler,e.promptVersion,e.modelInfo,e.featureFlags),r=()=>A$e(e.resourceAccessor,e.formattingOptions,e.fileOperationLockManager,e.stateHandler,e.promptVersion,e.modelInfo,e.featureFlags),o=()=>i$e(e.resourceAcc"
+    },
+    {
+      "id": "default_edit_inclusion",
+      "source": "R",
+      "character_offset": 3974513,
+      "summary": "Full default generator includes edit tools except Graphite background-chat restriction; no PLAN exclusion at this call.",
+      "excerpt": "T||(I.push(Dqe(t,n,r,d)),I.push(...nZe({...e,promptVersion:d})));const O=(e.featureFlags?.enableGrindSwarmSubagent??!1)&&KKe(e.modelInfo),N="
+    },
+    {
+      "id": "composer_edit_inclusion",
+      "source": "R",
+      "character_offset": 3999203,
+      "summary": "Composer full generator omits edits in filtered ASK/Graphite conditions, but not PLAN; A$e=StrReplace and F$e=Write.",
+      "excerpt": "b||(FX(e.enableReadLints,e.requestContext)?k.push(xWe(t,u)):k.push(THe(0,u)),_||k.push(v$e(t,f,a,n,u,e.modelInfo,e.featureFlags)),k.push(YVe(t,n,u,e.featureFlags)),_||(k.push(A$e(t,f,a,n,u,e.modelInfo,e.featureFlags)),k.push(F$e(t,a,n,u,e.modelInfo,e.featureFlags)))),k.push(gWe(t,f,u,{preferRedactedRead:g,fileOperationLockManager:a,featureFlags:e.featureFlags})),k.push(pze(t,u)),e.enableDeprecatedLsTool&&k.push(rHe(t,u)),!e.enableAskQue"
+    },
+    {
+      "id": "composer_edit_conditions",
+      "source": "R",
+      "character_offset": 3993346,
+      "summary": "Composer edit omission b is ASK && filter flag; _ is Graphite background-chat.",
+      "excerpt": "y=i===Q.xyI.ASK,w=e.enableFilterEditToolsInAskMode??!0,b=y&&w,_=e.agentType===vX.BACKGROUND&&e.backgroundAgentSource===qQ.GRAPHITE_CHAT_WEB;let S;const k=[];(function(e){return e.agentType===vX.CLI&&!0===e.featureFlags?."
+    },
+    {
+      "id": "catalog_feature_filters",
+      "source": "R",
+      "character_offset": 3958853,
+      "summary": "Final catalog applies allowedTools/excludedTools and advertisement limits; these static findings do not prove a specific live feature-gate configuration.",
+      "excerpt": "function WKe(e,t,n){const r=function(e,t){return void 0===t?e:e.filter((e=>{const n=E7[e.toolIdentifier];return void 0!==n&&t.has(n)}))}(function(e,t){return 0===t.size?e:e.filter((e=>{const n=E7[e.toolIdentifier];return void 0===n||!t.has(n)}))}(t,new Set(e.featureFlags?.excludedTools??[])),void 0!==e.featureFlags?.allowedTools?new Set(e.featureFlags.allowedTools):void 0);if(v"
+    },
+    {
+      "id": "path_normalize",
+      "source": "R",
+      "character_offset": 2452779,
+      "summary": "file:// uses node:url.fileURLToPath (fallback raw on failure), expands leading ~, resolves with native node:path; no filesystem realpath or file ownership lookup in this helper.",
+      "excerpt": "function tie(e,t){const n=function(e){return e.replace(/^~(?=$|\\/|\\\\)/,(0,IN.homedir)())}(function(e){if(!e.startsWith(\"file://\"))return e;try{return(0,eK.fileURLToPath)(e)}catch{return e}}(e));return t&&!(0,AN.isAbsolute)(n)?(0,AN.resolve)(t,n):(0,AN.resolve)(n)}function nie(e){return e.replace(/\\\\/g,\"/\")}functio"
+    },
+    {
+      "id": "path_module",
+      "source": "R",
+      "character_offset": 407702,
+      "summary": "AN resolves to native node:path; Windows/POSIX normalization depends on runtime platform.",
+      "excerpt": "76760(e){\"use strict\";e.exports=require(\"node:path\")},1"
+    },
+    {
+      "id": "allowed_suffixes",
+      "source": "R",
+      "character_offset": 3512869,
+      "summary": "Case-insensitive after trim for .md/.markdown/.mdown/.mkd/.mkdn/.mdx; canvas regex is case-insensitive exact projects/<one segment>/canvases/<one segment>.canvas.tsx.",
+      "excerpt": "VUe=\"Cannot edit non markdown files in plan mode\",YUe=[\".md\",\".markdown\",\".mdown\",\".mkd\",\".mkdn\",\".mdx\"],KUe=/(?:^|\\/)\\.cursor\\/projects\\/[^/]+\\/canvases\\/[^/]+\\.canvas\\.tsx$/i;class ZUe{constructor(e){this.buffer=[],this.closed=!1,this.waiters=[],this.consume"
+    },
+    {
+      "id": "path_predicate",
+      "source": "R",
+      "character_offset": 3526152,
+      "summary": "Normalizes through tie; Markdown path trim/lowercase; canvas path trim plus backslash-to-slash before regex. Not limited to .plan.md or owned/registered plan paths.",
+      "excerpt": "function kLe(e){const t=tie(e);return function(e){const t=e.trim().toLowerCase();return YUe.some((e=>t.endsWith(e)))}(t)||function(e){return KUe.test(e.trim().replace(/\\\\/g,\"/\"))}(t)}var TLe=n(76536);const xLe=/(?:^"
+    },
+    {
+      "id": "plan_guard",
+      "source": "R",
+      "character_offset": 3544115,
+      "summary": "Only PLAN mode applies kLe; rejected before Exec if disallowed.",
+      "excerpt": "function uBe(e,t){if(t.mode===Q.xyI.PLAN&&!kLe(e))throw new gV(VUe)}class dBe extends hV{constructor(e,t)"
+    },
+    {
+      "id": "str_replace_guard",
+      "source": "R",
+      "character_offset": 3552079,
+      "summary": "Shared edit reads call uBe before execution.",
+      "excerpt": "async function $Be(e,t,n,r,o,s,i){const a=performance.now();fBe.increment(e,1),uBe(n,s);const l=t.get(t1._A);try{const c=new e1.a2({path:n,toolCallId:o.toolCallId}),u=ZG(`${o.toolC"
+    },
+    {
+      "id": "write_guard_and_flag",
+      "source": "R",
+      "character_offset": 3556372,
+      "summary": "Every shared write checks uBe then emits WriteArgs planMode: state.mode===PLAN.",
+      "excerpt": "async function KBe(e,t,n,r,o,s,i,a,l){wBe.increment(e,1),uBe(n,i);const c=t.get(NK.Ln),u=new UK.hY({path:n,fileText:r,toolCallId:s.toolCallId,planMode:i.mode===Q.xyI.PLAN}),d=ZG(`${s.toolCallId}-write`),p=await c.execute(e,u,{execId:d,hookContextCollector:s.hookContextCollector,enableAgentStoreConflictNotices:!0===s.enableAgentStoreConflictNotices,...l});if(void 0===p.result.case)throw bBe.increment(e,1,{error_t"
+    },
+    {
+      "id": "write_field7_runtime",
+      "source": "R",
+      "character_offset": 5049868,
+      "summary": "plan_mode = field 7, scalar bool (8), not optional (no ?), constructor default false; encoding_hint field6 is optional.",
+      "excerpt": "WriteArgs|1 path 9|2 file_text 9|3 tool_call_id 9|4 return_file_content_after_write 8|5 file_bytes 12|6 encoding_hint 9?|7 plan_mode 8\"]}}class a extends s{constructor(e){super(),t"
+    },
+    {
+      "id": "write_field7_workbench",
+      "source": "W",
+      "character_offset": 12013861,
+      "summary": "Independent workbench descriptor confirms bool field 7 with no opt:true.",
+      "excerpt": "{no:7,name:\"plan_mode\",kind:\"scalar\",T:8}]),cxh=T.makeMessa"
+    },
+    {
+      "id": "write_field7_host",
+      "source": "H",
+      "character_offset": 3204728,
+      "summary": "Agent Host descriptor also confirms field7 bool non-optional.",
+      "excerpt": "WriteArgs|1 path 9|2 file_text 9|3 tool_call_id 9|4 return_file_content_after_write 8|5 file_bytes 12|6 encoding_hint 9?|7 plan_mode 8\"]}}class a extends o{constructor(t){super(),t"
+    },
+    {
+      "id": "identity_cache",
+      "source": "W",
+      "character_offset": 16907134,
+      "summary": "Caches creation promise by toolCallId; a failed promise is removed. It does not cache by conversation or plan name.",
+      "excerpt": "function Yoa(e,t){const i=dSr.get(e);if(i)return i;const n=t().catch(r=>{throw dSr.delete(e),r});return dSr.set(e,n),n}var dSr,dQp=B({\"createPlanIdentity.js\"(){\"use strict\";I(),dSr=new "
+    },
+    {
+      "id": "streaming_identity",
+      "source": "W",
+      "character_offset": 16909311,
+      "summary": "Streaming consumer reads URI from current tool bubble; updates that URI if present, else creates through Yoa(current toolCallId).",
+      "excerpt": "const u=r.getBubbleData(a)?.additionalData,d=u?.hasOpenedEditor===!0,p=u?.planId,m=u?.planUri,g=s?.name,v=this.isBackendControlledPlanComposer(),_=s?.plan||\"\",b=s?.overview||\"\",S=s?.todos?.map(k=>({id:k.id||\"\",content:k.content,status:\"pending\",dependencies:k.dependencies||[]}))||[];try{if(v)return;if(m){if(_){const k=MZ(m),A=s?.phases?.map(x=>({name:x.name,todos:x.todos?.map(R=>({id:R.id||\"\",content:R.content,status:\"pending\",dependenc"
+    },
+    {
+      "id": "query_consumer",
+      "source": "W",
+      "character_offset": 16916061,
+      "summary": "Queries current toolCallId bubble for its planUri; if absent, derives name from plan title when omitted and creates a fresh file via Yoa.",
+      "excerpt": "async handleCreatePlanRequest(e){const t=this.context.instantiationService.invokeFunction(p=>p.get(KY)),i=this.context.composerDataHandle.data.composerId,n=e.toolCallId,r=e.args,s=this.getToolFormer(),o=s.getBubbleIdByToolCallId(n),a=o?s.getBubbleData(o):void 0,l=a?.additionalData,c=l?.planId,u=l?.planUri;let d;if(u){const p=MZ(u);if(d=p.fsPath,o&&!c){const m=await t.getRegistryEntry(p);s.setBubbleData(o,{additionalData:{...a?.additionalData,planId:m?.id,planUri:p.toString()}})}}else try{const p=r?.name||void 0,m=r?.overview||\"\",g=r?.todos?.map(S=>({id:S.id||\"\",content:S.content,status:\"pending\",dependencies:[]}))||[],v=p??t.getPlanTitle(r?.plan??\"\"),_=await Yoa(n,async()=>{const S=await t.createPlanFile(i,v,m,"
+    },
+    {
+      "id": "plan_service_create",
+      "source": "W",
+      "character_offset": 15580974,
+      "summary": "Service delegates to createPlanForComposer; no getExistingPlanUri/getOrCreatePlanFile in this consumer path.",
+      "excerpt": "async createPlanFile(e,t,i,n,r,s,o){return(await this._planStorageService.createPlanForComposer({composerId:e,name:t,overview:i,todos:n,body:r,isProject:s,phases:o})).fileUri}async updatePlanByUri(e,t,i,n,"
+    },
+    {
+      "id": "plan_storage_create",
+      "source": "W",
+      "character_offset": 15549778,
+      "summary": "Storage allocates random eight-character suffix per call, writes file and registers new plan ID with composer ownership.",
+      "excerpt": "async createPlanForComposer(e){await this.loadRegistry();const t=nn().slice(0,8),n=`${this.sanitizeFileName(e.name)}_${t}`,r=`${n}.plan.md`,s=this.getVirtualUri(n),o={name:e.name,overview:e.overview,todos:e.todos,isProject:e.isProject,phases:e.phases},a=cLe(o)+`\n\n`+e.body,l=await this.writePlanFileWithFallback(r,a),c=Date.now(),u={id:n,name:e.name,uri:l,createdBy:e.composerId,editedBy:[e.composerId],referencedBy:[e.composerId]"
+    },
+    {
+      "id": "plan_storage_location",
+      "source": "W",
+      "character_offset": 15548825,
+      "summary": "Client chooses ~/.cursor/plans; on permission failure falls back to workspace .cursor/plans; actual filesystem writes performed by client file service.",
+      "excerpt": "async writePlanFileWithFallback(e,t){const i=await this.getUserPlansDir();try{try{await this.fileService.createFolder(i)}catch(o){if(this.isPermissionError(o))throw o}const s=as(i,e);return await this.fileService.writeFile(s,Nn.fromString(t)),s}catch(s){if(!this.isPermissionError(s))throw s;this._composerLogService.warn(\"[PlanStorageService] Permission denied writing to user plans directory, falling back to workspace .cursor/p"
+    },
+    {
+      "id": "old_get_or_create_definition",
+      "source": "W",
+      "character_offset": 15583236,
+      "summary": "This helper can reuse latest plan, but scoped installed JS has only its definition occurrence and modern CreatePlan handlers do not invoke it.",
+      "excerpt": "async getOrCreatePlanFile(e,t,i,n,r,s,o){const a=await this._planStorageService.getPlanForComposer(e);if(a){const c={overview:i,todos:n,body:r,isProject:s,phases:o};return t!==void 0&&(c.name=t),await this._planStorageService.updatePlanFull(a.id,c,e),(await this._planStorageService.getPlanForCompose"
+    },
+    {
+      "id": "write_transport",
+      "source": "W",
+      "character_offset": 13300844,
+      "summary": "Exec write request/result channel registration.",
+      "excerpt": "kZt=aD(G3.writeExecutor,e=>new oD(e,lD(\"writeArgs\"),cD(\"writeResult\")),(e,t)=>{t.register(new sD(e,dD(\"writeArgs\"),uD(\"writeResult\")))})}}),NZ,XP1=B({\"request-context.ts\"(){\"use strict\";I(),"
+    },
+    {
+      "id": "write_forwarding",
+      "source": "W",
+      "character_offset": 16439177,
+      "summary": "Workbench WriteExecutor resolves encoding hint then forwards to remoteWriteExecutor. Specific downstream field7 enforcement not present in scoped three artifacts.",
+      "excerpt": "qqp=class{constructor(e,t,i,n){this.remoteWriteExecutor=e,this.workspaceContextService=t,this.textResourceConfigurationService=i,this.textFileService=n}async execute(e,t,i){const n=this.workspaceContextService.resolveRelativePath(t.path),s=this.textFileService.files.get(n)?.getEncoding()??this.textResourceConfigurationService.getValue(n,\"files.encoding\");let o=t;return s&&s!==\"utf8\"&&(o=new ZDo({."
+    },
+    {
+      "id": "write_approval",
+      "source": "W",
+      "character_offset": 16768594,
+      "summary": "Client decisions service locates tool context, applies write approvals and policy details including outOfWorkspace/protectedConfig; separate from runtime Plan extension guard.",
+      "excerpt": "async handleWriteOperation(e,t,i,n){let r;try{r=await this.getToolContextOrWait(e,t,n)}catch(k){return{approved:!1,reason:`Failed to find tool call context: ${k instanceof Error?k.message:String(k)}`}}const s=this._composerDataService.getToolFormer(r.composerHandle);if(!s)throw new Error(\"[ComposerDecisionsService] ToolFormer not found for composerHandle\");const o=this._composerDataService.getComp"
+    }
+  ],
+  "inferences": [
+    {
+      "statement": "A second modern CreatePlan invocation with a new toolCallId, including omitted name, selects a new URI rather than updating latest plan.",
+      "basis": [
+        "identity_cache",
+        "query_consumer",
+        "plan_service_create",
+        "plan_storage_create"
+      ]
+    },
+    {
+      "statement": "The current BYOK description advising complete revised plan plus omitted name cannot select an existing file through the current native query handler.",
+      "basis": [
+        "factory_parameters",
+        "query_consumer",
+        "plan_storage_create"
+      ]
+    },
+    {
+      "statement": "Adding edit tool advertisement alone without a mode-aware path guard would omit a native permission boundary.",
+      "basis": [
+        "plan_guard",
+        "write_guard_and_flag"
+      ]
+    }
+  ],
+  "unknowns": [
+    "No reproduction steps in issue screenshot; cannot know exact original Cursor/client/build or whether the file was selected/attached in that case.",
+    "No direct CreatePlan target URI input in examined factory/query; file edits take model-selected path from returned URI/user context. No full audit of how context advertises existing plan URIs.",
+    "Installed native name-field description still mentions first-call-only/stable naming, but actual factory description and consumers generate new identity for new calls; do not use field description alone as behavior evidence."
+  ],
+  "repository_snapshot": {
+    "root": "/Users/renhao/.codex/worktrees/windows-ca-user-store/cursor-byok",
+    "facts": [
+      {
+        "path": "server/prompt/cursor/modes/plan.json",
+        "line": 1,
+        "summary": "Plan catalog omits Write/StrReplace/ApplyPatch."
+      },
+      {
+        "path": "server/prompt/cursor/tools.json",
+        "line": 294,
+        "summary": "CreatePlan wrongly advertises revise-current-plan by omitting name; native handler chooses per-call URI."
+      },
+      {
+        "path": "server/prompt/cursor/plan/runtime.md",
+        "line": 25,
+        "summary": "Plan prompt broadly prohibits file edits, lacks native plan-document editing exception."
+      },
+      {
+        "path": "server/src/cursor/tools/codec/query.rs",
+        "line": 142,
+        "summary": "CreatePlan query args and toolCallId, no target URI."
+      },
+      {
+        "path": "server/src/cursor/tools/codec/request.rs",
+        "line": 215,
+        "summary": "WriteArgs currently does not include plan_mode."
+      },
+      {
+        "path": "protocols/cursor/agent_v1.proto",
+        "line": 8593,
+        "summary": "WriteArgs declares only fields1-6, lacks field7 bool plan_mode."
+      },
+      {
+        "path": "server/src/cursor/tools/tool_call_result/interaction.rs",
+        "line": 301,
+        "summary": "Success renderer returns client plan_uri as plan created."
+      }
+    ]
+  },
+  "baseline_reproduction": {
+    "base_commit": "c512727833a8563020b6e2de830e286935133fab",
+    "test_file": "server/tests/plan_editing.rs",
+    "test_sha256": "99a8c53868420ac15c5a29ae8bd513605ffb3829edf1dfc964e6be2536016aa3",
+    "result": {
+      "passed": 1,
+      "failed": 3
+    },
+    "failures": [
+      "Plan does not offer Write",
+      "WriteArgs lost Plan mode field 7",
+      "Plan dispatched an edit outside its allowed document types"
+    ],
+    "control": "Agent mode edits source with plan_mode=false",
+    "log": "/tmp/cursor-byok-issue139-plan-editing-red.log",
+    "log_sha256": "9a9cdb8eb95a579f680d763474c33b69e29f8f48954d243846c8f168878e69c3",
+    "scope": "FakeProvider, synthetic protocol transport and temporary SQLite. Existing hidden edit dispatch already works if forced by the fake model; missing advertisement does not mean dispatcher returns unavailable."
+  },
+  "publication": {
+    "status": "candidate implemented; local validation complete; awaiting PR/CI",
+    "branch": "codex/plan-file-editing",
+    "base_commit": "1dfc34b453e27d763183ce5aef50a3a12ced53b1",
+    "latest_release": "v1.2.17",
+    "pr": null,
+    "merged": false,
+    "released": false
+  },
+  "path_contract_followup": {
+    "run_summary": {
+      "node": "v25.8.1",
+      "input_count": 141,
+      "row_count": 282,
+      "by_platform": [
+        {
+          "platform": "posix",
+          "allowed": 101,
+          "rejected": 40,
+          "error": 0,
+          "url_fallback": 10
+        },
+        {
+          "platform": "win32",
+          "allowed": 96,
+          "rejected": 45,
+          "error": 0,
+          "url_fallback": 20
+        }
+      ],
+      "sha256": "acd8c4f0c186ccd9421646b0e512e12c2bbc8344573d4842976a20e53e2a5144"
+    },
+    "manifest": {
+      "source_sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "node_version": "v25.8.1",
+      "case_count": 141,
+      "row_count": 282,
+      "files": {
+        "path-truth-table.json": "acd8c4f0c186ccd9421646b0e512e12c2bbc8344573d4842976a20e53e2a5144",
+        "path-inputs.json": "462c41e989b507bac7837e837b2c5daa5ddf6ea14af19f74c45f492cdaa22674",
+        "path-native-pure.js": "393b5defef860576bbceb2bf9e0f218cd03be76455d731ab058e461c4e289172",
+        "path-probe.cjs": "754658f05ae94dcac162ff77f935e924c9784472abf95cc9fbfd2283e45e69d4",
+        "path-extraction.json": "bb9a319f8b793d2e94527bbbf909c1040347e09d0167fcea787aafdbc0270542",
+        "path-run-summary.json": "9dacef0e92ffb9ab150e0e0f407bb6872868d753fbdd4bf4f7d55c49959f2e93",
+        "path-method.md": "122993e28f3aafb078bf84c0380a63cc58142f0dd6412d8d71ca8011a0ceedc8",
+        "path-entry-trace.json": "cd69b09d188ed2a45961a39b82dc716861028ccff0621109878be8393f556d74"
+      }
+    },
+    "entry_trace": {
+      "source_sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "scope": "Limited static follow-up through the concrete modern StrReplace/Write schema, streaming parser and shared edit/write helpers. Does not prove absence of path normalization in earlier request processing or downstream client executors. No additional execution.",
+      "observations": [
+        {
+          "id": "modern_strreplace_schema",
+          "character_offset": 3618280,
+          "excerpt": "C$e=VH.Ikc({path:VH.YjP().describe(\"The absolute path to the file to modify\"),old_string:VH.YjP().describe(\"The text to replace\"),new_string:VH.YjP().describe(\"The text to replace it with (must be different from old_string)\"),replace_all:VH.zMY().optional().de",
+          "summary": "Modern path is a plain string with absolute-path description; no transform in this schema."
+        },
+        {
+          "id": "streaming_parser",
+          "character_offset": 3548271,
+          "excerpt": "NBe=(e,t,n,r)=>Object.assign((async(o,s,i,a)=>{const l=new ZUe(i),c=async e=>{throw new fV(e??\"Invalid arguments\")};!0!==a.announcedByModelStep&&s.emitPartialToolCall(o,a.toolCallId,n);const u=MBe(r.path),d=r.streamField?MBe(r.streamField):void 0,p=new Kpe({em",
+          "summary": "Streaming parser safeParses JSON then passes r.data into concrete execute callback."
+        },
+        {
+          "id": "strreplace_path",
+          "character_offset": 3621496,
+          "excerpt": "h=\"path\"in s?s.path:s.file_path,m=new vd.g$({path:h,streamContent:s.new_string}),f=new vd.T6({args:m,result:void 0}),g=await o.executeToolCall(c.ctx,E$e(f),a.toolCallId,(async n=>{const o=await $Be(n,e,h,(async(e,n)=>{try{const r=tqe(e,{formattingOptions:t,con",
+          "summary": "StrReplace selects path/file_path directly and passes it to $Be."
+        },
+        {
+          "id": "edit_path_to_write",
+          "character_offset": 3554697,
+          "excerpt": "g=await KBe(e,t,n,f,{...m.edit,originalContent:p},o,s,i),v=performance.now()-a;return yBe.histogram(e,v),gBe.increment(e,1),g}catch(t){const n=performance.now()-a;throw yBe.histogram(e,n),vBe.increment(e,1,{error_type:\"exception\"}),t}}class jBe extends hV{cons",
+          "summary": "Shared edit forwards same path n to KBe; its guard uses kLe/tie only to allow/reject."
+        },
+        {
+          "id": "write_path",
+          "character_offset": 3625055,
+          "excerpt": "u=P$e(\"file_path\"in o?o.file_path:o.path),d=o.contents,p=new vd.g$({path:u,streamContent:d}),h=new vd.T6({args:p,result:void 0});return await r.executeToolCall(c.ctx,ABe(h),a.toolCallId,(async t=>{const r=new e1.a2({path:u,toolCallId:a.toolCallId}),l=ZG(`${a.t",
+          "summary": "Write first applies P$e to input path before Read/Write helpers."
+        },
+        {
+          "id": "write_typo_regex",
+          "character_offset": 3623097,
+          "excerpt": "const M$e=/(^\\/(?:Users|home)\\/[^/]+\\/\\.cursor\\/)worktries(?=\\/|$)/g;function P$e(e){return e.replace(M$e,\"$1worktrees\")}var R$e=function(e,",
+          "summary": "P$e correction is narrowly /Users or /home/<user>/.cursor/worktries to worktrees."
+        },
+        {
+          "id": "write_typo_helper",
+          "character_offset": 3623166,
+          "excerpt": "function P$e(e){return e.replace(M$e,\"$1worktrees\")}var R$e=function(e,t,n){if(null!=t){if(\"object\"!=typeof t&&\"function\"!=typeof t)throw new TypeError(\"Object expected.\");var r,o;if(n){if(!Symbol.asyncDispose)throw new TypeError(\"Symbol.asyncDispose is not de",
+          "summary": "P$e only uses the preceding replacement regex; no tie call."
+        },
+        {
+          "id": "write_path_to_write",
+          "character_offset": 3626546,
+          "excerpt": "g=await KBe(t,e,u,o.contents,{resultForModel:f,linesAdded:h,linesRemoved:m,diffString:p,originalContent:d},a,n,0,{refuseUnreadChanges:!0!==s?.writeUnreadChangeGuardDisabled});return LBe(t,u,g,{omitBeforeAfterFileStates:s?.omitEditBeforeAfterFileStates})}),(e=>",
+          "summary": "Write forwards P$e result u to KBe."
+        },
+        {
+          "id": "legacy_relative_schema",
+          "character_offset": 3624623,
+          "excerpt": "D$e=VH.Ikc({file_path:VH.YjP().describe(\"The path to the file to modify. Always specify the target file as the first argument. You can use either a relative path in the workspace or an absolute path.\"),contents:VH.YjP().describe(\"The contents of the file to wr",
+          "summary": "Legacy dsv3-1018 file_path schema explicitly permits workspace-relative or absolute paths; not the modern BYOK schema contract."
+        }
+      ]
+    },
+    "method_path": "/tmp/cursor-byok-issue139-contract/path-method.md",
+    "truth_table_path": "/tmp/cursor-byok-issue139-contract/path-truth-table.json",
+    "implementation_status": "No production changes yet; do not substitute server cwd/HOME for the client. Native normalization in this probe is not the final execution target."
+  },
+  "candidate": {
+    "behavior": [
+      "Plan advertises Write and StrReplace at the end of its tool list",
+      "CreatePlan always creates a new file; existing plans edited by returned path",
+      "WriteArgs field 7 plan_mode carries the execution mode",
+      "Pre-read and pre-write document guard; native Edit failure cards without execution",
+      "Missing client checkpoint restores mode from the stored conversation head; explicit Agent/ExecutePlan overrides"
+    ],
+    "dependencies": {
+      "typed-path": "0.13.0; cross-platform lexical resolution without server filesystem",
+      "percent-encoding": "2; direct use of existing transitive dependency for file URI decoding"
+    },
+    "path_policy": {
+      "native_total": 282,
+      "valid_native_comparisons": 252,
+      "rejected_native_url_conversion_fallbacks": 30,
+      "fixture": "server/src/cursor/tools/edit/plan/native-path-cases.json",
+      "fixture_sha256": "ab03a220ad9891389827442a091b8ef626f7a7320eb2e4054af9b865acb6f33c",
+      "client_context": "process_working_directory; home only when is_working_dir_home_dir=true; no server cwd/HOME",
+      "wire_target": "Original path retained; guard normalization is not written back"
+    },
+    "real_cursor_acceptance": false,
+    "provider_acceptance": false,
+    "twenty_minute_test": false,
+    "validation": [
+      {
+        "name": "first_green",
+        "log": "/tmp/cursor-byok-issue139-plan-editing-green.log",
+        "sha256": "408cafdc6698fd19e66e1655c1149bf6b591a903ec0cd179970fbebf43548c67",
+        "result": "4 passed"
+      },
+      {
+        "name": "resume_red",
+        "log": "/tmp/cursor-byok-issue139-plan-resume-red.log",
+        "sha256": "a79fff8317f3b7e1ff7fe508601d465210aa7482e4ca5da2be3d6d4912aa75a5",
+        "result": "6 passed; 1 failed: Plan restriction disappeared with include_state=false"
+      },
+      {
+        "name": "native_path_green",
+        "log": "/tmp/cursor-byok-issue139-native-path-green.log",
+        "sha256": "ddb20607e1038ce623143fead2d872303dc1150e5f42a72e087a588ed85bab5b",
+        "result": "8 passed, including 252 native comparisons"
+      },
+      {
+        "name": "clippy",
+        "log": "/tmp/cursor-byok-issue139-clippy.log",
+        "sha256": "71fef3f1b808ca6ebefd17efa51435773a505ead42923602729ef35ab8c57322",
+        "result": "workspace all-targets, warnings denied; exit 0"
+      },
+      {
+        "name": "focused_final",
+        "log": "/tmp/cursor-byok-issue139-plan-final.log",
+        "result": "10 plan_editing + 13 prefix_stability passed"
+      },
+      {
+        "name": "focused_refusal_recheck",
+        "log": "/tmp/cursor-byok-issue139-refusal-recheck.log",
+        "result": "1 anthropic_refusal recheck passed"
+      },
+      {
+        "name": "workspace_recheck",
+        "log": "/tmp/cursor-byok-issue139-workspace-recheck.log",
+        "result": "736 passed, 0 failed, 14 ignored across 50 suites"
+      },
+      {
+        "name": "clippy_final",
+        "log": "/tmp/cursor-byok-issue139-clippy-final.log",
+        "result": "workspace all-targets, warnings denied; exit 0"
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@
   "tools": [
     "Shell", "Glob", "Grep", "Read", "TodoWrite", "ReadLints", "WebSearch",
     "WebFetch", "AskQuestion", "CreatePlan", "Task", "FetchMcpResource",
-    "CallMcpTool", "SembleSearch", "SembleFindRelated", "CreateGoal", "UpdateGoal", "Await"
+    "CallMcpTool", "SembleSearch", "SembleFindRelated", "CreateGoal", "UpdateGoal", "Await",
+    "Write", "StrReplace"
   ]
 }

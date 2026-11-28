@@ -224,8 +224,10 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "CreateGoal",
             "UpdateGoal",
             "Await",
+            "Write",
+            "StrReplace",
         ],
-        "8cd737ddb832dc6d76208da487a59a8ed6c771b93e2e8b05728ab50d8517a23e",
+        "b8a969fda915a35c8a72ab5f5d8f35a2705b157ee316083fc059e3bf4b16ac58",
     );
     assert_mode(
         &assets,

@@ -1,4 +1,5 @@
 //! Maintains edit-specific Tool state and projections.
+pub(crate) mod plan;
 use serde_json::Value;
 use similar::{ChangeTag, TextDiff};
 

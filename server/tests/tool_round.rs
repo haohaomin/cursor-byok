@@ -45,6 +45,7 @@ fn call(id: &str, name: &str) -> ToolCall {
 
 fn exec_context() -> ExecContext {
     ExecContext {
+        plan: None,
         project_root: false,
         conversation_id: "conversation".into(),
         root_conversation_id: "conversation".into(),

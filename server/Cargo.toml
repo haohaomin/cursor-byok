@@ -34,6 +34,7 @@ include_dir = "0.7"
 json5 = "0.4"
 parking_lot = "0.12"
 pem = "3"
+percent-encoding = "2"
 prost = "0.13"
 prost-types = "0.13"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "brotli", "deflate", "gzip", "http2", "json", "native-tls-alpn", "socks", "stream", "system-proxy", "zstd"] }
@@ -56,6 +57,7 @@ tokio-util = "0.7"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tower-http = { version = "0.6", features = ["cors", "decompression-gzip", "fs"] }
+typed-path = "0.13.0"
 url = "2"
 uuid = { version = "1", features = ["v4"] }
 x509-parser = "0.18"
