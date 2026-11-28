@@ -52,9 +52,22 @@ pub async fn client_event(
     let Some(wire_result) = &message.message else {
         return Ok(ClientExecEvent::Pending);
     };
+    if pending.is_await(message.id).await {
+        let Some(entry) = pending.take_exec(message.id).await else {
+            return Ok(ClientExecEvent::Pending);
+        };
+        if let ExecStage::Await(sender) = entry.stage {
+            let _ = sender.send(Ok(wire_result.clone()));
+        }
+        return Ok(ClientExecEvent::Pending);
+    }
     let pb::exec_client_message::Message::ShellStream(stream) = wire_result else {
         let entry = take(message.id, pending).await?;
         return match entry.stage {
+            ExecStage::Await(sender) => {
+                let _ = sender.send(Ok(wire_result.clone()));
+                Ok(ClientExecEvent::Pending)
+            }
             ExecStage::EditRead => advance_edit(entry, wire_result, pending).await,
             ExecStage::Direct
             | ExecStage::DynamicMcp(_)
@@ -148,6 +161,11 @@ pub async fn stream_closed(id: u32, pending: &CursorToolRuntime) -> Result<Clien
         return Ok(ClientExecEvent::Pending);
     };
     let error = "Cursor Exec stream closed before returning a terminal result";
+    if let ExecStage::Await(sender) = entry.stage {
+        let _ = sender.send(Err(error.into()));
+        return Ok(ClientExecEvent::Pending);
+    }
+
     if matches!(entry.stage, ExecStage::Semble(_)) {
         let message = super::super::semble::fail(entry, pending, error.into()).await?;
         return Ok(ClientExecEvent::Messages(vec![message]));

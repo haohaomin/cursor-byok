@@ -1,13 +1,13 @@
 //! Tracks running Tool executions and coordinates cancellation and cleanup.
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
     sync::{
         atomic::{AtomicBool, AtomicU32, Ordering},
         Arc,
     },
 };
 
-use tokio::sync::Mutex;
+use tokio::sync::{oneshot, Mutex, Notify};
 
 use crate::{cursor::protocol::proto::agent::v1 as pb, model::ToolCall, Error, Result};
 
@@ -20,10 +20,12 @@ pub struct CursorToolRuntime {
     interactions: Arc<Mutex<HashMap<u32, PendingInteraction>>>,
     completed: Arc<Mutex<HashMap<u32, String>>>,
     interrupted: Arc<Mutex<HashSet<u32>>>,
-    searches: Arc<Mutex<HashMap<String, SearchWork>>>,
+    workers: Arc<Mutex<HashMap<String, ToolWork>>>,
+    outgoing: Arc<Mutex<VecDeque<(u32, pb::AgentServerMessage)>>>,
+    outgoing_ready: Arc<Notify>,
 }
 
-struct SearchWork {
+struct ToolWork {
     cancelled: Arc<AtomicBool>,
     worker: Option<tokio::task::AbortHandle>,
 }
@@ -39,6 +41,7 @@ pub(crate) struct PendingExec {
 
 pub(crate) enum ExecStage {
     Direct,
+    Await(oneshot::Sender<std::result::Result<pb::exec_client_message::Message, String>>),
     DynamicMcp(pb::McpToolDefinition),
     EditRead,
     Semble(Box<super::semble::SembleExecution>),
@@ -136,15 +139,17 @@ impl CursorToolRuntime {
             interactions: Arc::new(Mutex::new(HashMap::new())),
             completed: Arc::new(Mutex::new(HashMap::new())),
             interrupted: self.interrupted.clone(),
-            searches: Arc::new(Mutex::new(HashMap::new())),
+            workers: Arc::new(Mutex::new(HashMap::new())),
+            outgoing: Arc::new(Mutex::new(VecDeque::new())),
+            outgoing_ready: Arc::new(Notify::new()),
         }
     }
 
-    pub(crate) async fn register_search(&self, call_id: &str) -> Arc<AtomicBool> {
+    pub(crate) async fn register_worker(&self, call_id: &str) -> Arc<AtomicBool> {
         let cancelled = Arc::new(AtomicBool::new(false));
-        if let Some(previous) = self.searches.lock().await.insert(
+        if let Some(previous) = self.workers.lock().await.insert(
             call_id.into(),
-            SearchWork {
+            ToolWork {
                 cancelled: cancelled.clone(),
                 worker: None,
             },
@@ -157,14 +162,14 @@ impl CursorToolRuntime {
         cancelled
     }
 
-    pub(crate) async fn attach_search_worker(
+    pub(crate) async fn attach_worker(
         &self,
         call_id: &str,
         cancelled: &Arc<AtomicBool>,
         worker: tokio::task::AbortHandle,
     ) {
-        let mut searches = self.searches.lock().await;
-        if let Some(work) = searches
+        let mut workers = self.workers.lock().await;
+        if let Some(work) = workers
             .get_mut(call_id)
             .filter(|work| Arc::ptr_eq(&work.cancelled, cancelled))
         {
@@ -174,15 +179,15 @@ impl CursorToolRuntime {
         }
     }
 
-    pub(crate) async fn finish_search(
+    pub(crate) async fn finish_worker(
         &self,
         call_id: &str,
         cancelled: &Arc<AtomicBool>,
         results: &super::tool_call_result::ToolResultSender,
         completion: Result<super::tool_call_result::ToolCompletion>,
     ) {
-        let mut searches = self.searches.lock().await;
-        if searches
+        let mut workers = self.workers.lock().await;
+        if workers
             .get(call_id)
             .is_some_and(|owner| Arc::ptr_eq(&owner.cancelled, cancelled))
         {
@@ -192,16 +197,68 @@ impl CursorToolRuntime {
                     Err(error) => results.send_error(error),
                 }
             }
-            searches.remove(call_id);
+            workers.remove(call_id);
         }
     }
 
-    async fn cancel_searches(&self) {
-        for (_, work) in self.searches.lock().await.drain() {
+    async fn cancel_workers(&self) {
+        for (_, work) in self.workers.lock().await.drain() {
             work.cancelled.store(true, Ordering::Release);
             if let Some(worker) = work.worker {
                 worker.abort();
             }
+        }
+    }
+
+    pub(crate) async fn reserve_await(
+        &self,
+        call: &ToolCall,
+        context: &ExecContext,
+        cancelled: &AtomicBool,
+    ) -> Result<(
+        u32,
+        oneshot::Receiver<std::result::Result<pb::exec_client_message::Message, String>>,
+    )> {
+        let mut execs = self.execs.lock().await;
+        if cancelled.load(Ordering::Acquire) {
+            return Err(Error::Protocol("Await was cancelled".into()));
+        }
+        let id = self.next_id()?;
+        let (sender, receiver) = oneshot::channel();
+        execs.insert(
+            id,
+            PendingExec {
+                call: call.clone(),
+                context: context.clone(),
+                started_at_ms: now_ms(),
+                stdout: String::new(),
+                stderr: String::new(),
+                stage: ExecStage::Await(sender),
+            },
+        );
+        Ok((id, receiver))
+    }
+
+    pub(crate) async fn queue_exec(&self, id: u32, message: pb::AgentServerMessage) {
+        self.outgoing.lock().await.push_back((id, message));
+        self.outgoing_ready.notify_one();
+    }
+
+    pub(crate) async fn next_message(&self) -> pb::AgentServerMessage {
+        loop {
+            let notified = self.outgoing_ready.notified();
+            {
+                let execs = self.execs.lock().await;
+                let mut outgoing = self.outgoing.lock().await;
+                while let Some((id, message)) = outgoing.pop_front() {
+                    // No await between removing a message and returning it: callers
+                    // select this future alongside model events and cancellation.
+                    if execs.contains_key(&id) {
+                        return message;
+                    }
+                }
+            }
+            notified.await;
         }
     }
 
@@ -230,6 +287,14 @@ impl CursorToolRuntime {
             },
         );
         Ok(messages)
+    }
+
+    pub(crate) async fn is_await(&self, id: u32) -> bool {
+        self.execs
+            .lock()
+            .await
+            .get(&id)
+            .is_some_and(|entry| matches!(entry.stage, ExecStage::Await(_)))
     }
 
     pub(crate) async fn is_semble(&self, id: u32) -> bool {
@@ -410,7 +475,7 @@ impl CursorToolRuntime {
     }
 
     pub async fn drain_running(&self) -> Vec<pb::AgentServerMessage> {
-        self.cancel_searches().await;
+        self.cancel_workers().await;
         let mut entries = self.execs.lock().await;
         let messages = abort_entries(&mut entries, false);
         self.interactions.lock().await.clear();
@@ -420,7 +485,7 @@ impl CursorToolRuntime {
     }
 
     pub async fn interrupt_for_run_replacement(&self) -> Vec<pb::AgentServerMessage> {
-        self.cancel_searches().await;
+        self.cancel_workers().await;
         let mut execs = self.execs.lock().await;
         let mut interrupted_ids = execs.keys().copied().collect::<Vec<_>>();
         let messages = abort_entries(&mut execs, false);
@@ -437,7 +502,7 @@ impl CursorToolRuntime {
     }
 
     pub async fn interrupt_for_message(&self) -> Vec<pb::AgentServerMessage> {
-        self.cancel_searches().await;
+        self.cancel_workers().await;
         let (messages, interrupted_ids) = {
             let mut entries = self.execs.lock().await;
             let interrupted_ids = entries

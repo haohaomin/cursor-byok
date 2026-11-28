@@ -6,6 +6,7 @@ use std::{
 
 use tokio::sync::Mutex;
 
+pub(crate) mod await_task;
 pub mod codec;
 pub(crate) mod compat;
 pub(crate) mod edit;
@@ -194,6 +195,10 @@ impl ToolDispatcher {
         }
     }
 
+    pub(crate) async fn next_message(&self) -> pb::AgentServerMessage {
+        self.runtime.next_message().await
+    }
+
     pub async fn interrupt_for_message(&self) -> Vec<pb::AgentServerMessage> {
         self.edit_schedule.lock().await.clear();
         self.runtime.interrupt_for_message().await
@@ -287,9 +292,14 @@ impl ToolDispatcher {
 }
 
 fn validation_failure(call: &ToolCall, message: String) -> DispatchedTool {
+    let completion = if tool_call_dispatch::normalized(&call.name) == "await" {
+        await_task::validation_failure(call, message)
+    } else {
+        compat::failure_with_message(call, message)
+    };
     DispatchedTool {
         messages: Vec::new(),
-        completion: Some(compat::failure_with_message(call, message)),
+        completion: Some(completion),
     }
 }
 

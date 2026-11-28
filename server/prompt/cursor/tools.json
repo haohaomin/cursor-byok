@@ -3,6 +3,33 @@
     {
       "type": "function",
       "function": {
+        "name": "Await",
+        "description": "Wait for existing background work, or pause without running a command. Use a numeric task_id returned by Shell to observe its terminal output; use a subagent ID returned by Task to observe that existing subagent. This never starts or resumes a task. Omit task_id to sleep. Prefer automatic completion notifications over repeated polling. Use block_until_ms=0 for a single status check when a task_id is provided. A timeout or pattern match may return still_running; read output_file_path to inspect full output. Cancelling the wait does not cancel the underlying task.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "task_id": {
+              "type": "string",
+              "description": "Existing Shell or subagent task ID. Omit, leave blank, or use none for a pure wait."
+            },
+            "block_until_ms": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 7140000,
+              "description": "Maximum wait in milliseconds; defaults to 30000. Zero checks a task once. Client requests may add latency."
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Optional multiline regular expression for Shell output only. A match ends the wait without stopping the Shell."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
         "name": "CreateGoal",
         "description": "Create a persistent goal only when the user explicitly requests goal mode. Do not create goals for ordinary requests. State the full objective.",
         "parameters": {

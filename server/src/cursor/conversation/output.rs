@@ -202,10 +202,14 @@ impl ConversationOutput {
                     action = self.runtime_actions.recv() => Input::RuntimeAction(action.map(Box::new)),
                     event = self.core.events.recv() => Input::Event(event),
                     completion = self.results.recv() => Input::CompletionResult(completion),
+                    message = self.tools.next_message() => Input::ToolMessage(Box::new(message)),
                     failure = worker.failures.recv(), if checkpoint_worker_open => Input::CheckpointFailure(failure),
                 }
             };
             match input {
+                Input::ToolMessage(message) => {
+                    self.handle.emit(&message)?;
+                }
                 Input::CheckpointFailure(Some(error)) => return Err(error),
                 Input::CheckpointFailure(None) => {
                     checkpoint_worker_open = false;
@@ -1139,6 +1143,7 @@ impl ConversationOutput {
 }
 
 enum Input {
+    ToolMessage(Box<pb::AgentServerMessage>),
     Event(Option<RunEvent>),
     Completion(ToolCompletion),
     CompletionResult(Option<Result<ToolCompletion>>),

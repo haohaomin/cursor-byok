@@ -1,0 +1,321 @@
+{
+  "checked_at": "2026-11-28T06:22:25.738689+00:00",
+  "base_commit": "17afcdfa7148d2eab7713816a2ed470fe455214b",
+  "cursor_version": "3.31.15",
+  "rea_inventory_evidence": "ev_a485fa596bb60a5bf97cc88b22f0197ca1c4331db3c49acfa96d3cc6ff31806b",
+  "scope": "bounded static reads; no client execution; reused matching partial REA inventory",
+  "artifacts": [
+    {
+      "path": "extensions/cursor-local-agent-runtime/dist/main.js",
+      "sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "bytes": 5277933,
+      "anchors": [
+        {
+          "label": "definition",
+          "character_offset": 3486790,
+          "excerpt_sha256": "8b6c14fd4e9d45d5b4dbf02ecc55d18374b939c69be5a03aee5afe11fce46d2e",
+          "excerpt": "const FUe=(e,t,n)=>{n=n??\"latest\";const r=!0===t.enableSubagentAwaiting,o=!0===t.useTrainingShellOnlyPrompt,s=!1!==t.enableAwaitForSubagents,i=r&&s&&!o,a=i||o?\"Await\":eUe,l=!0===t.fixClaudeSubagentAwait&&a===eUe,c=!0===t.enableBoundedSubagentAwait,u=!0===t.enableJobCompletionNotifications,d=!0===t.refuseWatchedShellWaits,p=t.promptCacheTTLMs,h=!0===t.enableAwaitTerminalPathCompat,m=t.defaultBlockUntilMs??3e4,f=!0===t.requireBlockUntilMs,g=sUe(t.perCallLimitMs),v=iUe({enableSubagentAwaiting:i,useTrainingShellOnlyPrompt:o}),y=oUe({enableSubagentAwaiting:i,defaultBlockUntilMs:m,requireBlockUntilM"
+        },
+        {
+          "label": "schema",
+          "character_offset": 3473655,
+          "excerpt_sha256": "34bb1c0c3e8f845a386271329d5e7d85af1f0cbd1a5fa25bb1d22f7d65940029",
+          "excerpt": "function oUe(e){return rUe(JSON.stringify([e.enableSubagentAwaiting,e.defaultBlockUntilMs,e.requireBlockUntilMs,e.useTrainingShellOnlyPrompt,e.includeWaitingForSubagentSignal,e.perCallLimitMs??null,e.machineIds??null,e.machineIdParameterSchema??null]),(()=>function(e){const{enableSubagentAwaiting:t,defaultBlockUntilMs:n,requireBlockUntilMs:r,useTrainingShellOnlyPrompt:o,includeWaitingForSubagentSignal:s}=e,i=sUe(e.perCallLimitMs),a=Math.round(i/6e4),l=iUe({enableSubagentAwaiting:t,useTrainingShellOnlyPrompt:o}),c=o?\"Set to 0 for non-blocking status check.\":`Set to 0 only together with ${l}, fo"
+        },
+        {
+          "label": "dispatch",
+          "character_offset": 3491150,
+          "excerpt_sha256": "79e8dff09d7f01af31a94fda2d8df85e2cca27cbbee2a3f7d671dbea9f77d5e8",
+          "excerpt": ",s)=>{const u={stack:[],error:void 0,hasError:!1};try{const p=ZFe(u,(0,Tq.VI)(n.withName(\"awaitExecute\")),!1).ctx,h=OV(t.machineIds,o),f=o.task_id??o.shell_id??\"\",g=fUe(f);if(\"\"===g&&\"\"!==f.trim()){const e=new vJ;e.report(uUe.applied(g)),e.flush(p)}const y=Math.min(hUe(o.block_until_ms,m),t.maxBlockUntilMs??Number.POSITIVE_INFINITY),w=new rr.wj({taskId:g,blockUntilMs:y,regex:o.pattern}),b=new rr.$0({args:w,result:void 0});return r.executeToolCall(p,pUe(b),s.toolCallId,(async n=>{if(l&&!0===o.waiting_for_subagent)throw nUe();const r=Date.now(),u=r+y,m=s.contextInjectionSignal;if(!g){if(0===y)th"
+        },
+        {
+          "label": "bounded",
+          "character_offset": 3494025,
+          "excerpt_sha256": "8e2793006d599ba8fcf59e69d15339aa0ec3d9580a278bd4fd172e73ecf6c602",
+          "excerpt": "awaitResult:e})}}),[p,h]=n.withCancel(),v=(async()=>{if(c){const t=e.get(WFe.r);return await t.execute(p,new kMe.TN({agentId:g,timeoutMs:y}))}const r=(()=>{try{return e.get(lMe.Zn)}catch{throw new Error(\"Awaiting subagent ids is not available in this environment (subagent executor resource is not registered).\")}})();XFe.debug(n,\"nal.await_stall.legacy_subagent_fallback\",{taskId:g,blockUntilMs:y,callId:s.toolCallId,reason:\"bounded_await_disabled_for_client\"});const i=0===y?1:y,a=n.withTimeout(i),u=await r.execute(a,new kMe.Pw({toolCallId:s.toolCallId,resumeAgentId:g,parentConversationId:o,promp"
+        },
+        {
+          "label": "legacy",
+          "character_offset": 3494229,
+          "excerpt_sha256": "9ba3bf630ae1df15c2f30103344a09baf60fcbb57dd86d4958dec97f2bf239e9",
+          "excerpt": "Awaiting subagent ids is not available in this environment (subagent executor resource is not registered).\")}})();XFe.debug(n,\"nal.await_stall.legacy_subagent_fallback\",{taskId:g,blockUntilMs:y,callId:s.toolCallId,reason:\"bounded_await_disabled_for_client\"});const i=0===y?1:y,a=n.withTimeout(i),u=await r.execute(a,new kMe.Pw({toolCallId:s.toolCallId,resumeAgentId:g,parentConversationId:o,prompt:\"\",readonly:!0,runInBackground:!1,subagentType:t.defaultSubagentType??\"generalPurpose\",modelId:t.defaultModelId??\"default-model\"}));switch(u.result.case){case\"success\":{const e=u.result.value;return new"
+        },
+        {
+          "label": "result_projection",
+          "character_offset": 3495650,
+          "excerpt_sha256": "027d5fbee8371a13be2a873f3eb3d09bf2361b63d20bff4b4c2664cf089b40a4",
+          "excerpt": "t(\"steer_release\"):e=m.onUserInjectionAdmitted((()=>{t(\"steer_release\")})))}));try{const e=await Promise.race([v.then((e=>({kind:\"result\",result:e})),(e=>({kind:\"error\",error:e}))),t.then((()=>({kind:\"steer_release\"})))]);if(\"error\"===e.kind)throw e.error;\"steer_release\"===e.kind?(b=!0,h(),v.catch((()=>{})),w=new kMe.zJ({result:{case:\"stillRunning\",value:new kMe.L5({agentId:g,transcriptPath:await l()})}})):w=e.result}finally{e?.()}}switch(EUe(n),w.result.case){case\"complete\":{const e=w.result.value.transcriptPath??await l(),t=await u(e),n=Math.max(0,Date.now()-r);return d({case:\"complete\",valu"
+        },
+        {
+          "label": "generator",
+          "character_offset": 3973236,
+          "excerpt_sha256": "d4431cc81841dde6359f6f46d106974c6e1499a76b3e820c9e4d809c3d72d5f0",
+          "excerpt": "longRunningJobs,M=!0===e.featureFlags?.useClientSideSubagent&&!0!==e.taskToolProps?.requireServerSideSubagent,P=!1!==e.featureFlags?.enableAwaitForSubagents,R=I.some((e=>\"SHELL\"===e.toolIdentifier||\"TASK\"===e.toolIdentifier));A&&!ZKe(d)&&R&&I.push(FUe(t,{terminalsFolder:e.requestContext?.env?.terminalsFolder,agentTranscriptsFolder:e.agentType===vX.BACKGROUND?void 0:e.requestContext?.env?.agentTranscriptsFolder,defaultModelId:e.modelInfo.modelName,enableAwaitTerminalPathCompat:\"cursor-0226\"===e.modelInfo.promptVersion,enableSubagentAwaiting:M,enableAwaitForSubagents:P,fixClaudeSubagentAwait:!0="
+        },
+        {
+          "label": "alternate_generator",
+          "character_offset": 4005296,
+          "excerpt_sha256": "aee8aa5fa3e2b257824ff0ec6cd6c32282ed0edd527a44518396e5f4c793f95b",
+          "excerpt": "enableSubagentAwaiting??(!0===e.featureFlags?.useClientSideSubagent&&!0!==e.taskToolProps?.requireServerSideSubagent),r=e.enableAwaitForSubagents??!1!==e.featureFlags?.enableAwaitForSubagents,o=k.some((e=>\"SHELL\"===e.toolIdentifier||\"TASK\"===e.toolIdentifier));o&&k.push(FUe(t,{terminalsFolder:e.requestContext?.env?.terminalsFolder,agentTranscriptsFolder:e.agentType===vX.BACKGROUND?void 0:e.requestContext?.env?.agentTranscriptsFolder,defaultModelId:e.modelInfo?.modelName,defaultBlockUntilMs:e.defaultAwaitBlockUntilMs,requireBlockUntilMs:e.requireAwaitBlockUntilMs,maxBlockUntilMs:e.maxAwaitBlock"
+        }
+      ]
+    },
+    {
+      "path": "extensions/cursor-agent-host/dist/main.js",
+      "sha256": "c7170dacc639cfd42a671527fb40175594096f6db53c2a96fe738b85f7121528",
+      "bytes": 6875499,
+      "anchors": [
+        {
+          "label": "consumer",
+          "character_offset": 1632917,
+          "excerpt_sha256": "7900a86d01363df758e8c7728a3b818900dad69fbce6a624f2626e5900a5f041",
+          "excerpt": "function ol(t,e,r){const n=r.agentId,s=t.getTrackedBackgroundRun(n);if(void 0===s){if(il(t,n))return al(n);const s=Math.max(r.timeoutMs,1e3),[o,i]=e.withTimeoutAndCancel(s);await(t.awaitUntrackedChild?.(e,n,o)),i();const a=t.getTrackedBackgroundRun(n);return void 0!==a||il(t,n)?al(n,a?.transcriptPath):new rn.zJ({result:{case:\"notFound\",value:new rn.Hq({agentId:n})}})}const o=await function(t,e,r){if(r.signal.aborted)return Promise.resolve(void 0);const[n,s]=r.withTimeoutAndCancel(Math.max(0,e));return new Promise((e=>{const r=()=>{e(void 0)};n.signal.addEventListener(\"abort\",r,{once:!0}),t.pro"
+        },
+        {
+          "label": "request_schema",
+          "character_offset": 2787084,
+          "excerpt_sha256": "c2010791bcfffc5248b6c91efce4583dc54a6d197c4aef39e8d9381945f3f134",
+          "excerpt": "AgentRunRequest|1 conversation_state #0|2 action #1|3 model_details #2|9 requested_model #3?|4 mcp_tools #4|5 conversation_id 9?|6 mcp_file_system_options #5?|7 skill_options #6?|8 custom_system_prompt 9?|11 subagent_type_name 9?|12 exclude_workspace_context 8?|13 harness 9?|14 selected_subagent_models #3*|15 selected_subagent_model_details #2*|16 conversation_group_id 9?|17 pre_fetched_blobs #7*|18 dev_raw_model_slug 9?|19 client_supports_inline_images 8?|20 subagent_model_overrides #8*|21 can_create_cloud_subagents 8?|22 suppress_subagent_progress_update_tool 8?|23 client_supports_send_to_us"
+        },
+        {
+          "label": "notification_suppression",
+          "character_offset": 1719990,
+          "excerpt_sha256": "e7647f66b01aa346e024c46d69ac633a88d513786c967478bcd5709c5e852db8",
+          "excerpt": "=t.message.case)return;const e=t.message.value.toolCall?.tool;if(\"awaitToolCall\"!==e?.case)return;const r=e.value.args?.taskId.trim()??\"\",n=\"complete\"===function(t){if(!t||void 0===t.case)return{case:void 0};if(\"success\"===t.case){const e=t.value.awaitResult;return e&&void 0!==e.case?\"complete\"===e.case?{case:\"complete\",value:e.value}:\"stillRunning\"===e.case?{case:\"stillRunning\",value:e.value}:{case:void 0}:{case:void 0}}return\"error\"===t.case?{case:\"error\",value:t.value}:{case:void 0}}(e.value.result?.result).case;return rm.test(r)&&n?r:void 0}(e);void 0!==r&&t.hostHooks?.dropAwaitedBackgroun"
+        }
+      ]
+    },
+    {
+      "path": "out/vs/workbench/workbench.desktop.main.js",
+      "sha256": "79a1c7cc4fc3b14df093b18829ab88c1ee955e60ea49bb7984dbaf488f033713",
+      "bytes": 39951704,
+      "anchors": [
+        {
+          "label": "resource",
+          "character_offset": 16482660,
+          "excerpt_sha256": "85a658498e0d55a7c7d94aeed9d0bc6cc4e44a849bc45c3b6f12fc466e1b0174",
+          "excerpt": "aKp(this.subagentComposerService),Q=new yqp(this.conversationSearchService,this.logService),K=new H$i(S,[[Wlp,k],[Zdr,x],[ehr,R],[kZt,D],[NZ,N],[$lp,A],[wZt,O],[iAt,U],[Ydr,H],[rdp,z],[tBo,q],[sdp,Y],[Ulp,Q]]);return{dispose:()=>{TS(W,b)},get(j){return K.get(j)},entries:()=>K.entries(),cancelByToolCallId:async j=>{await b.cancelByToolCallId(j)},waitForInFlightToolCalls:()=>b.waitForInFlightToolCalls(),waitForOtherInFlightToolCalls:j=>b.waitForOtherInFlightToolCalls(j),waitingForMachine:o.value,agentHostSessionOptionsBase:{workspacePaths:n.workspacePaths,worktreeMainPath:n.worktreeMainPath,isGl"
+        },
+        {
+          "label": "handler",
+          "character_offset": 16456371,
+          "excerpt_sha256": "ddc9bf310e03a6758f23c9adb7b42033d61f58279fc743d7002f192a344c98ba",
+          "excerpt": "function aKp(e){return{execute:async(t,i)=>{try{const n=await e.awaitBackgroundSubagentBounded({composerId:i.agentId,timeoutMs:i.timeoutMs,abortSignal:t.signal});switch(n.status){case\"completed\":return n.result.success?new Pot({result:{case:\"complete\",value:new iPo({agentId:n.result.composerId||i.agentId,transcriptPath:n.transcriptPath,finalMessage:n.result.finalMessage,toolCallCount:n.result.toolCallCount??0})}}):new Pot({result:{case:\"error\",value:new UHi({agentId:n.result.composerId||i.agentId,error:n.result.error??\"Unknown subagent error\"})}});case\"stillRunning\":return new Pot({result:{cas"
+        },
+        {
+          "label": "bounded_consumer",
+          "character_offset": 16858690,
+          "excerpt_sha256": "46fca0a2e6e8698c9cd8aadebeea6ab36c6645ce7051ff9437abe5e54c82bdae",
+          "excerpt": "awaitBackgroundSubagentBounded({composerId:e,timeoutMs:t,abortSignal:i}){const n=await this._findBackgroundEntryForAwait(e),r=n?.agentId??e;if(!n)return{status:\"notFound\",agentId:r};const s=await this._waitForBackgroundEntryBounded(n.entry,t,i);if(s.status===\"stillRunning\"){await this._flushTranscriptAfterAwaitCompletion(r);const c=await this._resolveBackgroundOutputPath(r,n.entry.metadata);return{status:\"stillRunning\",agentId:r,transcriptPath:c}}const o=s.result,a=o.composerId||r;await this._flushTranscriptAfterAwaitCompletion(a);const l=await this._resolveBackgroundOutputPath(a,n.entry.metad"
+        },
+        {
+          "label": "legacy_wait",
+          "character_offset": 16466338,
+          "excerpt_sha256": "9c92c0db0fcaafd39a803a654b4e70d09898afa21a59bbc34e684c7bf9a1a7d9",
+          "excerpt": "isAwaitBackgroundMode(e){if(!this.subagentComposerService.isLongRunningJobsEnabled()||!!!(e.resumeAgentId&&(typeof e.prompt!=\"string\"||e.prompt.trim().length===0)&&e.readonly===!0&&e.runInBackground!==!0))return!1;if((e.parentConversationId??\"\").trim().length===0)throw new Error(`Missing parentConversationId for subagent await/status check (subagentId: ${e.resumeAgentId})`);return!0}async awaitBackgroundSubagent(e,t){const i={status:\"error\",error:\"Await timed out while task is still running\"};if(t.aborted)return i;if(!this.subagentComposerService.isRunningInBackground({composerId:e}))return{st"
+        },
+        {
+          "label": "notification_suppression",
+          "character_offset": 30780756,
+          "excerpt_sha256": "1f33ff44523d19ab79e961bdc39f6d62f662545d2b2ebbf9faeed4060c076096",
+          "excerpt": "_handleAwaitCompletionSuppressionUpdate(e,t){const i=t.message.case;if(i!==\"toolCallStarted\"&&i!==\"toolCallCompleted\")return;const n=t.message.value.toolCall;if(!n||n.tool.case!==\"awaitToolCall\")return;const r=n.tool.value.args?.taskId?.trim()??\"\";if(r.length===0)return;let s=this._pendingAwaitTaskIdsByComposerId.get(e);if(s||(s=new Set,this._pendingAwaitTaskIdsByComposerId.set(e,s)),i===\"toolCallStarted\"){s.add(r);return}s.delete(r),s.size===0&&this._pendingAwaitTaskIdsByComposerId.delete(e);const o=n.tool.value.result?.result;SD1(o).case===\"complete\"&&this._backgroundWorkService.suppress(e,r"
+        }
+      ]
+    }
+  ],
+  "open_questions": [
+    "Effective runtime flags",
+    "Real Cursor UI and Exec round trip",
+    "Cloud subagent support",
+    "Different notification suppression in workbench and Host"
+  ],
+  "followup_shell_and_sleep_audit": {
+    "kind": "static only; no live Cursor execution",
+    "runtime_character_offsets": {
+      "read_executor_binding": 672700,
+      "shell_footer_parser": 3478011,
+      "strip_header_footer": 3479540,
+      "interruptible_sleep": 3479759,
+      "exec_read_helper": 3480814,
+      "subagent_transcript_length": 3493829,
+      "subagent_result_conversion": 3496086,
+      "shell_poll_loop": 3497540
+    },
+    "shell_transport": "ExecServerMessage.read_args=7 -> ExecClientMessage.read_result=7; no PID/liveness query",
+    "shell_completion": "Requires final footer and exit_code marker; exit_code parsing is independent of completion",
+    "shell_poll_ms": 250,
+    "regex": "RE2 MULTILINE; strip header/footer; nonempty match releases as stillRunning",
+    "output_length": "positive file_size else JS UTF-16 string length",
+    "sleep": "timer, admitted user-message signal, and abort; injected input releases complete with wake_reason=context_injection; abort is an error",
+    "native_read_truncation": "NUe ignores truncated; workbench editor model path caps at 8 Mi characters; remote reader limits not fully traced",
+    "subagent_read": "Read explicit transcript after status; read errors keep original state with length 0; native has optional transcript path search not implemented by this candidate",
+    "watched_shell_refusal": "Only when native refuseWatchedShellWaits enabled, positive wait, locally tracked hasOutputNotification and not exitReported; BYOK policy does not infer this native flag"
+  },
+  "baseline_reproduction": {
+    "commit": "e2fe7a7a6c13ac24681302eb2797653a8a68938b",
+    "command": "cargo test --locked -p cursor-server --test await_tools -- --nocapture",
+    "environment_override": "CARGO_TARGET_DIR=/Users/renhao/works/cursor-byok/target; --config profile.dev.package.sqlx-macros.strip=\"none\"",
+    "result": "0 passed; 4 failed: tool catalogue plus Shell, subagent and no-ID sleep all unavailable",
+    "log": "/tmp/cursor-byok-issue244-await-red.log",
+    "log_sha256": "c1a90ffd44fa8542c9e8e10f316091f2bf21dc0c3106b469b5cbfca9962bd263"
+  },
+  "candidate_boundaries": [
+    "Modern Await is advertised by BYOK in modes already offering Shell; this does not assert native feature gates are enabled.",
+    "Only dedicated bounded SubagentAwait execution; no legacy SubagentArgs fallback or transcript path search.",
+    "New user input follows existing BYOK interruption/replacement handling, cancelling the observer; native same-lifecycle context_injection success is not reproduced.",
+    "Shell completion is footer observation, not proof from a process liveness query. Truncated/ranged reads explicitly fail.",
+    "Rust regex is reused for multiline patterns; no new RE2 dependency.",
+    "Real Cursor Exec/UI, cloud tasks and provider model selection remain unverified."
+  ],
+  "parser_review": {
+    "scope": "Pure parser comparison; no running Cursor or real terminal producer validation",
+    "native_path": "/Applications/Cursor.app/Contents/Resources/app/extensions/cursor-local-agent-runtime/dist/main.js",
+    "native_sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+    "candidate_path": "/Users/renhao/.codex/worktrees/windows-ca-user-store/cursor-byok/server/src/cursor/tools/await_task/shell.rs",
+    "candidate_sha256": "d7d7ed11d45083938265e08ea900b1acecace528fa05b7be5e5ba601c8c82e7e",
+    "native_helper_char_offsets": {
+      "vUe": 3478011,
+      "yUe": 3478137,
+      "xUe": 3479540
+    },
+    "cases": [
+      [
+        "trailing-newline",
+        "---\npid: 10\n---\nREADY\n"
+      ],
+      [
+        "empty-output-no-extra-newline",
+        "---\npid: 10\n---\n---\nexit_code: 0\nelapsed_ms: 45\n---\n"
+      ],
+      [
+        "empty-output-with-extra-newline",
+        "---\npid: 10\n---\n\n---\nexit_code: 0\nelapsed_ms: 45\n---\n"
+      ]
+    ],
+    "files": {
+      "native-helpers.js": "4c3e368e51c883255915cec83b91f316b0675fe81d1b44c064ed3c9debe3acb2",
+      "candidate-parser.rs": "487d0e856f21e68ad21aea5d113f1335fc63e34e1e2eb98d736071fa989aa094",
+      "candidate-shell.rs.snapshot": "d7d7ed11d45083938265e08ea900b1acecace528fa05b7be5e5ba601c8c82e7e",
+      "candidate-parser": "03b3bfbc71d9cdd4781fd8d968f4b5753d2035047a968ab89cea3ed99be94ae5",
+      "results.log": "6467a984c1b01f166ec14c9163669776406ab9fdd98f7301d2909687d6b59e20"
+    },
+    "findings": [
+      "Trailing newline was removed before regex, missing READY\\n match.",
+      "Completion parsing after header removal missed a footer directly following an empty output.",
+      "Running task age ignored running_for_ms and started_at header fields."
+    ],
+    "baseline_failures": [
+      {
+        "log": "/tmp/cursor-byok-issue244-await-parser-red.log",
+        "sha256": "0d95e7865315f8332a978006a804bd16dd5d3721f07a801b2d9c125fff819c03",
+        "result": "1 failed; 0 passed"
+      },
+      {
+        "log": "/tmp/cursor-byok-issue244-await-age-red.log",
+        "sha256": "38147ef8ce5b71471826a50eda7801510992592e566ee7033fd449c4ef4a7784",
+        "result": "1 failed; 0 passed"
+      }
+    ],
+    "changes": "Parse completion against raw text; preserve stdout whitespace for regex; strip metadata separately; track running_for_ms snapshots with bounded wall-clock correction from started_at.",
+    "runtime_age_offsets": {
+      "running_for_ms": 3478576,
+      "clock_correction": 3479013,
+      "shell_loop": 3497540
+    },
+    "final_static_review": "All three reported issues fixed; no new blocking issues in the scoped native-contract comparison. No live client execution."
+  },
+  "local_verification": {
+    "source_commit": "907bb3b15383718058e6dffc8195169e6e63f93f",
+    "await_unit_tests": 14,
+    "await_integration_tests": 5,
+    "transport_scenarios": [
+      "shell polling -> completion",
+      "subagent -> transcript read -> completion",
+      "pure sleep -> completion",
+      "new user message -> interrupted wait -> model continuation"
+    ],
+    "prefix_tests": 13,
+    "workspace": {
+      "passed": 707,
+      "failed": 0,
+      "ignored": 14
+    },
+    "clippy": "workspace all-targets -D warnings passed",
+    "format": "passed",
+    "cursor_ui": "not tested",
+    "real_provider": "not tested",
+    "logs": [
+      {
+        "path": "/tmp/cursor-byok-issue244-await-workspace-review-fix.log",
+        "sha256": "0fcf13ce17d6760727150e414d1c602e9bc34351316f8fa60a517c285032e106"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-clippy-review-fix.log",
+        "sha256": "449d66fda93d9572b83aa4cbc0d4929924806e0d1dc61b96ba96608569288d5b"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-validation-green.log",
+        "sha256": "8f48cc3fc656a440023ef20bdf58377f1987faa0c41e76516945ce69739404b1"
+      }
+    ]
+  },
+  "publication": {
+    "pr": 68,
+    "url": "https://github.com/haohaomin/cursor-byok/pull/68",
+    "status": "pushed; final cloud CI and review pending; not merged or released"
+  },
+  "pre_review_verification": {
+    "source_commit": "bce146667b757546c8159eec2fea6fa83c91ebd5",
+    "await_unit_tests": 13,
+    "await_integration_tests": 5,
+    "transport_scenarios": [
+      "shell polling -> completion",
+      "subagent -> transcript read -> completion",
+      "pure sleep -> completion",
+      "new user message -> interrupted wait -> model continuation"
+    ],
+    "prefix_tests": 13,
+    "workspace": {
+      "passed": 706,
+      "failed": 0,
+      "ignored": 14
+    },
+    "clippy": "workspace all-targets -D warnings passed",
+    "format": "passed",
+    "cursor_ui": "not tested",
+    "real_provider": "not tested",
+    "logs": [
+      {
+        "path": "/tmp/cursor-byok-issue244-await-workspace-release.log",
+        "sha256": "264246bc34fb9679ebc6f4f56d418de8ed62c5227b7c880051baaa28c4a47fc4"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-clippy-release.log",
+        "sha256": "8b79ff52beb30fb89b9e441d178c02fb9e7a7540347f7a25a28ea0e3e1554f54"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-unit-reviewed.log",
+        "sha256": "334532e14fd3f67487025848ea48dd3df3eb72852ea15bedc9e8992c1ce72a28"
+      }
+    ]
+  },
+  "review_fix": {
+    "reviewed_head": "2828c959c49cc23a5203acc4ab13822ed87f992d",
+    "thread": "PRRT_kwDOUon1cc69BZcf",
+    "finding": "P2: Await validation failures were represented as MCP cards",
+    "red_log": "/tmp/cursor-byok-issue244-await-validation-red.log",
+    "red_sha256": "6c73be6796a972f475df288bc0b9d754dbad18efee5b7aad092b244445ef0db3",
+    "red_result": "1 failed: validation failure must remain an Await card",
+    "fixed_source": "907bb3b15383718058e6dffc8195169e6e63f93f",
+    "cases": [
+      "non-string task_id",
+      "pattern on subagent",
+      "numeric task without terminals folder",
+      "invalid shell regex",
+      "disabled subagents",
+      "zero pure wait"
+    ],
+    "verification": "Six cases in one dispatcher regression; Await error card survives protobuf round-trip, canonical error and call ID agree, no client execution starts. 14 Await unit tests and 707 workspace tests pass.",
+    "sourcery": "skipped due to review limit; not treated as passed"
+  }
+}

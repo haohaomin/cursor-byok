@@ -44,7 +44,7 @@ pub(crate) async fn start(
         SembleOperation::parse(&tool_name, call.arguments.clone()).map_err(Error::Protocol)?;
     let started = now_ms();
     if operation.repo().starts_with("https://") || operation.repo().starts_with("http://") {
-        let cancelled = runtime.register_search(&call.call_id).await;
+        let cancelled = runtime.register_worker(&call.call_id).await;
         let (owner, results, owned_call) = (runtime.clone(), results.clone(), call.clone());
         let worker_cancelled = cancelled.clone();
         let worker = tokio::spawn(async move {
@@ -52,11 +52,11 @@ pub(crate) async fn start(
                 search::execute_semble(&tool_name, owned_call.arguments.clone(), store).await;
             let completion = result::semble(&owned_call, started, output);
             owner
-                .finish_search(&owned_call.call_id, &worker_cancelled, &results, completion)
+                .finish_worker(&owned_call.call_id, &worker_cancelled, &results, completion)
                 .await;
         });
         runtime
-            .attach_search_worker(&call.call_id, &cancelled, worker.abort_handle())
+            .attach_worker(&call.call_id, &cancelled, worker.abort_handle())
             .await;
         return Ok(Vec::new());
     }
@@ -82,7 +82,7 @@ pub(crate) async fn start(
     }
     let collector = Collector::new(root, operation.content());
     let command = collector.command().map_err(Error::Protocol)?;
-    let cancelled = runtime.register_search(&call.call_id).await;
+    let cancelled = runtime.register_worker(&call.call_id).await;
     let state = Box::new(SembleExecution {
         collection: Collection::new(call, context, command),
         operation,
@@ -240,11 +240,11 @@ async fn advance(entry: PendingExec, runtime: &CursorToolRuntime) -> Result<Clie
                     .await;
                 let completion = result::semble(&call, started_at_ms, output);
                 owner
-                    .finish_search(&call.call_id, &state.cancelled, &state.results, completion)
+                    .finish_worker(&call.call_id, &state.cancelled, &state.results, completion)
                     .await;
             });
             runtime
-                .attach_search_worker(&call_id, &cancelled, worker.abort_handle())
+                .attach_worker(&call_id, &cancelled, worker.abort_handle())
                 .await;
             Ok(ClientExecEvent::Messages(vec![collected]))
         }
@@ -294,7 +294,7 @@ async fn complete_error(
 ) {
     let completion = result::semble(call, started, Err(error));
     runtime
-        .finish_search(&call.call_id, &state.cancelled, &state.results, completion)
+        .finish_worker(&call.call_id, &state.cancelled, &state.results, completion)
         .await;
 }
 
