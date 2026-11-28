@@ -225,6 +225,46 @@
     "final_static_review": "All three reported issues fixed; no new blocking issues in the scoped native-contract comparison. No live client execution."
   },
   "local_verification": {
+    "source_commit": "907bb3b15383718058e6dffc8195169e6e63f93f",
+    "await_unit_tests": 14,
+    "await_integration_tests": 5,
+    "transport_scenarios": [
+      "shell polling -> completion",
+      "subagent -> transcript read -> completion",
+      "pure sleep -> completion",
+      "new user message -> interrupted wait -> model continuation"
+    ],
+    "prefix_tests": 13,
+    "workspace": {
+      "passed": 707,
+      "failed": 0,
+      "ignored": 14
+    },
+    "clippy": "workspace all-targets -D warnings passed",
+    "format": "passed",
+    "cursor_ui": "not tested",
+    "real_provider": "not tested",
+    "logs": [
+      {
+        "path": "/tmp/cursor-byok-issue244-await-workspace-review-fix.log",
+        "sha256": "0fcf13ce17d6760727150e414d1c602e9bc34351316f8fa60a517c285032e106"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-clippy-review-fix.log",
+        "sha256": "449d66fda93d9572b83aa4cbc0d4929924806e0d1dc61b96ba96608569288d5b"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-await-validation-green.log",
+        "sha256": "8f48cc3fc656a440023ef20bdf58377f1987faa0c41e76516945ce69739404b1"
+      }
+    ]
+  },
+  "publication": {
+    "pr": 68,
+    "url": "https://github.com/haohaomin/cursor-byok/pull/68",
+    "status": "pushed; final cloud CI and review pending; not merged or released"
+  },
+  "pre_review_verification": {
     "source_commit": "bce146667b757546c8159eec2fea6fa83c91ebd5",
     "await_unit_tests": 13,
     "await_integration_tests": 5,
@@ -259,9 +299,23 @@
       }
     ]
   },
-  "publication": {
-    "pr": 68,
-    "url": "https://github.com/haohaomin/cursor-byok/pull/68",
-    "status": "pushed; final cloud CI and review pending; not merged or released"
+  "review_fix": {
+    "reviewed_head": "2828c959c49cc23a5203acc4ab13822ed87f992d",
+    "thread": "PRRT_kwDOUon1cc69BZcf",
+    "finding": "P2: Await validation failures were represented as MCP cards",
+    "red_log": "/tmp/cursor-byok-issue244-await-validation-red.log",
+    "red_sha256": "6c73be6796a972f475df288bc0b9d754dbad18efee5b7aad092b244445ef0db3",
+    "red_result": "1 failed: validation failure must remain an Await card",
+    "fixed_source": "907bb3b15383718058e6dffc8195169e6e63f93f",
+    "cases": [
+      "non-string task_id",
+      "pattern on subagent",
+      "numeric task without terminals folder",
+      "invalid shell regex",
+      "disabled subagents",
+      "zero pure wait"
+    ],
+    "verification": "Six cases in one dispatcher regression; Await error card survives protobuf round-trip, canonical error and call ID agree, no client execution starts. 14 Await unit tests and 707 workspace tests pass.",
+    "sourcery": "skipped due to review limit; not treated as passed"
   }
 }
