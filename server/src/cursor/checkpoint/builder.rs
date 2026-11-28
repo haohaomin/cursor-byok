@@ -39,6 +39,12 @@ pub struct CheckpointBuilder {
 }
 
 impl CheckpointBuilder {
+    pub(crate) fn set_project_root(&mut self, project_root: bool) {
+        if project_root || self.base.is_root_project_conversation.is_some() {
+            self.base.is_root_project_conversation = Some(project_root);
+        }
+    }
+
     pub fn new(
         store: Store,
         sync: BlobSynchronizer,

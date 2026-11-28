@@ -14,6 +14,7 @@ pub(crate) mod registry;
 pub mod runtime;
 mod schedule;
 pub(crate) mod semble;
+pub(crate) mod send_message;
 pub(crate) mod stream;
 mod tool_call_dispatch;
 pub(crate) mod tool_call_result;
@@ -294,6 +295,8 @@ impl ToolDispatcher {
 fn validation_failure(call: &ToolCall, message: String) -> DispatchedTool {
     let completion = if tool_call_dispatch::normalized(&call.name) == "await" {
         await_task::validation_failure(call, message)
+    } else if tool_call_dispatch::normalized(&call.name) == "sendmessage" {
+        send_message::failure(call, message)
     } else {
         compat::failure_with_message(call, message)
     };

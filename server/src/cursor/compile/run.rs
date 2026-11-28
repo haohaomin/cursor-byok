@@ -145,7 +145,7 @@ pub(crate) async fn prepare(
     }
     let request_context = request_context;
     let ActionProjection {
-        mode: mode_number,
+        mode: mut mode_number,
         mut turn_user,
         action_context,
         mut event_id,
@@ -155,6 +155,11 @@ pub(crate) async fn prepare(
         background_completion,
         explicit_resume,
     } = action(request)?;
+    let project_root =
+        crate::cursor::projects::is_root(request, &conversation_id, store, blob_sync).await?;
+    if project_root && mode_number == pb::AgentMode::Multitask as i32 {
+        mode_number = pb::AgentMode::Agent as i32;
+    }
     let checkpoint_mode = if request.subagent_type_name.is_some() {
         Mode::Subagent
     } else {
@@ -180,6 +185,9 @@ pub(crate) async fn prepare(
             .collect::<Vec<_>>(),
         request.suppress_subagent_progress_update_tool == Some(true),
     )?;
+    if project_root {
+        compiler.enable_project_messages(&mut checkpoint_prompt)?;
+    }
     if subagents_disabled {
         checkpoint_prompt.tools.retain(|tool| tool.name != "Task");
     }
@@ -215,6 +223,11 @@ pub(crate) async fn prepare(
     let subagent_context = [
         model::subagent_model_context(request, &local_model_names),
         subagents::instructions(request.subagent_type_name.as_deref(), &request_context),
+        if project_root {
+            crate::cursor::projects::MESSAGE_INSTRUCTIONS.into()
+        } else {
+            String::new()
+        },
     ]
     .into_iter()
     .filter(|section| !section.is_empty())
@@ -395,7 +408,7 @@ pub(crate) async fn prepare(
             },
         }
     };
-    let exec = exec_context(
+    let mut exec = exec_context(
         request,
         &request_context,
         &conversation_id,
@@ -403,6 +416,7 @@ pub(crate) async fn prepare(
         subagents_disabled,
         &subagent_model_overrides,
     );
+    exec.project_root = project_root;
     Ok((
         PreparedRun {
             run_id,
@@ -746,6 +760,7 @@ fn exec_context(
         crate::model::SubagentModelOverride::Disabled => SubagentModel::Disabled,
     });
     ExecContext {
+        project_root: false,
         conversation_id: conversation_id.to_string(),
         agent_session_id: request.agent_session_id.clone(),
         root_conversation_id: request

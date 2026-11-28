@@ -926,11 +926,11 @@ fn spawn_run_request(
             };
             prepared
         };
-        // Recover before spawning the checkpoint worker: even a turn without
-        // TodoWrite must not overwrite persisted compacted todos with an empty list.
+        // Recover before spawning the checkpoint worker so omitted client state
+        // cannot erase compacted todos or the project's sent-message turns.
         let prepared = match prepared {
             Ok(prepared) if request.conversation_state.is_none() => checkpoint
-                .restore_todos(prepared.0.base_checkpoint_id)
+                .restore_local_presentation(prepared.0.base_checkpoint_id)
                 .await
                 .map(|()| prepared),
             result => result,
@@ -1072,6 +1072,7 @@ fn spawn_run_request(
                 return;
             }
         }
+        checkpoint.set_project_root(context.exec.project_root);
         checkpoint.configure(
             prepared.model.model_id.clone(),
             prepared.model.context_window_tokens,

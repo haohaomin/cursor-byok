@@ -3,6 +3,24 @@
     {
       "type": "function",
       "function": {
+        "name": "SendMessage",
+        "description": "Send a user-visible text message in the root project conversation. Use it for acknowledgements, progress updates and final responses. This does not send a message to another agent. After your final message, end the turn without repeating it in ordinary assistant text.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "The message to show the user. Must be nonempty after trimming, with at most 100000 UTF-16 code units."
+            }
+          },
+          "required": ["message"],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
         "name": "Await",
         "description": "Wait for existing background work, or pause without running a command. Use a numeric task_id returned by Shell to observe its terminal output; use a subagent ID returned by Task to observe that existing subagent. This never starts or resumes a task. Omit task_id to sleep. Prefer automatic completion notifications over repeated polling. Use block_until_ms=0 for a single status check when a task_id is provided. A timeout or pattern match may return still_running; read output_file_path to inspect full output. Cancelling the wait does not cancel the underlying task.",
         "parameters": {

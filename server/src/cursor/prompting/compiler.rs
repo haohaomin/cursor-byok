@@ -33,6 +33,13 @@ impl PromptCompiler {
         render(&self.assets.mode(mode).runtime, values)
     }
 
+    pub(crate) fn enable_project_messages(&self, prompt: &mut PromptSpec) -> Result<()> {
+        append_dynamic_tools(
+            &mut prompt.tools,
+            vec![self.assets.project_message_tool.clone()],
+        )
+    }
+
     pub fn prompt_spec(
         &self,
         mode: Mode,
