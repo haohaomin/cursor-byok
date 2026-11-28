@@ -471,3 +471,42 @@ async fn parent_checkpoint_does_not_erase_a_recorded_attention_notification() {
     assert_eq!(provider.requests().len(), 1);
     registry.shutdown().await;
 }
+
+#[tokio::test]
+async fn project_chat_message_cannot_finish_a_local_worker_with_the_same_tool_id() {
+    let (_directory, store) = fixtures::temp_store().await;
+    let provider = fake_provider::FakeProvider::default();
+    provider.push(stop_response("project-message", "Message considered."));
+    let registry = registry(store.clone(), &provider);
+    let handle = registry.get_or_create("project-message").await.unwrap();
+    let initial = running_state();
+    let mut message = notice(
+        initial.clone(),
+        false,
+        300,
+        pb::BackgroundTaskStatus::Success,
+    );
+    completion(&mut message).reason =
+        pb::BackgroundTaskCompletionReason::ProjectSessionMessage as i32;
+    let (state, _) = drive_completion(&handle, message).await;
+    assert_eq!(
+        state.subagent_runs_by_parent_tool_call_id,
+        initial.subagent_runs_by_parent_tool_call_id
+    );
+    let requests = provider.requests();
+    assert_eq!(requests.len(), 1);
+    let text = serde_json::to_string(&requests[0].history).unwrap();
+    assert!(text.contains("project_session_message"));
+    assert!(!text.contains("The following task has finished"));
+    let stored: Vec<u8> = sqlx::query_scalar(
+        "SELECT state FROM cursor_subagent_runs WHERE parent_tool_call_id = 'task-call'",
+    )
+    .fetch_one(store.pool())
+    .await
+    .unwrap();
+    assert_eq!(
+        pb::SubagentRunState::decode(stored.as_slice()).unwrap(),
+        initial.subagent_runs_by_parent_tool_call_id["task-call"]
+    );
+    registry.shutdown().await;
+}

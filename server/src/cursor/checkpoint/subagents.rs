@@ -33,7 +33,8 @@ fn key(completion: &pb::BackgroundTaskCompletion) -> Option<String> {
         || matches!(
             pb::BackgroundTaskCompletionReason::try_from(completion.reason),
             Ok(pb::BackgroundTaskCompletionReason::TaskProgress
-                | pb::BackgroundTaskCompletionReason::WorkerMessage)
+                | pb::BackgroundTaskCompletionReason::WorkerMessage
+                | pb::BackgroundTaskCompletionReason::ProjectSessionMessage)
         )
     {
         return None;

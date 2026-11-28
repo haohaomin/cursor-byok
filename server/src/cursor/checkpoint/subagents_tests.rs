@@ -17,6 +17,7 @@ fn progress_messages_and_unidentified_notifications_do_not_finish_workers() {
     for reason in [
         pb::BackgroundTaskCompletionReason::TaskProgress,
         pb::BackgroundTaskCompletionReason::WorkerMessage,
+        pb::BackgroundTaskCompletionReason::ProjectSessionMessage,
     ] {
         let mut state = pb::ConversationStateStructure::default();
         let mut completion = notice();

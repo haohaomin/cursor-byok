@@ -77,8 +77,8 @@
   ],
   "verified_at": "2026-11-27T19:36:44.034043+00:00",
   "validation": {
-    "conversation_delivery_passed": 33,
-    "workspace_passed": 687,
+    "conversation_delivery_passed": 34,
+    "workspace_passed": 688,
     "workspace_failed": 0,
     "workspace_ignored": 14,
     "clippy": "workspace all-targets -D warnings passed",
@@ -86,17 +86,24 @@
     "independent_static_review": "all reported findings fixed; no remaining blockers",
     "logs": [
       {
-        "file": "/tmp/cursor-byok-subagent-state-workspace-final.log",
-        "sha256": "f1f3ea519f9e868d69f2e588cba8bda1847899e22b512dade0c3751a58b5822a"
+        "file": "/tmp/cursor-byok-subagent-state-review-workspace.log",
+        "sha256": "f0070516e347a367ee7674d48a99b3f6bff8ab1aa56487f30b2c3b39202422fd"
       },
       {
-        "file": "/tmp/cursor-byok-subagent-state-clippy.log",
-        "sha256": "17f840ce5aa0bb09082fac778f73c48af9e80f75c77c2aa4d079936e6be719a0"
+        "file": "/tmp/cursor-byok-subagent-state-review-clippy.log",
+        "sha256": "a1126f7fce765762d67fcaaa9cbe05a44397fa79e1f89a1f0cb18f636b751b44"
       },
       {
-        "file": "/tmp/cursor-byok-subagent-state-finalization.log",
-        "sha256": "207ff4d6d360ed04975ab32ef01860ff9dc2b3c949cc07b93ee2f8d31999db42"
+        "file": "/tmp/cursor-byok-subagent-state-review-unit.log",
+        "sha256": "6f5e76c5a0953e24b1c416d32ba5dca9caafb6028c3f12931f10b9f68661e27c"
       }
     ]
+  },
+  "review_fix": {
+    "finding_url": "https://github.com/haohaomin/cursor-byok/pull/67#discussion_r4723118768",
+    "baseline_log_sha256": "c316b99edf8832a87aef37ad4004dd596632a6a4a6d2cf8118a3a684a22f8345",
+    "baseline_result": "1 failed: project message populated local run state",
+    "policy": "Exclude ProjectSessionMessage from local run-state updates while retaining visible message delivery; intentionally stricter than native reducer",
+    "result": "reducer and transport regressions passed; independent review found no blockers"
   }
 }
