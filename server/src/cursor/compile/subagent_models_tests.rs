@@ -134,6 +134,7 @@ fn context_reports_the_effective_override_and_empty_list_is_not_unavailability()
 #[test]
 fn task_execution_prioritizes_explicit_model_over_cursor_default() {
     let mut context = ExecContext {
+        project_root: false,
         conversation_id: "conversation".into(),
         root_conversation_id: "conversation".into(),
         agent_session_id: None,

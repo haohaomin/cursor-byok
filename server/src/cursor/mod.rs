@@ -4,6 +4,7 @@ pub mod checkpoint;
 pub mod compile;
 pub mod conversation;
 pub(crate) mod goals;
+pub(crate) mod projects;
 pub mod prompting;
 pub mod protocol;
 pub mod services;

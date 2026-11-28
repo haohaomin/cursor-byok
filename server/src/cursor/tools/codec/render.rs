@@ -227,6 +227,7 @@ pub fn tool_placeholder(name: &str, call_id: &str) -> Result<pb::ToolCall> {
         "websearch" => Tool::WebSearchToolCall(pb::WebSearchToolCall::default()),
         "task" => Tool::TaskToolCall(pb::TaskToolCall::default()),
         "await" => Tool::AwaitToolCall(pb::AwaitToolCall::default()),
+        "sendmessage" => Tool::SendMessageToolCall(pb::SendMessageToolCall::default()),
         "fetchmcpresource" => Tool::ReadMcpResourceToolCall(pb::ReadMcpResourceToolCall::default()),
         "askquestion" => Tool::AskQuestionToolCall(pb::AskQuestionToolCall::default()),
         "webfetch" => Tool::WebFetchToolCall(pb::WebFetchToolCall::default()),
@@ -455,6 +456,9 @@ pub fn render_tool_call(call: &ToolCall, completed: bool) -> Result<pb::ToolCall
         }
         Some(pb::tool_call::Tool::AwaitToolCall(tool)) => {
             tool.args = Some(super::super::await_task::arguments(call)?.wire());
+        }
+        Some(pb::tool_call::Tool::SendMessageToolCall(tool)) => {
+            tool.args = Some(super::super::send_message::arguments(call)?);
         }
         Some(pb::tool_call::Tool::TaskToolCall(tool)) => {
             tool.args = Some(pb::TaskArgs {

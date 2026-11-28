@@ -68,6 +68,7 @@ pub struct ModeAssets {
 #[derive(Clone, Debug)]
 pub struct PromptAssets {
     modes: [ModeAssets; 7],
+    pub(crate) project_message_tool: ToolDefinition,
 }
 
 impl PromptAssets {
@@ -123,6 +124,7 @@ impl PromptAssets {
             });
         }
         Ok(Self {
+            project_message_tool: catalog.tool("SendMessage")?,
             modes: modes
                 .try_into()
                 .map_err(|_| Error::Config("incomplete Cursor prompt mode catalog".into()))?,

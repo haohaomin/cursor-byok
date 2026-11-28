@@ -56,6 +56,10 @@ pub(super) async fn start(
     let call = normalized_call.as_ref().unwrap_or(call);
 
     match normalized(&call.name).as_str() {
+        "sendmessage" => Ok(ToolStart {
+            messages: Vec::new(),
+            completion: Some(super::send_message::complete(call, context.project_root)?),
+        }),
         "await" => super::await_task::start(runtime, results, call, context).await,
         "shell" | "bash" | "read" | "delete" | "grep" | "glob" | "readlints" | "task"
         | "callmcptool" | "fetchmcpresource" | "getmcptools" => {

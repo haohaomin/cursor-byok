@@ -51,9 +51,7 @@ impl ToolRegistry {
             .tools
             .iter()
             .map(|entry| match entry {
-                ManifestTool::Name(name) => self.tools.get(name).cloned().ok_or_else(|| {
-                    Error::Config(format!("tool manifest references unknown schema: {name}"))
-                }),
+                ManifestTool::Name(name) => self.tool(name),
                 ManifestTool::Variant { name, variant } => self
                     .variants
                     .get(&format!("{name}.{variant}"))
@@ -65,6 +63,12 @@ impl ToolRegistry {
                     }),
             })
             .collect()
+    }
+
+    pub(crate) fn tool(&self, name: &str) -> Result<ToolDefinition> {
+        self.tools.get(name).cloned().ok_or_else(|| {
+            Error::Config(format!("tool manifest references unknown schema: {name}"))
+        })
     }
 }
 

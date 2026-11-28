@@ -50,6 +50,7 @@ pub(crate) enum ExecStage {
 
 #[derive(Clone, Debug, Default)]
 pub struct ExecContext {
+    pub project_root: bool,
     pub conversation_id: String,
     pub root_conversation_id: String,
     pub agent_session_id: Option<String>,

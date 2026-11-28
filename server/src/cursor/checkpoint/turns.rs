@@ -33,6 +33,19 @@ impl CheckpointBuilder {
         };
         let changed = !presentation.steps.is_empty();
         for step in &presentation.steps {
+            if matches!(
+                step.message.as_ref(),
+                Some(pb::conversation_step::Message::ToolCall(pb::ToolCall {
+                    tool: Some(pb::tool_call::Tool::SendMessageToolCall(_)),
+                    ..
+                }))
+            ) {
+                turn.current.send_message_step_indices.push(
+                    u32::try_from(turn.current.steps.len()).map_err(|_| {
+                        Error::Protocol("Too many project conversation steps".into())
+                    })?,
+                );
+            }
             let mut encoded = Vec::new();
             step.encode(&mut encoded)?;
             let id = self.sync.persist(&encoded, &[]).await?;

@@ -16,11 +16,19 @@ use crate::{
 use super::CheckpointBuilder;
 
 impl CheckpointBuilder {
-    /// Restore Todo presentation from the selected canonical history when the
-    /// client omitted its checkpoint. Compaction removes the original tool calls.
-    pub(crate) async fn restore_todos(&mut self, checkpoint_id: CheckpointId) -> Result<()> {
+    /// Restore local presentation when the client omitted its checkpoint.
+    /// Compaction removes Todo calls; project turns carry sent-message indices.
+    pub(crate) async fn restore_local_presentation(
+        &mut self,
+        checkpoint_id: CheckpointId,
+    ) -> Result<()> {
         if let Some(bytes) = self.store.cursor_checkpoint(checkpoint_id).await? {
-            self.base.todos = pb::ConversationStateStructure::decode(bytes.as_slice())?.todos;
+            let state = pb::ConversationStateStructure::decode(bytes.as_slice())?;
+            self.base.todos = state.todos;
+            if state.is_root_project_conversation == Some(true) {
+                self.base.is_root_project_conversation = Some(true);
+                self.base.turns = state.turns;
+            }
         }
         Ok(())
     }
