@@ -292,9 +292,14 @@ impl ToolDispatcher {
 }
 
 fn validation_failure(call: &ToolCall, message: String) -> DispatchedTool {
+    let completion = if tool_call_dispatch::normalized(&call.name) == "await" {
+        await_task::validation_failure(call, message)
+    } else {
+        compat::failure_with_message(call, message)
+    };
     DispatchedTool {
         messages: Vec::new(),
-        completion: Some(compat::failure_with_message(call, message)),
+        completion: Some(completion),
     }
 }
 

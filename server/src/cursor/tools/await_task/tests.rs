@@ -346,6 +346,89 @@ fn parameter_rules_bound_waits_and_reject_invalid_targets() {
 }
 
 #[tokio::test]
+async fn validation_failures_keep_await_cards_without_starting_client_work() {
+    use crate::cursor::tools::{ToolBatchState, ToolDispatcher};
+    use prost::Message;
+    use std::collections::{BTreeMap, HashSet};
+
+    for (args, terminals, allow_subagents, expected_error, valid_args) in [
+        (json!({"task_id":5}), "", true, "must be a string", false),
+        (
+            json!({"task_id":"child","pattern":"ready"}),
+            "",
+            true,
+            "only supported for Shell",
+            false,
+        ),
+        (json!({"task_id":"12"}), "", true, "terminals folder", true),
+        (
+            json!({"task_id":"12","pattern":"["}),
+            "/terminals",
+            true,
+            "Invalid Await pattern",
+            true,
+        ),
+        (json!({"task_id":"child"}), "", false, "unavailable", true),
+        (
+            json!({"block_until_ms":0}),
+            "",
+            true,
+            "greater than zero",
+            false,
+        ),
+    ] {
+        let runtime = CursorToolRuntime::default();
+        let dispatcher = ToolDispatcher::new(runtime.clone());
+        let call = call(args);
+        let dispatched = dispatcher
+            .start_batch(
+                std::slice::from_ref(&call),
+                ToolBatchState {
+                    completed: &HashSet::new(),
+                    started: &HashSet::new(),
+                    response_text: "",
+                    response_thinking: "",
+                    goal_state: None,
+                },
+                &[],
+                &BTreeMap::new(),
+                &ExecContext {
+                    terminals_folder: terminals.into(),
+                    allow_subagents,
+                    ..Default::default()
+                },
+            )
+            .await
+            .unwrap();
+        assert_eq!(dispatched.len(), 1);
+        assert!(dispatched[0].messages.is_empty());
+        let completion = dispatched[0]
+            .completion
+            .as_ref()
+            .expect("validation result");
+        assert!(completion.result().is_error);
+        assert_eq!(completion.result().call_id, call.call_id);
+        assert!(
+            completion.result().content.contains(expected_error),
+            "{}",
+            completion.result().content
+        );
+        let wire = pb::ToolCall::decode(completion.tool_call().encode_to_vec().as_slice()).unwrap();
+        assert_eq!(wire.tool_call_id.as_deref(), Some(call.call_id.as_str()));
+        let Some(pb::tool_call::Tool::AwaitToolCall(tool)) = wire.tool else {
+            panic!("validation failure must remain an Await card")
+        };
+        assert_eq!(tool.args.is_some(), valid_args);
+        let Some(pb::await_result::Result::Error(error)) = tool.result.and_then(|r| r.result)
+        else {
+            panic!("Await validation error missing")
+        };
+        assert_eq!(error.error, completion.result().content);
+        assert!(runtime.running_exec_ids().await.is_empty());
+    }
+}
+
+#[tokio::test]
 async fn unexpected_stream_result_fails_await_once() {
     let (runtime, mut receiver, started) =
         begin(json!({"task_id":"child","block_until_ms":0})).await;

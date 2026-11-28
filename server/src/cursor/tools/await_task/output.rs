@@ -1,6 +1,9 @@
 //! One canonical result and one Await card per completed observation.
 use super::{super::tool_call_result::ToolCompletion, Wait};
-use crate::{cursor::protocol::proto::agent::v1 as pb, model::ToolResult};
+use crate::{
+    cursor::protocol::proto::agent::v1 as pb,
+    model::{ToolCall, ToolResult},
+};
 
 #[allow(clippy::too_many_arguments)]
 pub(super) fn complete(
@@ -91,6 +94,26 @@ pub(super) fn completion(
     wait: &Wait,
     result: std::result::Result<pb::await_success::AwaitResult, String>,
 ) -> ToolCompletion {
+    finish(&wait.call, wait.started_ms, Some(wait.args.wire()), result)
+}
+
+pub(crate) fn validation_failure(call: &ToolCall, error: String) -> ToolCompletion {
+    // Invalid input has no valid typed arguments, but still belongs to Await.
+    // Context failures retain the successfully validated arguments.
+    finish(
+        call,
+        super::now_ms(),
+        super::arguments(call).ok().map(|args| args.wire()),
+        Err(error),
+    )
+}
+
+fn finish(
+    call: &ToolCall,
+    started_ms: u64,
+    args: Option<pb::AwaitArgs>,
+    result: std::result::Result<pb::await_success::AwaitResult, String>,
+) -> ToolCompletion {
     let (content, is_error, wire) = match result {
         Ok(result) => {
             let content = match &result {
@@ -120,16 +143,16 @@ pub(super) fn completion(
         ),
     };
     ToolCompletion::new(
-        &wait.call,
-        wait.started_ms,
+        call,
+        started_ms,
         ToolResult {
-            call_id: wait.call.call_id.clone(),
+            call_id: call.call_id.clone(),
             content,
             is_error,
             image: None,
         },
         pb::tool_call::Tool::AwaitToolCall(pb::AwaitToolCall {
-            args: Some(wait.args.wire()),
+            args,
             result: Some(pb::AwaitResult { result: Some(wire) }),
         }),
     )

@@ -4,6 +4,8 @@ mod shell;
 #[cfg(test)]
 mod tests;
 
+pub(super) use output::validation_failure;
+
 use serde_json::Value;
 use std::{
     sync::{atomic::AtomicBool, Arc},
