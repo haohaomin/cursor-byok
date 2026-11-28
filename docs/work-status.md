@@ -2,6 +2,8 @@
 
 更新：2026-11-28；v1.2.16 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
+**2026-11-28 Issue #244 项目消息候选：**已复现根项目缺少 SendMessage 并接通文本输出、原生卡片、根身份和步骤索引；重启、压缩、显式/后台续跑和角色边界已验证，718 项工作区回归及 Clippy 通过。独立分支 `codex/project-send-message` 的云端 CI/审查待完成，尚未合入/发布；真实项目 UI、SendToAgent 和 Agent Store 未完成。[记录](history/issues/2026-11-28-issue244-project-messages-check.md)。
+
 **2026-11-28 Issue #244 Await 已发布：**已复现工具缺失并接通 Shell、子代理和纯等待三个分支；协议往返与新用户消息中断、707 项工作区回归及 Clippy 通过；PR #68 已合入 main（`46affbc`）；最终提交 `84e9b5d` 的分支、PR 与主线 CI 全部通过。v1.2.16 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。[实现与边界](history/issues/2026-11-28-issue244-await-fix.md)。
 
 **2026-11-28 Issue #244 后续：**已修复子代理完成后仍显示后台状态、record-only 不保存状态、旧检查点覆盖完成/待操作通知的问题；新增会话内运行记录和原子更新，保留历史、压缩及取消/失败时的呈现。34 项通知、688 项工作区回归、Clippy 与独立复核通过；PR #67 已合入 main（`a8037b0`），最终提交 `dbbede7` 的分支、PR 与主线 CI 全部通过；v1.2.15 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。真实 Cursor/完整项目编排仍待验收。[状态修复](history/issues/2026-11-27-issue244-subagent-state-fix.md)。

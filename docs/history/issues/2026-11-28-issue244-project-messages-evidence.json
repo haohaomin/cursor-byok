@@ -1,0 +1,423 @@
+{
+  "date": "2026-11-28",
+  "scope": "Root project SendMessage candidate: scoped native artifact contract review, isolated pure-function comparison, and local synthetic protocol regression tests. No real client/cloud/provider acceptance.",
+  "rea_inventory": "ev_a485fa596bb60a5bf97cc88b22f0197ca1c4331db3c49acfa96d3cc6ff31806b",
+  "coverage": "Reused partial REA identity; focused source character offsets only; no complete call-graph claim",
+  "files": {
+    "runtime": {
+      "path": "/Applications/Cursor.app/Contents/Resources/app/extensions/cursor-local-agent-runtime/dist/main.js",
+      "sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "bytes": 5277933
+    },
+    "host": {
+      "path": "/Applications/Cursor.app/Contents/Resources/app/extensions/cursor-agent-host/dist/main.js",
+      "sha256": "c7170dacc639cfd42a671527fb40175594096f6db53c2a96fe738b85f7121528",
+      "bytes": 6875499
+    },
+    "workbench": {
+      "path": "/Applications/Cursor.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js",
+      "sha256": "79a1c7cc4fc3b14df093b18829ab88c1ee955e60ea49bb7984dbaf488f033713",
+      "bytes": 39951704
+    }
+  },
+  "observations": [
+    {
+      "file": "runtime",
+      "char_start": 1843787,
+      "char_end": 1844930,
+      "subject": "K6/Z6/Q6/t9 root predicates",
+      "summary": "Current user projectDetails must be present with no subagent/sideChat and no bestOfNGroupId for initial root detection. If current message has no explicit boundary, Q6 uses persisted root. History recovery scans latest user turns backwards and stops at first ordinary non-simulated user without a boundary."
+    },
+    {
+      "file": "runtime",
+      "char_start": 3330850,
+      "char_end": 3332000,
+      "subject": "Root before tools build",
+      "summary": "Z6(current user) sets state.isRootProjectConversation before tool construction; does not set a separate PROJECT/CUSTOM mode."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2714130,
+      "char_end": 2714900,
+      "subject": "Restore project state",
+      "summary": "Restores isRootProjectConversation and projectCoordinatorSystemSection plus communication-rules flag from ConversationStateStructure."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2740950,
+      "char_end": 2741600,
+      "subject": "Persist project state",
+      "summary": "Serializes root flag and coordinator prompt section; no need to infer every run from latest text."
+    },
+    {
+      "file": "runtime",
+      "char_start": 4666700,
+      "char_end": 4668200,
+      "subject": "State schema",
+      "summary": "ConversationStateStructure root flag field33; project coordinator section50 and rules51; thread summaries53/recent replies54."
+    },
+    {
+      "file": "runtime",
+      "char_start": 3156500,
+      "char_end": 3157800,
+      "subject": "Initialization/resume",
+      "summary": "initializeConversation recovers root from project history boundary; IDE also recognizes parsed plan metadata isProject."
+    },
+    {
+      "file": "runtime",
+      "char_start": 3103200,
+      "char_end": 3104050,
+      "subject": "Background completion",
+      "summary": "Already-persisted root retained; otherwise t9 recovers root from history before notification projection."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2864000,
+      "char_end": 2864900,
+      "subject": "Compaction entry",
+      "summary": "Retains or recovers root; builds coordinator prompt carrier or stable system section."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2879300,
+      "char_end": 2880150,
+      "subject": "Compaction result",
+      "summary": "Restores/replaces project system section in compacted messages and stores new section; root flag not cleared."
+    },
+    {
+      "file": "runtime",
+      "char_start": 1576837,
+      "char_end": 1576956,
+      "subject": "SendMessage tool gate",
+      "summary": "RX: no subagentConfig, no subagentInstanceId, GY(state)==root. Not gated here by requestContext.sendMessageEnabled or clientSupportsSendToUser."
+    },
+    {
+      "file": "runtime",
+      "char_start": 3972050,
+      "char_end": 3972500,
+      "subject": "Default tool builder",
+      "summary": "Adds Phe SendMessage when RX is true."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2623546,
+      "char_end": 2631250,
+      "subject": "SendMessage implementation",
+      "summary": "Name SendMessage. Required message string trimmed nonempty up to100000 UTF16 units. Optional reply_to/end_turn/main_bot_summary/replace_previous_message depend on config. Local executeToolCall builds card with text and success timestamp/messageId; no Exec/Interaction. Default render Message sent to user. Attachment protobuf exists but text tool schema does not accept attachment input. Link validators also apply."
+    },
+    {
+      "file": "runtime",
+      "char_start": 4980989,
+      "char_end": 4982200,
+      "subject": "SendMessage schema",
+      "summary": "Args text1/attachment2/reply_to3/replace_previous_message4; success timestamp1/message_id2/thread_id3. Current repository lacks optional fields3/4 and success.thread_id."
+    },
+    {
+      "file": "runtime",
+      "char_start": 4617480,
+      "char_end": 4618440,
+      "subject": "ToolCall schema",
+      "summary": "SendMessage card55; SendToUser58; GetAgentStatus73; SendToAgent74; ReadAgentTranscript75; CreateAgent76; StopAgent77."
+    },
+    {
+      "file": "runtime",
+      "char_start": 4746344,
+      "char_end": 4748570,
+      "subject": "SendToAgent schema only",
+      "summary": "Args tool_call_id1,agent_id2,message3,delivery4,title5,model6,tracked_task_keys7; success worker_bc_id1,delivered_as2,message3,recipient4(kind MAIN_BOT or PROJECT_SESSION). Actual factory, enabled JSON parameters and delivery RPC not located in scoped files."
+    },
+    {
+      "file": "runtime",
+      "char_start": 4811476,
+      "char_end": 4815000,
+      "subject": "Exec envelope exclusion",
+      "summary": "Full Exec server/client unions have neither SendMessage nor SendToAgent request/result; ToolCall fields must not be mistaken for Exec fields."
+    },
+    {
+      "file": "runtime",
+      "char_start": 4688032,
+      "char_end": 4689500,
+      "subject": "Interaction envelope exclusion",
+      "summary": "Interaction query/response union likewise has no SendMessage or SendToAgent branch."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2634780,
+      "char_end": 2636800,
+      "subject": "Project communication prompt",
+      "summary": "Root-only project instructions designate SendMessage for user-visible acknowledgement/progress/final; ordinary assistant text is internal thinking; no further ordinary text after final SendMessage. AskQuestion can remain appropriate for questions."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2744379,
+      "char_end": 2744790,
+      "subject": "Mode resolution",
+      "summary": "Mode defaults/inherits normally; root MULTITASK normalized AGENT. No PROJECT mode or forced CUSTOM; cloud coordinator prompting branch X6 requires BACKGROUND+AGENT and non-local prompting."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2694145,
+      "char_end": 2694800,
+      "subject": "SendMessage turn bookkeeping",
+      "summary": "Restores sendMessageStepIndices, filters indices against steps; hasSendMessageCall derived from nonempty list."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2697770,
+      "char_end": 2698240,
+      "subject": "SendMessage step bookkeeping",
+      "summary": "Records every sendMessageToolCall step index; current repo checkpoint/turns.rs writes an empty index list."
+    },
+    {
+      "file": "runtime",
+      "char_start": 2994471,
+      "char_end": 2997900,
+      "subject": "Missing visible reply handling",
+      "summary": "Conditional root retry/reminder if a person turn ends without user-visible SendMessage; feature/config/loop-budget controlled. Not proof of unconditional resend."
+    },
+    {
+      "file": "workbench",
+      "char_start": 15442161,
+      "char_end": 15442400,
+      "subject": "UI root",
+      "summary": "Composer isProject=true and no parentComposerId is root for SendMessage presentation."
+    },
+    {
+      "file": "workbench",
+      "char_start": 15444300,
+      "char_end": 15446400,
+      "subject": "UI presentation eligibility",
+      "summary": "Root project composer or peerSideChat enables normalizationMode active and sentMessage voice; independent from server root field."
+    },
+    {
+      "file": "workbench",
+      "char_start": 8114850,
+      "char_end": 8117450,
+      "subject": "Output presentation",
+      "summary": "sentMessage voice renders send-message payload as assistantMarkdown; normal assistant markdown becomes a thinking activity, not deleted from wire/history."
+    },
+    {
+      "file": "workbench",
+      "char_start": 12639520,
+      "char_end": 12641000,
+      "subject": "Card consumption",
+      "summary": "Got/JJh read successful completed SendMessage text with optional reply/replacement; QNo identifies PROJECT_SESSION SendToAgent messages separately."
+    },
+    {
+      "file": "workbench",
+      "char_start": 16970800,
+      "char_end": 16971950,
+      "subject": "Streaming card consumption",
+      "summary": "iaa reads SendMessage text and pacing updates preserve tool card shape."
+    },
+    {
+      "file": "workbench",
+      "char_start": 17434792,
+      "char_end": 17436500,
+      "subject": "Project creation entry",
+      "summary": "Cloud repository isProject request creates ProjectDetails(name), tracked-task list and project metadata before cloud start RPC."
+    },
+    {
+      "file": "workbench",
+      "char_start": 16503948,
+      "char_end": 16505100,
+      "subject": "Local child/sidechat entry",
+      "summary": "Local run derives project subagent or sideChat details from ownership/store dir; does not establish that ordinary BYOK IDE chat receives root project metadata."
+    }
+  ],
+  "minimal_next_item": "Root Project SendMessage text output and root/step bookkeeping, independently tested with synthetic protocol requests; not cross-agent SendToAgent, not complete Projects.",
+  "unknowns": [
+    "Actual cloud SendToAgent execution factory/RPC and authorization/recipient routing",
+    "Current user window/runtime feature flags",
+    "Real root project requests routed through BYOK and actual UI acceptance",
+    "Client/server project memberships, thread store, Agent Store mounting and cloud worker lifecycle integration"
+  ],
+  "baseline_reproduction": {
+    "commit": "46affbcfe27337526844ba8338a96365bb800f25",
+    "test_file": "server/tests/project_messages.rs",
+    "test_sha256": "223ef07c68ad1cbc309d69c0ddd4096759a980ed67e44050882509fb068e745e",
+    "result": {
+      "passed": 1,
+      "failed": 2
+    },
+    "log": "/tmp/cursor-byok-issue244-project-message-red.log",
+    "log_sha256": "d805145e5ddcb69ca90926b821caa7885afbe080994b6783da9b22a0cae3fa6c",
+    "failures": [
+      "root project has no user-visible message tool",
+      "SendMessage did not produce its native card"
+    ],
+    "control": "ordinary chat does not offer SendMessage",
+    "environment": "FakeProvider, synthetic UserMessage.project_details, temporary SQLite; real Cursor UI and cloud requests not tested"
+  },
+  "boundary_addendum": {
+    "scope": "Read-only narrow static boundary check; no live client/RPC tests",
+    "rea_inventory": "ev_a485fa596bb60a5bf97cc88b22f0197ca1c4331db3c49acfa96d3cc6ff31806b",
+    "files": {
+      "runtime_sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "workbench_sha256": "79a1c7cc4fc3b14df093b18829ab88c1ee955e60ea49bb7984dbaf488f033713"
+    },
+    "observations": [
+      {
+        "file": "runtime",
+        "char_start": 3330850,
+        "char_end": 3333500,
+        "summary": "Z6(currentUser) only sets persistent root true; Q6 effective h feeds coordinator prompting policy. toolsGenerator receives stateHandler, not h."
+      },
+      {
+        "file": "runtime",
+        "char_start": 1576837,
+        "char_end": 1576956,
+        "summary": "RX checks missing subagentConfig/subagentInstanceId and GY(state). GY at1502309 returns state.isRootProjectConversation === true."
+      },
+      {
+        "file": "workbench",
+        "char_start": 17605329,
+        "char_end": 17605970,
+        "summary": "reparentAgentIntoProject rejects source header.isProject.value===true with Project agents cannot be reparented as threads. Also rejects self-parent and existing subagentParentId; target must be cloud Project. This establishes supported UI guard, not unknown backend authorization behavior."
+      },
+      {
+        "file": "runtime",
+        "char_start": 2619489,
+        "char_end": 2620400,
+        "summary": "Default lhe first masks fenced/inline code via the regex, scans ]( optional< destination until whitespace/) />, and only validates lowercase bc- prefixed destinations; first undefined Rpe result creates one custom issue and returns. Does not query actual agent existence/ownership."
+      },
+      {
+        "file": "runtime",
+        "char_start": 2589870,
+        "char_end": 2593500,
+        "summary": "Tpe accepts bc- plus hyphenated UUID syntax case-insensitively in UUID portion; Rpe handles ID, changes/desktop hash or path views, and file references. Default lhe does not enforce full worker-file link validity: invalid file fragments may degrade to an agent-only parsed result and are accepted; query strings on shorthand bc- links are rejected by Mpe."
+      }
+    ],
+    "unknowns": [
+      "No evidence that backend accepts root-project reparenting through direct RPC; only explicit supported UI guard established",
+      "Inconsistent forged/current-user child metadata against persisted root is not established as legitimate root-to-child migration"
+    ]
+  },
+  "candidate_review": {
+    "initial_differences": [
+      {
+        "name": "longer-opening-fence",
+        "accepted": true,
+        "trimmed": "````\n[worker](bc-unknown)\n```",
+        "candidate": false
+      },
+      {
+        "name": "longer-opening-tilde",
+        "accepted": true,
+        "trimmed": "~~~~\n[worker](bc-unknown)\n~~~",
+        "candidate": false
+      },
+      {
+        "name": "bom-before-close",
+        "accepted": true,
+        "trimmed": "[worker](bc-12345678-1234-1234-1234-123456789abc﻿)",
+        "candidate": false
+      },
+      {
+        "name": "nel-before-close",
+        "accepted": false,
+        "issue": "`bc-12345678-1234-1234-1234-123456789abc` is not an agent ID. A new agent's ID exists only in its CreateAgent result: link it after that result arrives, or name it without a link.",
+        "trimmed": "[worker](bc-12345678-1234-1234-1234-123456789abc)",
+        "candidate": true
+      },
+      {
+        "name": "empty-bom",
+        "accepted": false,
+        "trimmed": "",
+        "candidate": true
+      },
+      {
+        "name": "empty-nel",
+        "accepted": true,
+        "trimmed": "",
+        "candidate": false
+      }
+    ],
+    "reviewed_text_and_delimiters": {
+      "scope": "Revised candidate unchanged links and js_whitespace copied to isolated rustc probe using cached libs; native pure functions in Node VM. Finite fixed delimiters (including partially consumed closing runs), ECMAScript whitespace, seed-244 mixed text. No Cargo, application bootstrap, network, repository writes.",
+      "case_count": 2191,
+      "candidate_count": 2191,
+      "difference_count": 0,
+      "source_sha256": "a637fafae17faca9c0d07b6fac0a31c1cb63915335a78527e004567142cd834c",
+      "source_character_offsets": {
+        "code_and_target_regex": 2619489,
+        "default_superRefine_lhe": 2620135,
+        "message_schema_trim": 2625431
+      },
+      "files": {
+        "candidate-links-reviewed.rs.snapshot": "c76ac5224ab16eb11d8a7024c09c289cac4a1e086e16fe7d7e3fbcd6fdc5f0f3",
+        "candidate-trim-reviewed.rs.snapshot": "cbdebc93a9307176fb95c82c83b5342914667ab0c6c07b433614ae1c935fe5d0",
+        "reviewed-cases.json": "537fc70065502c5092c65f1821c57b81bfbb0c65a6cc10d83989b8cf96a1dcab",
+        "candidate-reviewed-probe.rs": "d3a4f207061805e5e37c3ddc425383a736fc94f47b73696fe8bbd2e7069d936a",
+        "probe-native-reviewed.cjs": "c61548628a30f0e4a34204028729836a8c1b0db17e7d4c1e0f0013ac2b52ba60",
+        "native-reviewed-results.json": "daa630fd4416804fb35b8d5416691ea3e1c69714ee3882015770e734b5dff109",
+        "candidate-reviewed-results.tsv": "95ca7ed3e44f1f1293cd30d2ac5a4e3cec3730e112ac5a075abf0770df53b9d8",
+        "reviewed-differences.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      }
+    },
+    "url_cases": {
+      "scope": "1099 fixed cases comparing unchanged candidate links.rs snapshot with isolated native pure functions; no app, network, Cargo, or repository edits. Includes file fragment percent decoding, duplicate/unknown keys, malformed values, views, query, path.",
+      "count": 1099,
+      "difference_count": 0,
+      "files": {
+        "url-cases.json": "e94891012d2ba2c33398589270faf0c6a6104110f03e2a9e247eb6b6900e8a5c",
+        "native-url-results.json": "e5b6980a881798615b96a1c5fce8e755e36ba9a20b0f22b0a7314652c431b119",
+        "candidate-url-results.tsv": "b68a9e62ad83f937322c824c733d9ab8a92303cd6b19a8965dde794817bf9fea",
+        "url-differences.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "candidate-url-probe.rs": "699b2668f92dd57d114608b52478074308677c6e4729e2984a5c5716e5ef7a61",
+        "probe-native-url.cjs": "4f99f5c313c3711a1ff3594ddf0781aea6bdedf363a5694ea726eea120009b17"
+      }
+    },
+    "limitations": "Static artifact and isolated pure functions only, no real Cursor UI or provider test."
+  },
+  "local_verification": {
+    "integration_tests": 8,
+    "unit_tests": 3,
+    "workspace": {
+      "passed": 718,
+      "failed": 0,
+      "ignored": 14
+    },
+    "clippy": "workspace all-targets -D warnings passed",
+    "logs": [
+      {
+        "path": "/tmp/cursor-byok-issue244-project-message-recovery-red.log",
+        "sha256": "b2bd5c5d3cbb6177672bf2791cda3a9ad59c76b2ab3a752ebb4380ce56027836"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-project-message-recovery-green.log",
+        "sha256": "c5629d4d7f51c365ad24c5a48b7fe1560734f5bc7ebdd67a6d3c639e8f794f49"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-sendmessage-boundaries-red.log",
+        "sha256": "5210cd5e84cd2670758291ad9b631d9b263430b7b423ad4e4fedbdb5ad1ef64f"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-sendmessage-boundaries-green.log",
+        "sha256": "88ffa8e478d8ffff0b5209c891b4d65e258c528da46d3cc3d6c8b65724114c8b"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-project-message-expanded.log",
+        "sha256": "e2d0da33f139116c4478792f05bc098c6d24c405285c0f505b7ec7c033328a11"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-project-message-workspace.log",
+        "sha256": "528cdfad5a3f8ba749520cbecd0ceb468981471b16a167d3e465d06e4143631d"
+      },
+      {
+        "path": "/tmp/cursor-byok-issue244-project-message-clippy.log",
+        "sha256": "539424fd38dd8ad14bbe766f534c138b5a3f48629cfe176e56b624e91812df9e"
+      }
+    ],
+    "source_commit": "58c62d06110cad9b20e2597a03ef6a95b2e0a50a",
+    "format": "passed",
+    "up_to_date_main": "4782e0bdb72874e25b40c230d6cdf62cbfbaa2af",
+    "server_tree_unchanged_by_rebase": true,
+    "rebase_changes": "five v1.2.16 version files and finalized Await release documentation only"
+  },
+  "publication": {
+    "status": "candidate; cloud CI, PR review, merge and release pending",
+    "branch": "codex/project-send-message"
+  },
+  "initial_audit_scope": "Read-only scoped static inspection; no repository edits, Cargo, running client, cloud account, outbound messages or full inventory rerun"
+}
