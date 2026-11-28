@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-28 个人维护 PR #69
+
+[PR #69](https://github.com/haohaomin/cursor-byok/pull/69) 补齐根项目 SendMessage、身份和消息步骤索引，保留重启、压缩及续跑后的呈现。PR #69 已合入 main（`c512727`）；最终提交 `78d3d5e` 的分支、PR 与主线 CI 全部通过，Codex 审查无发现。v1.2.17 已发布，20 项资产、7 份签名和三个更新清单实际下载核验通过。718 项工作区回归、Clippy 和格式检查通过；Sourcery 配额跳过。真实项目 UI/路由、SendToAgent 和 Agent Store 仍待完成。[记录](history/issues/2026-11-28-issue244-project-messages-check.md)。
+
 ## 2026-11-28 个人维护 PR #68
 
 [PR #68](https://github.com/haohaomin/cursor-byok/pull/68) 补齐现代 Await：等待已有 Shell、子代理或仅计时，支持取消、断流及正确的原生错误卡片。PR #68 已合入 main（`46affbc`）；最终提交 `84e9b5d` 的分支、PR 与主线 CI 全部通过。v1.2.16 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。707 项工作区回归、Clippy 与格式检查通过；Codex 的卡片校验问题已修复并解决审查，Sourcery 配额跳过；真实 Cursor/完整 #244 待验收。[记录](history/issues/2026-11-28-issue244-await-fix.md)。

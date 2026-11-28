@@ -645,3 +645,15 @@
 - 新增等待已有 Shell、子代理和纯计时三个分支，修正终端解析、取消和校验失败卡片；707 项工作区回归、Clippy 和格式检查通过。
 - 实际下载 20 项资产，全部大小及 SHA-256 与 GitHub 一致；7 份签名通过原公钥验证；三个更新清单的版本、平台、URL、签名和旧版校验值通过。[结构化证据](2026-11-28-v1.2.16-release-evidence.json)。
 - 中文说明已发布并逐字回读；未安装此版本。真实 Cursor、云子代理、真实供应商及自动通知竞争待验；完整 #244 未完成，#155 保持部分完成，未测 20 分钟任务。[范围](issues/2026-11-28-issue244-await-fix.md)。
+
+<a id="v1217"></a>
+
+## v1.2.17：根项目用户消息
+
+2026-11-28 发布；[Release](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.17) 在核验时为 Latest，非草稿、非预发布。
+
+- PR #69 合并 `c512727` 与最终已测 head `78d3d5e` 文件树一致；版本提交 `9e61016` 仅修改五个版本文件。
+- [主线 CI](https://github.com/haohaomin/cursor-byok/actions/runs/46127349275)、[四平台发布](https://github.com/haohaomin/cursor-byok/actions/runs/46128113631) 全部成功；最终提交 Codex 审查无发现，Sourcery 配额跳过。
+- 新增 SendMessage 用户文本卡片，保存根身份和消息索引，修复重启丢失呈现并验证压缩/续跑；718 项工作区回归、Clippy 和格式检查通过。
+- 实际下载 20 项资产，全部大小及 SHA-256 与 GitHub 一致；7 份签名通过原公钥验证；三个更新清单的版本、平台、URL、签名和旧版校验值通过。[结构化证据](2026-11-28-v1.2.17-release-evidence.json)。
+- 中文说明已发布并逐字回读；未安装此版本。真实项目 UI/路由、云投递、线程、附件与 Agent Store 未完成或未验收；完整 #244 与 #155 不标为已解决，未测 20 分钟任务。[范围](issues/2026-11-28-issue244-project-messages-check.md)。

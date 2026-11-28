@@ -1,8 +1,8 @@
 # 工作状态
 
-更新：2026-11-28；v1.2.16 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
+更新：2026-11-28；v1.2.17 已发布并完成下载、签名和更新清单核验。历史测试与环境状态保留原核对日期。逐项调查见 [Issue 清单](issues.md)，原始测试见 [历史资料](history/README.md)。
 
-**2026-11-28 Issue #244 项目消息候选：**已复现根项目缺少 SendMessage 并接通文本输出、原生卡片、根身份和步骤索引；重启、压缩、显式/后台续跑和角色边界已验证，718 项工作区回归及 Clippy 通过。独立分支 `codex/project-send-message` 的云端 CI/审查待完成，尚未合入/发布；真实项目 UI、SendToAgent 和 Agent Store 未完成。[记录](history/issues/2026-11-28-issue244-project-messages-check.md)。
+**2026-11-28 Issue #244 项目消息已发布：**已复现根项目缺少 SendMessage 并接通文本输出、原生卡片、根身份和步骤索引；重启、压缩、显式/后台续跑和角色边界已验证，718 项工作区回归及 Clippy 通过。PR #69 已合入 main（`c512727`）；最终提交 `78d3d5e` 的分支、PR 与主线 CI 全部通过，Codex 审查无发现。v1.2.17 已发布，20 项资产、7 份签名和三个更新清单实际下载核验通过；真实项目 UI、SendToAgent 和 Agent Store 未完成。[记录](history/issues/2026-11-28-issue244-project-messages-check.md)。
 
 **2026-11-28 Issue #244 Await 已发布：**已复现工具缺失并接通 Shell、子代理和纯等待三个分支；协议往返与新用户消息中断、707 项工作区回归及 Clippy 通过；PR #68 已合入 main（`46affbc`）；最终提交 `84e9b5d` 的分支、PR 与主线 CI 全部通过。v1.2.16 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。[实现与边界](history/issues/2026-11-28-issue244-await-fix.md)。
 
@@ -16,7 +16,7 @@
 
 **2026-11-13 进展：**#150/#417 的逐模型 Token 定价已通过 [PR #39](https://github.com/haohaomin/cursor-byok/pull/39) 合入 `main`（合并提交 `e53e97e`）；原 #35 是合入已先落地的 #34 分支，未直接进入主线，已由 #39 在当前主线基线上重新集成。设置页按 `model_hash` 保存输入、输出、缓存读取和缓存写入单价；首页总计与按模型明细按覆盖价计算，未配置覆盖时使用全局价格。当前主线联合回归为 293 个服务端单测通过、0 失败、14 忽略，桌面检查、Clippy 和生产构建通过。插件模型暂使用全局价格，真实供应商和发布版本仍待验收，见 [定价验证记录](history/issues/2026-11-13-issue150-model-pricing.md)。
 
-**当前结论：2026-11-28 已将 PR #13、#43–#49、#52、#53、#57、#59、#60、#62、#63、#64、#65、#66、#67 和 #68 合入 main。最新公开版本为 v1.2.16，包含此前合并、PR #50 的 HTTP/2、PR #51 的自动压缩、PR #52 的 Todo、PR #53 的团队配置、PR #57 的 DeepSeek 跨协议 reasoning 及 PR #59 的二进制 BidiAppend 修复，以及 PR #60 的自动压缩时限设置、PR #62 的摘要输出上限与有限重试、PR #63 的 HTTP 请求体和解压大小限制，以及 PR #64 的自定义子代理角色传递与明确停用、PR #65 的目标模式工具与续跑协议，以及 PR #66 的新通知接收、去重和消息顺序修复，以及 PR #67 的子代理运行状态保存、并发与旧检查点覆盖保护，以及 PR #68 的现代 Await 等待、取消与原生错误卡片。真实 OAuth 账号、Semble 批准/拒绝、DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收；Windows Cursor UI 的 CA 初始化与接管已通过。**
+**当前结论：2026-11-28 已将 PR #13、#43–#49、#52、#53、#57、#59、#60、#62、#63、#64、#65、#66、#67、#68 和 #69 合入 main。最新公开版本为 v1.2.17，包含此前合并、PR #50 的 HTTP/2、PR #51 的自动压缩、PR #52 的 Todo、PR #53 的团队配置、PR #57 的 DeepSeek 跨协议 reasoning 及 PR #59 的二进制 BidiAppend 修复，以及 PR #60 的自动压缩时限设置、PR #62 的摘要输出上限与有限重试、PR #63 的 HTTP 请求体和解压大小限制，以及 PR #64 的自定义子代理角色传递与明确停用、PR #65 的目标模式工具与续跑协议，以及 PR #66 的新通知接收、去重和消息顺序修复，以及 PR #67 的子代理运行状态保存、并发与旧检查点覆盖保护，以及 PR #68 的现代 Await 等待、取消与原生错误卡片，以及 PR #69 的根项目用户消息、身份及步骤索引保存。真实 OAuth 账号、Semble 批准/拒绝、DeepSeek 账号和 Cursor 原生 Agent UI 仍待验收；Windows Cursor UI 的 CA 初始化与接管已通过。**
 
 **2026-11-13 进展：**上游 PR #433 已按当前 Rust/Tauri 架构选择性重实现：非 Tab 的 Cursor host 请求进入本地路由，CONNECT 隧道保持原始 authority；硬编码云端 400/404 短路和 `custom-protocol` feature 未采用。定向代理测试、Clippy、桌面检查和工作区回归通过，真实代理网络与 Cursor UI 待验，见[验证记录](history/pull-requests/2026-11-13-pr433-proxy-routing.md)。**
 

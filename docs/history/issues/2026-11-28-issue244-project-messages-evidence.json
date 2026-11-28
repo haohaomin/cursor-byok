@@ -416,8 +416,26 @@
     "rebase_changes": "five v1.2.16 version files and finalized Await release documentation only"
   },
   "publication": {
-    "status": "candidate; cloud CI, PR review, merge and release pending",
-    "branch": "codex/project-send-message"
+    "pr": 69,
+    "url": "https://github.com/haohaomin/cursor-byok/pull/69",
+    "status": "merged and released; artifacts verified; real Cursor project UI/routing not tested",
+    "source_commit": "58c62d06110cad9b20e2597a03ef6a95b2e0a50a",
+    "tested_head": "78d3d5e2b0e439610875e1ff994c3e3624f55921",
+    "merge_commit": "c512727833a8563020b6e2de830e286935133fab",
+    "merge_tree_matches_tested_head": true,
+    "merged_at": "2026-11-28T08:46:09Z",
+    "branch_ci": 46126466446,
+    "pr_ci": 46126493756,
+    "main_ci": 46127349275,
+    "ci_status": "all succeeded",
+    "codex_review": "completed on final head with no findings",
+    "sourcery": "skipped due to review limit",
+    "release_run": 46128113631,
+    "release_commit": "9e61016e6dce135e750094049a3f1bd742dc708a",
+    "version": "1.2.17",
+    "release_evidence": "../2026-11-28-v1.2.17-release-evidence.json",
+    "source_branch_deleted": true,
+    "release_notes": "Chinese summary plus generated changelog; exact API readback verified"
   },
   "initial_audit_scope": "Read-only scoped static inspection; no repository edits, Cargo, running client, cloud account, outbound messages or full inventory rerun"
 }
