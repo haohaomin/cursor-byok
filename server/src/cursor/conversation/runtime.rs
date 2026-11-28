@@ -821,7 +821,25 @@ fn spawn_run_request(
                         Ok(
                             super::background::Admission::Ignored
                             | super::background::Admission::Duplicate,
-                        ) => TransportFinish::Acknowledged,
+                        ) => {
+                            if crate::cursor::checkpoint::subagents::has_updates(&request) {
+                                match registry
+                                    .publish_idle_checkpoint(
+                                        &handle,
+                                        request
+                                            .conversation_id
+                                            .as_deref()
+                                            .unwrap_or(handle.request_id()),
+                                    )
+                                    .await
+                                {
+                                    Ok(()) => TransportFinish::Acknowledged,
+                                    Err(error) => TransportFinish::Failed(error),
+                                }
+                            } else {
+                                TransportFinish::Acknowledged
+                            }
+                        }
                         Err(error) => TransportFinish::Failed(error),
                         _ => unreachable!(),
                     };
@@ -1116,7 +1134,7 @@ fn spawn_run_request(
                 tasks: generation.tasks.clone(),
             },
         );
-        let finish = match output.run().await {
+        let mut finish = match output.run().await {
             Ok(finish) => finish,
             Err(error) => {
                 if generation.superseded.is_cancelled() {
@@ -1132,7 +1150,12 @@ fn spawn_run_request(
             }
         };
         let _ = core_run.await;
-        registry.release(&conversation_id, &run_id).await;
+        if let Err(error) = registry
+            .release(&conversation_id, &run_id, &handle, &mut finish)
+            .await
+        {
+            finish = RunFinish::Transport(TransportFinish::Failed(error));
+        }
         if generation
             .run
             .lock()

@@ -193,8 +193,8 @@ async fn record_only_notifications_do_not_wake_or_consume_a_later_delivery() {
     .await;
     assert_eq!(
         messages.len(),
-        1,
-        "record-only input should only acknowledge the turn"
+        2,
+        "record-only input publishes status and acknowledges the turn"
     );
     assert!(provider.requests().is_empty());
     let handle = registry.get_or_create("record-delivery").await.unwrap();

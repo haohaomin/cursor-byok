@@ -30,6 +30,7 @@ pub struct TransportHandle {
     output: Arc<OutputHub>,
     conversation_id: Arc<OnceLock<String>>,
     parent: Arc<Mutex<Option<TransportParent>>>,
+    latest_checkpoint: Arc<Mutex<Option<pb::ConversationStateStructure>>>,
     trace: CursorTraceRecorder,
     lifecycle: TransportLifecycle,
     disconnect: CancellationToken,
@@ -48,6 +49,7 @@ impl TransportHandle {
             output,
             conversation_id: Arc::new(OnceLock::new()),
             parent: Arc::new(Mutex::new(None)),
+            latest_checkpoint: Arc::new(Mutex::new(None)),
             trace,
             lifecycle: TransportLifecycle::new(),
             disconnect: CancellationToken::new(),
@@ -141,11 +143,30 @@ impl TransportHandle {
     }
 
     pub fn emit(&self, message: &pb::AgentServerMessage) -> Result<()> {
+        let checkpoint = match &message.message {
+            Some(pb::agent_server_message::Message::ConversationCheckpointUpdate(state)) => {
+                Some(state)
+            }
+            _ => None,
+        };
+        // Serialize checkpoint emission and its cached presentation together.
+        let mut latest =
+            checkpoint.map(|_| self.latest_checkpoint.lock().expect("checkpoint lock"));
         if self.emit_frame(connect::encode_message(message)?) {
+            if let (Some(latest), Some(state)) = (latest.as_mut(), checkpoint) {
+                **latest = Some(state.clone());
+            }
             Ok(())
         } else {
             Err(Error::RunNotFound(self.request_id.clone()))
         }
+    }
+
+    pub(crate) fn latest_checkpoint(&self) -> Option<pb::ConversationStateStructure> {
+        self.latest_checkpoint
+            .lock()
+            .expect("checkpoint lock")
+            .clone()
     }
 
     pub(crate) fn close_output(&self) -> bool {

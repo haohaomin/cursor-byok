@@ -21,6 +21,7 @@ mod writer;
 
 pub use cas::*;
 pub use conversation_metadata::ConversationMetadata;
+pub(crate) use cursor_checkpoints::CursorCheckpointUpdate;
 pub(crate) use cursor_traces::BufferedCursorTraceChunk;
 pub(crate) use llm_calls::{BufferedLlmChunk, ContextUsageAnchor};
 pub use runs::*;

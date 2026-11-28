@@ -6,6 +6,7 @@ pub mod messages;
 mod recovery;
 mod roots;
 mod steps;
+pub(crate) mod subagents;
 mod summary;
 mod turns;
 pub(crate) mod worker;
