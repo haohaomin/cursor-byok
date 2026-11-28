@@ -56,6 +56,7 @@ pub(super) async fn start(
     let call = normalized_call.as_ref().unwrap_or(call);
 
     match normalized(&call.name).as_str() {
+        "await" => super::await_task::start(runtime, results, call, context).await,
         "shell" | "bash" | "read" | "delete" | "grep" | "glob" | "readlints" | "task"
         | "callmcptool" | "fetchmcpresource" | "getmcptools" => {
             exec::start(runtime, call, context).await

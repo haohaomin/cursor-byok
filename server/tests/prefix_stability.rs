@@ -140,7 +140,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             .as_path(),
     )
     .unwrap();
-    assert_eq!(assets.mode(Mode::Agent).tools.len(), 23);
+    assert_eq!(assets.mode(Mode::Agent).tools.len(), 24);
     assert_eq!(
         assets
             .mode(Mode::Agent)
@@ -172,6 +172,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleFindRelated",
             "CreateGoal",
             "UpdateGoal",
+            "Await",
         ]
     );
     assert_mode(
@@ -197,8 +198,9 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleFindRelated",
             "CreateGoal",
             "UpdateGoal",
+            "Await",
         ],
-        "adeceeb3c14c5522a4fcb75ec17c1a1b04a4cd70a8b564e4d2fafdbd6a508552",
+        "0978c80f822e2d982e6e51cab8165e1f31ddcac3f14213170276770dd01322e4",
     );
     assert_mode(
         &assets,
@@ -221,8 +223,9 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleFindRelated",
             "CreateGoal",
             "UpdateGoal",
+            "Await",
         ],
-        "02212e56da854ae19c9ebbb275c65c96b6696a280c2032308c5cb7bd5cb23227",
+        "8cd737ddb832dc6d76208da487a59a8ed6c771b93e2e8b05728ab50d8517a23e",
     );
     assert_mode(
         &assets,
@@ -247,8 +250,9 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleFindRelated",
             "CreateGoal",
             "UpdateGoal",
+            "Await",
         ],
-        "adeceeb3c14c5522a4fcb75ec17c1a1b04a4cd70a8b564e4d2fafdbd6a508552",
+        "0978c80f822e2d982e6e51cab8165e1f31ddcac3f14213170276770dd01322e4",
     );
     assert_mode(
         &assets,
@@ -275,8 +279,9 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "SembleFindRelated",
             "CreateGoal",
             "UpdateGoal",
+            "Await",
         ],
-        "1f4f8a8281a61fbe5112e3ca39f961f9572f300f773b6c5ac0c3520a460e6a52",
+        "c81c5f4f026b0149e337d4a89ceb8941e58b0e9e22f3eaaac8f6a7058546dd56",
     );
     assert_mode(
         &assets,
@@ -302,8 +307,9 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
             "CallMcpTool",
             "SembleSearch",
             "SembleFindRelated",
+            "Await",
         ],
-        "0dfda50ea3369bc0fed66023454a4f591458b7f63094876a4105ab65fd401d92",
+        "728e223eabe046f70a8b20a878182ecfa433014444a62b8fd6c9ddad03ab8797",
     );
     assert_mode(
         &assets,
@@ -313,7 +319,7 @@ fn every_prompt_mode_loads_the_captured_tool_set() {
     );
     assert_eq!(
         schema_digest(&assets.mode(Mode::Agent).tools),
-        "78c1d965e4f83f167de959ea41192fa8b7fd75fab76ae155d340d4fc093458ae"
+        "f6ceb6fc1e7d6678bb21d8c69c8e6dc773c45cbd561db591575d6cd773bcfe48"
     );
     let task = assets
         .mode(Mode::Agent)
@@ -557,6 +563,7 @@ fn subagent_uses_the_agent_prompt_and_only_the_captured_tool_delta() {
             "CallMcpTool",
             "SembleSearch",
             "SembleFindRelated",
+            "Await",
         ]
     );
     assert!(!request.tools.iter().any(|tool| tool.name == "Task"));

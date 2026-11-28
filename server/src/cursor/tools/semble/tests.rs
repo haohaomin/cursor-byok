@@ -363,11 +363,11 @@ async fn permission_denial_and_stream_close_complete_only_the_original_tool() {
 async fn interrupted_search_worker_cannot_publish_after_owner_is_replaced() {
     let runtime = CursorToolRuntime::default();
     let (sender, mut receiver) = tool_result_channel();
-    let owner = runtime.register_search("search-call").await;
+    let owner = runtime.register_worker("search-call").await;
     runtime.interrupt_for_run_replacement().await;
     assert!(owner.load(std::sync::atomic::Ordering::Acquire));
     runtime
-        .finish_search(
+        .finish_worker(
             "search-call",
             &owner,
             &sender,
@@ -380,16 +380,16 @@ async fn interrupted_search_worker_cannot_publish_after_owner_is_replaced() {
 #[tokio::test]
 async fn cancellation_aborts_waiting_workers_and_workers_attached_after_interruption() {
     let runtime = CursorToolRuntime::default();
-    let owner = runtime.register_search("search-call").await;
+    let owner = runtime.register_worker("search-call").await;
     let worker = tokio::spawn(std::future::pending::<()>());
     runtime
-        .attach_search_worker("search-call", &owner, worker.abort_handle())
+        .attach_worker("search-call", &owner, worker.abort_handle())
         .await;
     runtime.interrupt_for_message().await;
     assert!(worker.await.unwrap_err().is_cancelled());
     let late = tokio::spawn(std::future::pending::<()>());
     runtime
-        .attach_search_worker("search-call", &owner, late.abort_handle())
+        .attach_worker("search-call", &owner, late.abort_handle())
         .await;
     assert!(late.await.unwrap_err().is_cancelled());
 }

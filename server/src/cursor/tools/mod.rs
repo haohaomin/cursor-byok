@@ -6,6 +6,7 @@ use std::{
 
 use tokio::sync::Mutex;
 
+pub(crate) mod await_task;
 pub mod codec;
 pub(crate) mod compat;
 pub(crate) mod edit;
@@ -192,6 +193,10 @@ impl ToolDispatcher {
             Ok(started) => Ok(Some(started)),
             Err(error) => recover_validation_failure(&next.call, error).map(Some),
         }
+    }
+
+    pub(crate) async fn next_message(&self) -> pb::AgentServerMessage {
+        self.runtime.next_message().await
     }
 
     pub async fn interrupt_for_message(&self) -> Vec<pb::AgentServerMessage> {
