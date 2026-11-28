@@ -46,8 +46,10 @@ server/
 
 定向测试覆盖普通完成、record-only 不调用模型且不创建消息、重启后旧通知、两条独立数据库连接并发、父 Run 活跃时通知、压缩后旧历史导入、目标续跑被未决工具阻塞，以及最终 payload 已生成之后的通知。正常完成、取消和失败三个出口均补发积压状态；取消/失败只更新最后已发送呈现的运行 map，保留未提交工具呈现。存储回归覆盖从迁移 12 升级、已有检查点保留、事务中途失败回滚、会话隔离、重启与外键清理；状态归并另覆盖等时/旧时终态、待操作和进度/消息排除。
 
-最终通知套件 **34 通过**；工作区 **688 通过、0 失败、14 忽略**；Clippy `--workspace --all-targets -- -D warnings`、格式与 diff 检查通过。云端 CI、合入和发布尚待完成。独立静态复核发现的历史分支、Goal 确认、最终发布窗口、非终态通知与取消/失败出口问题均已修复并补充回归，最终复核无新增阻断项。
+最终通知套件 **34 通过**；工作区 **688 通过、0 失败、14 忽略**；Clippy `--workspace --all-targets -- -D warnings`、格式与 diff 检查通过。PR #67 已合入 main（`a8037b0`），最终提交 `dbbede7` 的分支、PR 与主线 CI 全部通过；v1.2.15 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。见 [发布证据](../2026-11-28-v1.2.15-release-evidence.json)。独立静态复核发现的历史分支、Goal 确认、最终发布窗口、非终态通知与取消/失败出口问题均已修复并补充回归，最终复核无新增阻断项。
 
 本轮使用临时数据库和 FakeProvider，未操作正式代理或 Cursor 安装文件。真实 Cursor 自动通知生成、原生卡片显示和真实供应商仍待验收。`subagent_state` 字段 14 的实际消费路径未被证明，本轮不添加猜测性的 blob 加载或状态恢复。现代 Await、Projects/项目协调器、Agent Store 完整联动仍未完成；#244 保持部分完成，#155 不扩大验收结论，也不测试 20 分钟任务。
 
 审查补充：PR #67 自动审查发现跨项目聊天消息带工具 ID/终态时可能误完成本地子任务。新增 reducer 用例已先复现，再排除 `ProjectSessionMessage` 的运行状态写入；transport 回归确认消息仍正常投递，本地运行与持久化状态均不改变。这是按当前消息归属增加的本地约束，比安装包原始 reducer 的排除列表更严格，不宣称此点与原生逐行一致。
+
+发布：[PR #67](https://github.com/haohaomin/cursor-byok/pull/67)、[主线 CI](https://github.com/haohaomin/cursor-byok/actions/runs/46113402036)、[发布流水线](https://github.com/haohaomin/cursor-byok/actions/runs/46114368764)、[v1.2.15](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.15)。版本提交 `17afcdf` 只改五个版本文件；签名公钥保持不变，未安装到本机。Codex 提出的项目消息 P2 已先复现、修复并解决审查线程；最终增量独立复核通过。Sourcery 配额跳过，不计为通过。

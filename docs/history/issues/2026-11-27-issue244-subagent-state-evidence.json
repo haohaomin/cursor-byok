@@ -105,5 +105,22 @@
     "baseline_result": "1 failed: project message populated local run state",
     "policy": "Exclude ProjectSessionMessage from local run-state updates while retaining visible message delivery; intentionally stricter than native reducer",
     "result": "reducer and transport regressions passed; independent review found no blockers"
+  },
+  "publication": {
+    "pr": 67,
+    "head": "dbbede705dd005b9448b2a639a335cbb44edf869",
+    "merge_commit": "a8037b0c4ca96eae223b1010080ce246be2ae017",
+    "merged_at": "2026-11-28T05:43:39Z",
+    "branch_ci": 46112659446,
+    "pr_ci": 46112662774,
+    "main_ci": 46113402036,
+    "release_run": 46114368764,
+    "release_commit": "17afcdfa7148d2eab7713816a2ed470fe455214b",
+    "release": "v1.2.15",
+    "release_evidence": "../2026-11-28-v1.2.15-release-evidence.json",
+    "merge_tree_matches_tested_head": true,
+    "version_commit_changes_only_five_version_files": true,
+    "ci": "all passed",
+    "temporary_branch_deleted": true
   }
 }

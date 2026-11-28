@@ -617,3 +617,19 @@
 - 未安装新包到用户机器；真实 Cursor 自动通知、原生卡片和真实供应商仍待验收。现代 Await、完整 Projects 与 Agent Store/原生通知状态同步未完成，#244 保持部分完成；#155 范围不变，不做 20 分钟验收。
 
 [修复与边界](issues/2026-11-27-issue244-notifications-fix.md)；[结构化发布证据](2026-11-27-v1.2.14-release-evidence.json)。
+
+
+<a id="v1215"></a>
+
+## v1.2.15 发布验证记录
+
+来源日期：2026-11-28。
+
+- PR #67 修复子代理完成/待操作状态保存、旧检查点覆盖、并发通知和父任务结束补发；跨项目聊天消息不会完成本地子任务。
+- 最终源码 `dbbede7`，合并 `a8037b0`（文件树一致）；版本提交 `17afcdf` 仅变更五个版本文件。
+- 34 项通知、688 项工作区回归、Clippy 及最终分支、PR、主线跨平台 CI 全部通过。
+- 主线 CI：[46113402036](https://github.com/haohaomin/cursor-byok/actions/runs/46113402036)；发布：[46114368764](https://github.com/haohaomin/cursor-byok/actions/runs/46114368764)。
+- [v1.2.15](https://github.com/haohaomin/cursor-byok/releases/tag/v1.2.15) 为公开 Latest，draft=false，prerelease=false；20 项资产实际下载核对大小和 SHA-256，7 份签名以既有公钥验证通过，三个更新清单的平台、版本、URL、签名及旧包校验一致。
+- 未在本机安装；真实 Cursor 自动通知、卡片和供应商仍待验收，完整 #244 尚未解决。
+
+[状态修复报告](issues/2026-11-27-issue244-subagent-state-fix.md)；[资产证据](2026-11-28-v1.2.15-release-evidence.json)。

@@ -4,6 +4,10 @@
 >
 > 之前投稿的 #487、#500、#501 因用户要求删除源分支而关闭，均未合入上游；修复提交保留在本 fork main。评论尝试被归档只读的 403 拒绝，见 [回复记录](history/pull-requests/2026-10-27-community-replies.md)。
 
+## 2026-11-28 个人维护 PR #67
+
+[PR #67](https://github.com/haohaomin/cursor-byok/pull/67) 修复子代理完成/待操作状态保存、旧历史分支覆盖及父任务正常结束、取消、失败时的状态补发。PR #67 已合入 main（`a8037b0`），最终提交 `dbbede7` 的分支、PR 与主线 CI 全部通过；v1.2.15 已发布，20 项资产、7 份签名与三个更新清单实际下载核验通过。34 项通知、688 项工作区回归和 Clippy 通过；自动审查提出的跨项目消息误改本地运行问题已修复并经独立复核，Sourcery 配额跳过。[验证与边界](history/issues/2026-11-27-issue244-subagent-state-fix.md)。
+
 ## 2026-11-27 上游 PR #245
 
 [#245](https://github.com/leookun/cursor-byok/pull/245) 固定 head `a29f7190b2cd` 已完成源码审查，**不采用原补丁**：create-agent 只发转后台控制请求，Projects 提示依赖未提供的 send_message，旧 Proto 声明未接线；当前 Cursor 已无旧 AgentMode=6。现有 Task 的两项协议探针和 59 项相关回归通过，未修改生产代码，未新发版；现代 Await、项目协调器通信与 Agent Store 仍待实现及真实验收。[逐项范围与证据](history/issues/2026-11-27-issue244-orchestration-check.md)。
